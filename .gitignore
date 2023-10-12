@@ -6,6 +6,6 @@ __pycache__
 *.tif
 
 build/
-radiation_mapping/bags
-radiation_mapping/radiation_mapping_exports/
-radiation_mapping/include/libtorch
+hector_radiation_mapping/bags
+hector_radiation_mapping/radiation_mapping_exports/
+hector_radiation_mapping/include/libtorch
