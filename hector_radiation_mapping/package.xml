@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>hector_radiation_mapping</name>
+  <version>0.0.0</version>
+  <description>The hector_radiation_mapping package</description>
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag -->
+  <!-- Example:  -->
+  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+  <maintainer email="martin.volz@stud.tu-darmstadt.de">Martin Volz</maintainer>
+  <maintainer email="jonas.suess@stud.tu-darmstadt.de">Jonas Suess</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>TODO</license>
+
+  <!-- dependencies -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <build_depend>message_generation</build_depend>
+  <depend>cv_bridge</depend>
+  <depend>ddynamic_reconfigure</depend>
+  <depend>geometry_msgs</depend>
+  <depend>grid_map_msgs</depend>
+  <depend>grid_map_ros</depend>
+  <depend>nav_msgs</depend>
+  <depend>rosbag</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>eigen</depend>
+  <depend>interactive_markers</depend>
+  <depend>hector_radiation_mapping_msgs</depend>
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

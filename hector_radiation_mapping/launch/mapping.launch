@@ -1,0 +1,8 @@
+<launch>
+	<rosparam command="load" ns="hector_radiation_mapping" file="$(find hector_radiation_mapping)/config/params.yaml" />
+	<node name="hector_gp_node" pkg="hector_gaussian_process" type="gp_node" />
+	<node name="hector_radiation_mapping" pkg="hector_radiation_mapping" type="radiation_mapping_node" output="screen">
+        <param name="mode" value="0" type="int" /> <!-- MODE: 0 = normal, 1 = test-->
+        <param name="messageKey_rate" value="rate" type="string" />
+	</node>
+</launch>

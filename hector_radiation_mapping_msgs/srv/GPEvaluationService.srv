@@ -1,0 +1,4 @@
+std_msgs/Float64MultiArray positions
+---
+std_msgs/Float64MultiArray mean
+std_msgs/Float64MultiArray variance

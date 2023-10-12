@@ -1,0 +1,36 @@
+# Radiation Mapping Parameters
+
+# General
+doseSubSize: 20
+rosSpinnerThreads: 4
+useDoseRate: true
+enableOnline3DEvaluation: true
+subscribeTopic: "/dose_rate"
+environmentCloudTopic: "/pointcloud_accumulated"
+environmentMapTopic: "/map"
+messageKey_cps: "cps"
+messageKey_rate: "rate"
+messageKey_frameId: "frame_id"
+
+# MapExport
+radiationUnit: "µSv/h"
+exportPath: "/radiation_mapping_exports/" # relative to ros::package::getPath("hector_radiation_mapping")
+
+# GPython2D
+meanFactor: 1
+minSourceStrength: 50.0 #in model unit
+circleRadius: 5.0 #meter
+minDistanceBetweenSamples2d: 0.2 #meter
+minUpdateTime2d: 2000 #in ms
+
+# GPython3D
+gpLocalRadius: 5.0 #meter
+minDistanceBetweenSamples3d: 0.1 #meter
+minUpdateTime3d: 2000 #in ms
+
+# GridMap
+gridMapResolution: 0.1 #meter
+
+# PointCloud3D
+distanceCutoffLevels: [1.0, 3.0, 5] #meter
+pointCloud3DSizeLevels: [15000, 10000, 10000]

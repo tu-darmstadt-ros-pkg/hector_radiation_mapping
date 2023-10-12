@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+import time
+
+import rospkg
+import rospy
+import torch
+
+from hector_radiation_mapping_msgs.msg import Samples as SamplesMsg
+from hector_radiation_mapping_msgs.srv import GPEvaluationService, GPEvaluationServiceResponse, AddSamplesService, \
+    AddSamplesServiceResponse
+from std_msgs.msg import Float64MultiArray
+
+from sample import Sample
+from gp_manager import GPManager
+
+import multiprocessing
+
+
+class GPNode:
+    def __init__(self):
+        """
+        Initialize gp node and gp models for 2d and 3d radiation mapping and start services for adding samples and gp
+        evaluation requests
+        """
+        self.gp_model2d = GPManager(dimension=2)
+        self.gp_model3d = GPManager(dimension=3)
+        # self.modelUpdateTimes = []
+        # self.evaluationTimes = []
+        # self.modelSize = []
+
+        print("CUDA available: ", torch.cuda.is_available())
+
+        rospy.init_node('gp_node')
+        rospy.Service('/radiation_mapping/gp_samples', AddSamplesService, self.add_samples_callback)
+        rospy.Service('/radiation_mapping/gp_evaluation', GPEvaluationService, self.gp_evaluation_callback)
+        rospy.spin()
+
+        # save_list_to_file(self.evaluationTimes, file_path, 'evaluationTimes.txt')
+        # save_list_to_file(self.modelUpdateTimes, file_path, 'modelUpdateTimes.txt')
+        # save_list_to_file(self.modelSize, file_path, 'modelSize.txt')
+
+    def add_samples_callback(self, req):
+        """
+        Callback for AddSamplesService
+        :param req: request message
+        :return: response message
+        """
+        print("Sample callback")
+        # startTime = time.time()
+
+        # add samples to lists
+        req_samples = req.samples_msgs.samples
+        req_params = req.params
+        samples2d = []
+        samples3d = []
+        for sample_msg in req_samples:
+            sample = Sample(sample_msg.id, sample_msg.cps, sample_msg.doseRate, sample_msg.position,
+                            sample_msg.header.stamp)
+            if sample_msg.for2d:
+                samples2d.append(sample)
+            if sample_msg.for3d:
+                samples3d.append(sample)
+
+        params = []
+        for param in req_params:
+            params.append(param)
+            print(param)
+
+        self.gp_model2d.add_samples(samples2d, params)
+        self.gp_model3d.add_samples(samples3d, params)
+
+        # self.modelSize.append(len(self.samples))
+        # self.modelUpdateTimes.append(time.time() - startTime)
+        return AddSamplesServiceResponse()
+
+    def gp_evaluation_callback(self, request):
+        """
+        Callback for GPEvaluationService
+        :param request: request message
+        :return: response message
+        """
+        # startTime = time.time()
+        print("GP evaluation callback")
+        dim = request.positions.layout.dim
+        num_rows = dim[0].size
+        num_columns = dim[1].size
+
+        if num_columns == 0 or num_rows == 0:
+            print("No positions to evaluate")
+            return GPEvaluationServiceResponse()
+        if num_columns != 2 and num_columns != 3:
+            print("No Model for number of columns in positions exists")
+            return GPEvaluationServiceResponse()
+
+        eval_positions = torch.tensor(request.positions.data).view(num_rows, num_columns)
+        mean, variance = None, None
+        if num_columns == 2:
+            mean, variance = self.gp_model2d.evaluate(eval_positions)
+        if num_columns == 3:
+            mean, variance = self.gp_model3d.evaluate(eval_positions)
+        print(mean.shape, variance.shape)
+
+        mean_msg = Float64MultiArray()
+        mean_msg.data = mean.flatten().tolist()
+        variance_msg = Float64MultiArray()
+        variance_msg.data = variance.flatten().tolist()
+
+        result: GPEvaluationServiceResponse = GPEvaluationServiceResponse()
+        result.mean = mean_msg
+        result.variance = variance_msg
+
+        # self.evaluationTimes.append(time.time() - startTime)
+        return result
+
+
+def main():
+    GPNode()
+
+
+if __name__ == '__main__':
+    process = multiprocessing.Process(target=main)
+    process.start()

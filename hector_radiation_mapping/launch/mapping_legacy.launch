@@ -1,0 +1,7 @@
+<launch>
+	<rosparam command="load" ns="RadiationMapping" file="$(find hector_radiation_mapping)/config/params.yaml" />
+	<node name="RadiationMapping" pkg="hector_radiation_mapping" type="radiation_mapping_node" output="screen">
+        <param name="mode" value="0" type="int" /> <!-- MODE: 0 = normal, 1 = test-->
+        <param name="messageKey_rate" value="dose_in_muSv_h" type="string" />
+	</node>
+</launch>
