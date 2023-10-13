@@ -53,14 +53,14 @@ The topics of the occupancy grid (`nav_msgs/OccupancyGrid`) and the accumulated 
 
 
 ### Launching the node 
-The Radiation Mapping node can be launched using
+The Radiation Mapping node can be launched with 2D and 3D mapping enabled using
 ```
 roslaunch radiation_mapping mapping.launch
 ```
 
-For 3D mapping to be enabled, the Pointcloud Accumulator [LINK] needs to be started first.
+If only 2D mapping is required, the node can be launched with
 ```
-roslaunch pointcloud_accumulator node.launch cloud_in:=/scan_matched_points2 resolution:=0.05
+roslaunch radiation_mapping mapping_2D_only.launch
 ```
 
 ## ROS topics and services
