@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_PARAMETERS_H
 #define RADIATION_MAPPING_PARAMETERS_H
 
+#include "pch.h"
+
 class Parameters {
 public:
     static Parameters &instance() {
@@ -12,7 +14,6 @@ public:
     double startTime_;
 
     // General
-    int mode;
     int doseSubSize;
     int rosSpinnerThreads;
     bool useDoseRate;
@@ -58,14 +59,9 @@ private:
         bool success = true;
         startTime_ = ros::Time::now().toSec();
 
-        // init with standard values
-        mode = 0;
-
-        // load parameters from file (config/params.yaml)
+        doseSubSize = 100;
 
         // General
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/mode", mode);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/doseSubSize", doseSubSize);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/rosSpinnerThreads", rosSpinnerThreads);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/useDoseRate", useDoseRate);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableOnline3DEvaluation", enableOnline3DEvaluation);

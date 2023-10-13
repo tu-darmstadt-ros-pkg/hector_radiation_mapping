@@ -2,7 +2,9 @@
 #define RADIATION_MAPPING_SOURCE_INTERACTIVE_H
 
 #include <interactive_markers/interactive_marker_server.h>
+
 #include "source.h"
+#include "pch.h"
 
 /**
  * @brief The SourceInteractive class

@@ -15,7 +15,6 @@ find_package(catkin REQUIRED COMPONENTS
 		std_msgs
 		tf2_ros
 		pcl_ros
-		message_generation
 		interactive_markers
 		ros_babel_fish
 		hector_radiation_mapping_msgs
@@ -24,14 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Eigen3 REQUIRED)
 
-generate_messages(
-		DEPENDENCIES
-		std_msgs
-)
-
-catkin_package(
-		LIBRARIES
-		CATKIN_DEPENDS message_runtime)
+catkin_package()
 
 include_directories(
 		${catkin_INCLUDE_DIRS}
@@ -62,7 +54,6 @@ add_executable(radiation_mapping_node
         src/hector_radiation_mapping/source_interactive.cpp
 		src/hector_radiation_mapping/source.cpp
 		src/util/util.cpp
-		src/util/tests.cpp
         src/util/color.cpp
 		src/util/dddynamic_reconfigure.cpp
 		)

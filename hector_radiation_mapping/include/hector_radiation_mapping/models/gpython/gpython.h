@@ -3,6 +3,7 @@
 
 #include <utility>
 #include "hector_radiation_mapping/sample.h"
+#include "pch.h"
 
 /**
  * @brief The GPython class

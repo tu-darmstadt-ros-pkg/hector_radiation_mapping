@@ -5,6 +5,7 @@
 #include "util/parameters.h"
 #include "util/dddynamic_reconfigure.h"
 #include "marker/marker_manager.h"
+#include "pch.h"
 
 
 RadiationMapper::RadiationMapper() {
@@ -21,7 +22,7 @@ RadiationMapper::RadiationMapper() {
 
 void RadiationMapper::sigintHandler(int sig) {
     // shutdown procedure
-    ROS_INFO_STREAM("shutdown procedure...");
+    ROS_INFO_STREAM("hector_radiation_mapping shutdown procedure...");
     MarkerManager::instance().deleteAllMarkers();
     MarkerManager::instance().deleteAllInteractiveMarkers();
     ModelManager::instance().shutDown();
@@ -34,23 +35,7 @@ int main(int argc, char **argv) {
     // Initialize the ROS environment
     ros::init(argc, argv, "hector_radiation_mapping", ros::init_options::NoSigintHandler);
     signal(SIGINT, &RadiationMapper::sigintHandler);
-    int mode = Parameters::instance().mode;
-    ROS_INFO_STREAM("Mode: " << mode);
-    switch (mode) {
-        case 0 : // normal
-        {
-            RadiationMapper radiationMapper;
-            break;
-        }
-        case 1 : // test
-        {
-            Tests::runTests();
-            break;
-        }
-        default :
-            ROS_WARN_STREAM("No suitable mode defined in config");
-            break;
-    }
+    RadiationMapper radiationMapper;
 
     ROS_INFO_STREAM("hector_radiation_mapping node finished!");
     return 0;
