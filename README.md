@@ -93,7 +93,7 @@ The Radiation Mapping node provides the following services.
 
 
 ## Test Data
-We provide example test data from ENRICH 2023. A processed .bag file can be downloaded [here](https://drive.google.com/drive/folders/1WV3fYanjld1taLhOsZZ3k1dQ2qcrn5l8?usp=drive_link) TODO: Update link.
+We provide an processed ros-bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
 
 [INSERT PRETTY IMAGES]
 
