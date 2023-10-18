@@ -7,8 +7,6 @@
 #include "util/util.h"
 #include "util/clock_cpu.h"
 
-#define STREAM(x) if(true){ROS_INFO_STREAM(x);}
-#define STREAM_TEST(x) if(false){ROS_INFO_STREAM(x);}
 
 GPython2D::GPython2D() {
     int id = 0;
@@ -54,7 +52,7 @@ void GPython2D::activate() {
     if (active_) return;
     this->active_ = true;
     updateThread_ = std::thread(&GPython2D::updateLoop, this);
-    ROS_INFO_STREAM("GPython2D activated");
+    STREAM_DEBUG("GPython2D activated");
 }
 
 void GPython2D::deactivate() {
@@ -62,7 +60,7 @@ void GPython2D::deactivate() {
     if (!active_) return;
     this->active_ = false;
     updateThread_.join();
-    ROS_INFO_STREAM("GPython2D deactivated");
+    STREAM_DEBUG("GPython2D deactivated");
 }
 
 void GPython2D::updateLoop() {
@@ -91,13 +89,12 @@ void GPython2D::updateLoop() {
             evaluationSizes.push_back((double) GPython::instance().getSampleIds2d().size());
         }
         int sleepTime = std::max(0, minUpdateTime_ - (int) clock.tock());
-        //ROS_INFO_STREAM("GPython2D sleeping for " << sleepTime << "ms" << " " << minUpdateTime_);
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
     }
-    std::string exportPath = Util::getExportPath("runtime");
-    Util::exportVectorToTxtFile(evaluationTimes, exportPath, "evaluationTimes", Util::TxtExportType::NEW, true);
-    Util::exportVectorToTxtFile(sourcePredTimes, exportPath, "sourcePredTimes", Util::TxtExportType::NEW, true);
-    Util::exportVectorToTxtFile(evaluationSizes, exportPath, "evaluationSizes", Util::TxtExportType::NEW, true);
+    //std::string exportPath = Util::getExportPath("runtime");
+    //Util::exportVectorToTxtFile(evaluationTimes, exportPath, "evaluationTimes", Util::TxtExportType::NEW, true);
+    //Util::exportVectorToTxtFile(sourcePredTimes, exportPath, "sourcePredTimes", Util::TxtExportType::NEW, true);
+    //Util::exportVectorToTxtFile(evaluationSizes, exportPath, "evaluationSizes", Util::TxtExportType::NEW, true);
 }
 
 Matrix GPython2D::getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slamMap, bool useCircle,
@@ -153,7 +150,7 @@ void GPython2D::updateSourcePrediction(const Matrix &positions, const Vector &pr
             }
         }
     }
-    ROS_INFO_STREAM("GP2D Kept " << sources_.size() << " sources.");
+    STREAM_DEBUG("GP2D Kept " << sources_.size() << " sources.");
 
     // Generate start positions (All points in trajectory with at least minDist to each other)
     Eigen::Matrix3Xd startPositions;
@@ -179,7 +176,7 @@ void GPython2D::updateSourcePrediction(const Matrix &positions, const Vector &pr
         }
     }
     mean = mean / startPositions.cols();
-    ROS_INFO_STREAM("GP2D Start positions: " << startPositions.cols() << " Mean: " << mean);
+    STREAM_DEBUG("GP2D Start positions: " << startPositions.cols() << " Mean: " << mean);
 
     // Gradient ascent for each start position
     int steps;
@@ -210,17 +207,17 @@ void GPython2D::updateSourcePrediction(const Matrix &positions, const Vector &pr
             if (dosage < 0.1) {
                 continue;
             }
-            ROS_INFO_STREAM("GP2D Adding source: ");
+            STREAM_DEBUG("GP2D Adding source: ");
             Vector3d pos = Vector3d(pos3D.x(), pos3D.y(), 0.0);
             std::shared_ptr<SourceInteractive> source = std::make_shared<SourceInteractive>(pos, dosage, dosage,
                                                                                             boost::bind(
                                                                                                     &GPython2D::interactiveMarkerCallback,
                                                                                                     this, _1));
             sources_.push_back(source);
-            ROS_INFO_STREAM("GP2D Adding source: " + std::to_string(source->getStrength()));
+            STREAM_DEBUG("GP2D Adding source: " + std::to_string(source->getStrength()));
         }
     }
-    ROS_INFO_STREAM("Done with sources");
+    STREAM_DEBUG("Done with sources");
 }
 
 Vector GPython2D::computeGradientStep(const Vector &position) {
@@ -281,7 +278,7 @@ void GPython2D::confirmSource(int sourceId) {
 
 void GPython2D::interactiveMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback) {
     if (feedback->event_type == visualization_msgs::InteractiveMarkerFeedback::BUTTON_CLICK) {
-        STREAM("interactiveMarkerCallback : << " << feedback->marker_name);
+        STREAM_DEBUG("interactiveMarkerCallback : << " << feedback->marker_name);
         confirmSource(std::stoi(feedback->marker_name));
     }
 }

@@ -4,6 +4,7 @@
 #include "util/dddynamic_reconfigure.h"
 #include "util/util.h"
 #include "util/clock_cpu.h"
+#include "pch.h"
 
 #include "hector_radiation_mapping_msgs/GPEvaluationService.h"
 #include "hector_radiation_mapping_msgs/GPEvaluationServiceRequest.h"
@@ -35,11 +36,12 @@ GPython::GPython() {
     DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param2", param2_ptr, boost::bind(&GPython::paramCallback, this), "param2", 0.0, 100.0, groupName_);
     DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param3", param3_ptr, boost::bind(&GPython::paramCallback, this), "param3", 0.0, 100.0, groupName_);
     DDDynamicReconfigure::instance().publish();
-    ROS_INFO_STREAM("GPython params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
+    STREAM_DEBUG("GPython params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
 
     // Initialize variables
     active_ = false;
     paramUpdate_ = false;
+    modelSize_ = 0;
     activate();
 }
 
@@ -61,7 +63,7 @@ void GPython::activate() {
     if (active_) return;
     this->active_ = true;
     updateThread_ = std::thread(&GPython::updateLoop, this);
-    ROS_INFO_STREAM("GPython activated");
+    STREAM_DEBUG("GPython activated");
 }
 
 void GPython::deactivate() {
@@ -70,13 +72,22 @@ void GPython::deactivate() {
     this->active_ = false;
     waitCondition_.notify_one();
     updateThread_.join();
-    ROS_INFO_STREAM("GPython deactivated");
+    STREAM_DEBUG("GPython deactivated");
 }
 
 void GPython::addSample(SampleGP &sample) {
     std::lock_guard<std::mutex> lock{sampleQueue_mtx_};
     samplesQueue_.push_back(sample);
     waitCondition_.notify_one();
+    modelSize_++;
+    // Position with 2 decimals
+    double pos_x = round(sample.sample.position_[0] * 100) / 100;
+    double pos_y = round(sample.sample.position_[1] * 100) / 100;
+    double pos_z = round(sample.sample.position_[2] * 100) / 100;
+
+    STREAM("Added sample #" << modelSize_ << " with dose rate " << sample.sample.doseRate_ << " " << Parameters::instance().radiationUnit 
+        << " at [" << pos_x << ", " << pos_y << ", " << pos_z << "].\n");
+
 }
 
 void GPython::addSamples(std::vector<SampleGP> &samples) {
@@ -110,9 +121,9 @@ void GPython::updateLoop() {
         }
         updateSizes_.push_back((double) sampleIds2d_.size());
     }
-    std::string exportPath = Util::getExportPath("runtime");
-    Util::exportVectorToTxtFile(updateTimes_, exportPath, "updateTimes_", Util::TxtExportType::NEW, true);
-    Util::exportVectorToTxtFile(updateSizes_, exportPath, "updateSizes_", Util::TxtExportType::NEW, true);
+    //std::string exportPath = Util::getExportPath("runtime");
+    //Util::exportVectorToTxtFile(updateTimes_, exportPath, "updateTimes_", Util::TxtExportType::NEW, true);
+    //Util::exportVectorToTxtFile(updateSizes_, exportPath, "updateSizes_", Util::TxtExportType::NEW, true);
 }
 
 Vector GPython::varianceToStdDeviation(Vector &variance) {
@@ -122,7 +133,7 @@ Vector GPython::varianceToStdDeviation(Vector &variance) {
 GPython::GPResult GPython::evaluate(Matrix &positions) {
     // check if positions are 2D or 3D
     if (positions.cols() != 2 && positions.cols() != 3) {
-        ROS_ERROR_STREAM("GPython: evaluate() positions must be 2D or 3D");
+        STREAM_ERROR("GPython: evaluate() positions must be 2D or 3D");
         return {{}, {}};
     }
 
@@ -194,7 +205,7 @@ void GPython::addSamplesToModel(const std::vector<SampleGP> &samples) {
     req.params[0] = *param1_ptr;
     req.params[1] = *param2_ptr;
     req.params[2] = *param3_ptr;
-    ROS_INFO_STREAM("Params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
+    STREAM_DEBUG("Params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
     //{
     //    std::lock_guard<std::mutex> lock{model_mtx_};
         sampleServiceClient_.call(req, res);
@@ -221,7 +232,7 @@ void GPython::addSamplesWithinRadius(const Vector3d& position, double radius, bo
 }
 
 void GPython::paramCallback() {
-    ROS_INFO_STREAM("GPython params changed " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
+    STREAM_DEBUG("GPython params changed " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
     paramUpdate_ = true;
     waitCondition_.notify_one();
 }

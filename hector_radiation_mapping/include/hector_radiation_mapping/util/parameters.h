@@ -63,7 +63,6 @@ private:
 
         // General
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/rosSpinnerThreads", rosSpinnerThreads);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/useDoseRate", useDoseRate);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableOnline3DEvaluation", enableOnline3DEvaluation);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/subscribeTopic", subscribeTopic);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/environmentMapTopic", environmentMapTopic);
@@ -93,6 +92,9 @@ private:
         if (!success) {
             ROS_ERROR("Could not load all parameters!");
         }
+
+        // Set useDoseRate to true, if messageKey_rate is set
+        useDoseRate = !messageKey_rate.empty();
     }
 
     Parameters(const Parameters &) = delete;

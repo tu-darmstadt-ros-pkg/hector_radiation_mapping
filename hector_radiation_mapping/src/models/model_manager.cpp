@@ -6,10 +6,6 @@
 #include "models/gpython/gpython3D.h"
 #include "models/model_exporter.h"
 
-
-#define STREAM(x) if(true){ROS_INFO_STREAM(x);}
-#define STREAM_TEST(x) if(true){ROS_INFO_STREAM(x);}
-
 ModelManager::ModelManager() {
     sysCmdSub_ = ros::Subscriber(
             Parameters::instance().nodeHandle_->subscribe("/syscommand", 10, &ModelManager::sysCmdCallback, this));
@@ -29,7 +25,7 @@ ModelManager &ModelManager::instance() {
 }
 
 void ModelManager::resetModels() {
-    ROS_INFO_STREAM("Model reset.");
+    STREAM("Model reset.");
     MarkerManager::instance().deleteAllMarkers();
     MarkerManager::instance().deleteAllInteractiveMarkers();
     DDDynamicReconfigure::instance().reset();

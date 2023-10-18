@@ -3,7 +3,7 @@
 #include "util/parameters.h"
 
 Source::Source(const Eigen::Vector3d &position, double cps, double doseRate, bool createMarker) {
-    ROS_INFO_STREAM("Source 0 " << cps << "|" << doseRate);
+    STREAM_DEBUG("Source 0 " << cps << "|" << doseRate);
     id_ = idCounter_;
     idCounter_++;
     position_ = position;

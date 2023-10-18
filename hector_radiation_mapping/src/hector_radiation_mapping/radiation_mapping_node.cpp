@@ -15,14 +15,14 @@ RadiationMapper::RadiationMapper() {
     SampleManager::instance();
     ModelManager::instance();
 
-    ROS_INFO_STREAM("hector_radiation_mapping node initialized!");
+    STREAM("hector_radiation_mapping node initialized!");
     ros::MultiThreadedSpinner spinner(Parameters::instance().rosSpinnerThreads);
     spinner.spin();
 }
 
 void RadiationMapper::sigintHandler(int sig) {
     // shutdown procedure
-    ROS_INFO_STREAM("hector_radiation_mapping shutdown procedure...");
+    STREAM("hector_radiation_mapping shutdown procedure...");
     MarkerManager::instance().deleteAllMarkers();
     MarkerManager::instance().deleteAllInteractiveMarkers();
     ModelManager::instance().shutDown();
@@ -37,6 +37,6 @@ int main(int argc, char **argv) {
     signal(SIGINT, &RadiationMapper::sigintHandler);
     RadiationMapper radiationMapper;
 
-    ROS_INFO_STREAM("hector_radiation_mapping node finished!");
+    STREAM("hector_radiation_mapping node finished!");
     return 0;
 }

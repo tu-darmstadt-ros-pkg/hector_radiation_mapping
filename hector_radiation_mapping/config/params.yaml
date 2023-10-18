@@ -1,9 +1,7 @@
 # Radiation Mapping Parameters
 
 # General
-doseSubSize: 20
 rosSpinnerThreads: 4
-useDoseRate: true
 enableOnline3DEvaluation: true
 subscribeTopic: "/dose_rate"
 environmentCloudTopic: "/pointcloud_accumulated"

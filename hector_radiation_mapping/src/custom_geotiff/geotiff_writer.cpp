@@ -1,7 +1,6 @@
 // A custom Geotiff Writer implementation by Jonas Suess and Martin Volz
 // Original version by Stefan Kohlbrecher
 
-#include "custom_geotiff/geotiff_writer.h"
 #include <ros/console.h>
 
 #include <QFile>
@@ -25,6 +24,9 @@ namespace fs = std::experimental::filesystem;
 namespace fs = std::filesystem;
 #endif
 
+#include "pch.h"
+#include "custom_geotiff/geotiff_writer.h"
+
 namespace geotiff {
 
     namespace {
@@ -44,13 +46,13 @@ namespace geotiff {
         strcpy(fake_argv[1], "-platform");
         strcpy(fake_argv[2], "offscreen"); // Set the env QT_DEBUG_PLUGINS to 1 to see available platforms
 
-        ROS_INFO("Creating application with offscreen platform.");
+        STREAM_DEBUG("Creating application with offscreen platform.");
         //Create a QApplication cause otherwise drawing text will crash
         app = new QApplication(fake_argc, fake_argv);
         delete[] fake_argv[0];
         delete[] fake_argv[1];
         delete[] fake_argv[2];
-        ROS_INFO("Created application");
+        STREAM_DEBUG("Created application");
 
         std::string font_path = ros::package::getPath("hector_geotiff") + "/fonts/Roboto-Regular.ttf";
         int id = QFontDatabase::addApplicationFont(QString::fromStdString(font_path));
@@ -220,7 +222,7 @@ namespace geotiff {
         maxCoordsMap = Eigen::Vector2i(map.info.width, map.info.height);
 
         if (!HectorMapTools::getMapExtends(map, minCoordsMap, maxCoordsMap)) {
-            ROS_INFO("Cannot determine map extends!");
+            STREAM_DEBUG("Cannot determine map extends!");
             return false;
         }
 
@@ -597,10 +599,10 @@ namespace geotiff {
         tfwFile.close();
 
         if (!success) {
-            ROS_INFO("Writing image with file %s failed with error %s", complete_file_string.c_str(),
-                     imageWriter.errorString().toStdString().c_str());
+            //ROS_INFO("Writing image with file %s failed with error %s", complete_file_string.c_str(),
+            //         imageWriter.errorString().toStdString().c_str());
         } else {
-            ROS_INFO("Successfully wrote geotiff to %s", complete_file_string.c_str());
+            //ROS_INFO("Successfully wrote geotiff to %s", complete_file_string.c_str());
         }
     }
 
@@ -700,7 +702,7 @@ namespace geotiff {
     Eigen::MatrixX4d
     GeotiffWriter::applyColorMap(const Eigen::MatrixX3d &colorMap, const Vector &values, bool invert, bool logspace) {
         if (colorMap.rows() < 2) {
-            ROS_INFO_STREAM(
+            STREAM_DEBUG(
                     "ColorMap does not have enough samples, it needs 2 or more but currently has " << colorMap.rows());
             return {};
         }
@@ -714,7 +716,7 @@ namespace geotiff {
                     val_c(i) = 0;
                 }
             }
-            ROS_INFO_STREAM("Applied logspace");
+            STREAM_DEBUG("Applied logspace");
         }
 
         // normalize values to be between 0 and 1

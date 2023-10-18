@@ -155,6 +155,7 @@ private:
     ros::ServiceClient sampleServiceClient_;
 
     // Model
+    int modelSize_;
     std::vector<SampleGP> samplesQueue_;
     std::vector<int> sampleIds2d_;
     std::vector<int> sampleIds3d_;

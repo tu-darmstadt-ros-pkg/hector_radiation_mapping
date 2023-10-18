@@ -36,4 +36,8 @@ enum DIMENSION {
     DIM2 = 2, DIM3 = 3
 };
 
+#define STREAM(x) if(true){ROS_INFO_STREAM(x);}
+#define STREAM_ERROR(x) if(true){ROS_ERROR_STREAM(x);}
+#define STREAM_DEBUG(x) if(false){ROS_INFO_STREAM(x);}
+
 #endif //RADIATION_MAPPING_PCH_H

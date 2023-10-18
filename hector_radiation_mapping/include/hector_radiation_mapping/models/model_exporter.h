@@ -56,12 +56,12 @@ private:
     /**
      * Exports the 2D map.
      */
-    void export2DMap();
+    void export2DMap(std::string path);
 
     /**
      * Exports the 3D map.
      */
-    void export3DMap();
+    void export3DMap(std::string path);
 
     /**
      * Get all grid maps, paired with their corresponding occupancy grid.

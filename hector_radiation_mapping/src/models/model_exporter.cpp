@@ -14,8 +14,6 @@
 #include "models/gpython/gpython3D.h"
 #include "models/gpython/gpython2D.h"
 
-#define STREAM(x) if(true){ROS_INFO_STREAM(x);}
-#define STREAM_TEST(x) if(true){ROS_INFO_STREAM(x);}
 
 ModelExporter::ModelExporter() {
     exporting_ = false;
@@ -38,17 +36,19 @@ bool ModelExporter::exportServiceCallback(hector_radiation_mapping_msgs::ExportS
     }
     std::string path = req.path;
     exporting_ = true;
-    STREAM("Export started! -------------------------------------------path: " << path);
-    export3DMap(); // needs to before export2DMap because the sources get generated during export3DMap
-    export2DMap();
+    STREAM("Exporting to \"" << path << "\".");
+    export3DMap(path); // needs to before export2DMap because the sources get generated during export3DMap
+    export2DMap(path);
     exporting_ = false;
-    STREAM("Export finished!!!");
+    STREAM("Export finished!");
     res.success = true;
     return true;
 }
 
-void ModelExporter::export2DMap() {
-    std::string path = Util::getExportPath("maps");
+void ModelExporter::export2DMap(std::string path) {
+    if(path.empty()) {
+        path = Util::getExportPath("maps");
+    }
     std::vector<Eigen::Vector2f> trajectory = getTrajectory();
     std::vector<std::pair<grid_map::GridMap, std::shared_ptr<nav_msgs::OccupancyGrid>>> maps = getMaps();
     std::vector<std::shared_ptr<Source>> sources = getSources();
@@ -62,13 +62,13 @@ void ModelExporter::export2DMap() {
         int gridHeight = combinedGrid.info.height;
 
         for (const std::string &layerName: layers) {
-            STREAM_TEST("LayerName: " << layerName);
+            STREAM_DEBUG("LayerName: " << layerName);
 
             Vector finalData(gridWidth * gridHeight);
             grid_map::Matrix &mapData = (gridMap)[layerName];
             double min = std::max(0.004f, mapData.minCoeff());
 
-            STREAM_TEST("Interpolate gridmap!");
+            STREAM_DEBUG("Interpolate gridmap!");
             for (int i = 0; i < gridWidth * gridHeight; i++) {
                 grid_map::Position position;
                 position.x() = (i % gridWidth) * combinedGrid.info.resolution + combinedGrid.info.origin.position.x;
@@ -108,23 +108,25 @@ void ModelExporter::export2DMap() {
     }
 }
 
-void ModelExporter::export3DMap() {
-    STREAM_TEST("ModelExport export3DMap()");
+void ModelExporter::export3DMap(std::string path) {
+    STREAM_DEBUG("ModelExport export3DMap()");
     pcl::PointCloud<PointCloud3D::PointXYZPC> exportPointCloud = GPython3D::instance().getExportPointCloud();
-    std::string path = Util::getExportPath("pointclouds");
+    if(path.empty()) {
+        path = Util::getExportPath("pointclouds");
+    }
     std::string fileName = "point_cloud_" + std::to_string(int(ros::Time::now().toSec())) + ".ply";
     std::string fullPath = path + "/" + fileName;
     pcl::io::savePLYFile(fullPath, exportPointCloud);
-    STREAM_TEST("ModelExport export3DMap() finished");
+    STREAM_DEBUG("ModelExport export3DMap() finished");
 }
 
 std::vector<std::pair<grid_map::GridMap, std::shared_ptr<nav_msgs::OccupancyGrid>>> ModelExporter::getMaps() {
-    STREAM_TEST("ModelExport getGridMaps()");
+    STREAM_DEBUG("ModelExport getGridMaps()");
     return {GPython2D::instance().getExportGridMap()};
 }
 
 std::vector<std::shared_ptr<Source>> ModelExporter::getSources() {
-    STREAM_TEST("ModelExport getSources()");
+    STREAM_DEBUG("ModelExport getSources()");
     std::vector<std::shared_ptr<Source>> sources;
     if (GPython3D::instance().hasEnvironmentCloud()) {
         std::vector<std::shared_ptr<Source>> sources_copy(GPython3D::instance().getSources());
@@ -137,7 +139,7 @@ std::vector<std::shared_ptr<Source>> ModelExporter::getSources() {
 }
 
 std::vector<Eigen::Vector2f> ModelExporter::getTrajectory() {
-    STREAM_TEST("ModelExport getTrajectory()");
+    STREAM_DEBUG("ModelExport getTrajectory()");
     std::vector<Sample> samples = SampleManager::instance().getSamples();
     std::vector<Eigen::Vector2f> trajectory;
     for (Sample sample: samples) {
@@ -149,10 +151,10 @@ std::vector<Eigen::Vector2f> ModelExporter::getTrajectory() {
 }
 
 nav_msgs::OccupancyGrid ModelExporter::setUpCombinedGrid(nav_msgs::OccupancyGrid &slamGrid) {
-    STREAM_TEST("ModelExport setUpCombinedGrid()");
+    STREAM_DEBUG("ModelExport setUpCombinedGrid()");
     nav_msgs::OccupancyGrid combinedGrid;
 
-    STREAM_TEST("Set geotiff metadata!");
+    STREAM_DEBUG("Set geotiff metadata!");
     combinedGrid.info.resolution = slamGrid.info.resolution;
     combinedGrid.info.width = slamGrid.info.width;
     combinedGrid.info.height = slamGrid.info.height;
@@ -163,7 +165,7 @@ nav_msgs::OccupancyGrid ModelExporter::setUpCombinedGrid(nav_msgs::OccupancyGrid
     int gridWidth = combinedGrid.info.width;
     int gridHeight = combinedGrid.info.height;
 
-    STREAM_TEST("Set SLAM data!");
+    STREAM_DEBUG("Set SLAM data!");
     int max_i = gridWidth * gridHeight;
     for (int i = 0; i < max_i; i++) {
         combinedGrid.data.push_back(0.0);
@@ -269,7 +271,7 @@ double ModelExporter::computeSourceError2D(int sourceId, const Eigen::Vector3d &
     // calculate deviation in percent
     double deviation = ((mean - actualValue) * 100) / actualValue;
 
-    ROS_INFO_STREAM("Source #" << sourceId << " useGlobal " << useGlobal << " WallsOn: " << wallsOn << " Mean: " << mean
+    STREAM_DEBUG("Source #" << sourceId << " useGlobal " << useGlobal << " WallsOn: " << wallsOn << " Mean: " << mean
                                << " std var: " << stdVar << " deviation: " << deviation);
     return mean;
 }

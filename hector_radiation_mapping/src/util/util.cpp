@@ -134,19 +134,19 @@ void Util::exportVectorToTxtFile(const std::vector<double>& data, const std::str
             break;
         }
         default:
-            ROS_INFO_STREAM("Unknown export type.");
+            STREAM("Unknown export type.");
             break;
     }
 
     if (file.is_open()) {
-        if (print) ROS_INFO_STREAM("Writing file at " << filePath << " with mode " << static_cast<int>(type) << ".");
+        if (print) STREAM("Writing file at " << filePath << " with mode " << static_cast<int>(type) << ".");
         for (const auto& value : data) {
             file << value << '\n';
         }
         file.close();
-        if (print) ROS_INFO_STREAM("Data saved to file successfully.");
+        if (print) STREAM("Data saved to file successfully.");
     } else {
-        if (print) ROS_INFO_STREAM("Unable to open the file.");
+        if (print) STREAM("Unable to open the file.");
     }
 }
 

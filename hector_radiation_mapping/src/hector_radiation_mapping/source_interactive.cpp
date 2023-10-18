@@ -1,6 +1,8 @@
-#include "hector_radiation_mapping/source_interactive.h"
 #include <tf/tf.h>
+
+#include "hector_radiation_mapping/source_interactive.h"
 #include "marker/marker_manager.h"
+#include "pch.h"
 
 SourceInteractive::SourceInteractive(const Eigen::Vector3d &position, double cps, double doseRate,
                                      interactive_markers::InteractiveMarkerServer::FeedbackCallback callback)
@@ -12,7 +14,7 @@ SourceInteractive::SourceInteractive(const Eigen::Vector3d &position, double cps
     tf::Vector3 posTf(position.x(), position.y(), position.z());
     tf::pointTFToMsg(posTf, intMarker_.pose.position);
 
-    ROS_INFO_STREAM("Source 0 " << name_ << "|" << description_);
+    STREAM_DEBUG("Source 0 " << name_ << "|" << description_);
     intMarker_.name = name_;
     intMarker_.description = description_;
     visualMarker_.type = visualization_msgs::Marker::SPHERE;

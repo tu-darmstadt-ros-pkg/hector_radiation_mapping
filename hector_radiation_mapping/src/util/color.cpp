@@ -1,11 +1,12 @@
-#include "util/color.h"
 #include <filesystem>
 #include <iostream>
 
+#include "pch.h"
+#include "util/color.h"
+
 Eigen::MatrixX4d Color::applyColorMap(const Eigen::MatrixX3d &colorMap, const Vector &values, bool invert) {
     if (colorMap.rows() < 2) {
-        ROS_INFO_STREAM(
-                "ColorMap does not have enough samples, it needs 2 or more but currently has " << colorMap.rows());
+        STREAM("ColorMap does not have enough samples, it needs 2 or more but currently has " << colorMap.rows());
         return {};
     }
 
@@ -64,7 +65,7 @@ void Color::saveColorMap(const Eigen::MatrixX3d &colorMap, const std::string &fi
         std::filesystem::create_directories(path);
     }
     std::ofstream file(path + "/" + filename + ".xml", std::ios::trunc);
-    ROS_INFO_STREAM(path);
+    STREAM_DEBUG(path);
 
     if (file.is_open()) {
         for (const auto& value : data) {

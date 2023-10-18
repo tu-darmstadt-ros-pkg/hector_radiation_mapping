@@ -72,7 +72,7 @@ void PointCloud3D::generatePointCloudFromEnvironmentCloud(
     pointCloud_.clear();
     int index = 0;
     int numPoints = environmentCloud->size();
-    ROS_INFO_STREAM("Generating point cloud from environment cloud with step size " << stepSize << " and " << numPoints << " points.");
+    STREAM_DEBUG("Generating point cloud from environment cloud with step size " << stepSize << " and " << numPoints << " points.");
     while (index < numPoints - stepSize) {
         pointCloud_.push_back(transformPoint(environmentCloud->at(index), environmentCloudTransform));
         index = index + stepSize;

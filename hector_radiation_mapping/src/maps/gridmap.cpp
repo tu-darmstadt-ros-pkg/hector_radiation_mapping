@@ -1,8 +1,6 @@
 #include "maps/gridmap.h"
 #include "util/parameters.h"
-
-#define STREAM(x) if(true){ROS_INFO_STREAM(x);}
-#define STREAM_TEST(x) if(true){ROS_INFO_STREAM(x);}
+#include "pch.h"
 
 GridMap::GridMap(const std::string &name, double resolution,
                  Eigen::Vector3d origin) {
@@ -67,13 +65,13 @@ Eigen::MatrixX2d GridMap::getCircleSamplePositions(const Eigen::Vector2d &center
 
 void GridMap::updateLayer(const std::string &layerName, const Vector &values) {
     if (!existsLayer(layerName)) {
-        STREAM("GridMap: updateLayer() Layer name \"" << layerName << "\" for update does not exist.");
+        STREAM_DEBUG("GridMap: updateLayer() Layer name \"" << layerName << "\" for update does not exist.");
         return;
     }
 
     grid_map::Matrix &layerData = (map_)[layerName];
     if (layerData.size() != values.size()) {
-        STREAM_TEST("GridMap: updateLayer() values vector size is unexpected: " << values.size() << " / "
+        STREAM_DEBUG("GridMap: updateLayer() values vector size is unexpected: " << values.size() << " / "
                                                                                 << layerData.size());
     }
 
@@ -90,7 +88,7 @@ void GridMap::updateLayer(const std::string &layerName, const Vector &values) {
 
 void GridMap::updateSubMapLayer(const std::string &layerName, const Vector &values) {
     if (!existsLayer(layerName)) {
-        STREAM("GridMap: updateLayer() Layer name \"" << layerName << "\" for update does not exist.");
+        STREAM_DEBUG("GridMap: updateLayer() Layer name \"" << layerName << "\" for update does not exist.");
         return;
     }
 
@@ -110,7 +108,7 @@ void GridMap::updateSubMapLayer(const std::string &layerName, const Vector &valu
 
 void GridMap::updateLayer(const std::string &layerName, const Vector &values, const Eigen::Vector2d &center, double radius) {
     if (!existsLayer(layerName)) {
-        STREAM("GridMap: updateLayer() Layer name \"" << layerName << "\" for update does not exist.");
+        STREAM_DEBUG("GridMap: updateLayer() Layer name \"" << layerName << "\" for update does not exist.");
         return;
     }
 
@@ -125,9 +123,9 @@ void GridMap::updateLayer(const std::string &layerName, const Vector &values, co
         ++it;
     }
     if (!it.isPastEnd()) {
-        STREAM_TEST("GridMap: updateLayer() values vector had less values than circleIterator");
+        STREAM_DEBUG("GridMap: updateLayer() values vector had less values than circleIterator");
     } else if (i < values.size()) {
-        STREAM_TEST("GridMap: updateLayer() values vector had more values than circleIterator");
+        STREAM_DEBUG("GridMap: updateLayer() values vector had more values than circleIterator");
     }
 }
 

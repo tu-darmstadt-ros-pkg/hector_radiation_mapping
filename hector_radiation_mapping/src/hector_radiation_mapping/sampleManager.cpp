@@ -5,6 +5,7 @@
 #include "models/gpython/gpython.h"
 #include "hector_radiation_mapping/source.h"
 #include "util/util.h"
+#include "pch.h"
 
 SampleManager::SampleManager() {
     // Fix topic name if necessary
@@ -65,7 +66,7 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
         //Util::appendDoubleToTxtFile(doseRate, exportPath, "doseRate");
         //Util::appendDoubleToTxtFile(time, exportPath, "time");
     } catch (tf2::TransformException &exception) {
-        ROS_INFO_STREAM(exception.what());
+        ROS_WARN_STREAM(exception.what());
     }
 }
 
@@ -130,7 +131,6 @@ void SampleManager::processSample(const Sample &newSample) {
 }
 
 void SampleManager::addSample(Sample &sample) {
-    //ROS_INFO_STREAM("Adding sample. DoseRate: " << sample.doseRate_ << ", CPS: " << sample.cps_);
     samples_.push_back(sample);
 
     double max = 0.0;
@@ -139,7 +139,6 @@ void SampleManager::addSample(Sample &sample) {
             max = sample.doseRate_;
         }
     }
-    //ROS_INFO_STREAM("MAXIMUM::: " << max);
     GPython::SampleGP sampleGP(sample, true, true);
     GPython::instance().addSample(sampleGP);
 }
