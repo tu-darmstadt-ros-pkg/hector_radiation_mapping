@@ -72,7 +72,7 @@ private:
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/messageKey_frameId", messageKey_frameId);
         // MapExport
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/radiationUnit", radiationUnit);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/exportPath", exportPath);
+
         // GPython2D
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/minDistanceBetweenSamples2d", minDistanceBetweenSamples2d);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/meanFactor", meanFactor);
@@ -95,6 +95,8 @@ private:
 
         // Set useDoseRate to true, if messageKey_rate is set
         useDoseRate = !messageKey_rate.empty();
+
+        exportPath = "/exports/";
     }
 
     Parameters(const Parameters &) = delete;
