@@ -94,11 +94,15 @@ The Radiation Mapping node provides the following services.
 
 
 ## Test Data
-We provide an processed ros-bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
-
+We provide a processed ROS bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
+You can play the bag file using
+```
+rosbag play telemax_run2_processed_straight_init.bag
+```
+in another terminal window, before launching the Radiation Mapping node.
 <p align="center">
-    <img src="./hector_radiation_mapping/media/sample_map.jpg" alt="drawing" width="480"/>
-    <img src="./hector_radiation_mapping/media/3DComplete.jpg" alt="drawing" width="480"/>
+    <img src="./hector_radiation_mapping/media/sample_map.jpg" alt="drawing" width="400"/>
+    <img src="./hector_radiation_mapping/media/3DComplete.jpg" alt="drawing" width="400"/>
 </p>
 
 ## Additional reading
