@@ -27,9 +27,6 @@ With 3D mapping enabled, a colored pointcloud is also provided, containing predi
 - [ANYbotics grid_map](https://github.com/ANYbotics/grid_map)
 - [Point Cloud Accumulator](https://github.com/tu-darmstadt-ros-pkg/pointcloud_accumulator)
 
-TODO: RadEye messages for test data??
-TODO: PointCloud Accumulator?
-
 The following ROS modules are required: <br><br>
 `roscpp`, `std_msgs`, `geometry_msgs`, `grid_map_ros`, `grid_map_msgs`, `nav_msgs`, `tf2_ros`, `pcl_ros`, `interactive_markers`, `ros_babel_fish`,`cv_bridge`
 
@@ -37,7 +34,7 @@ The following ROS modules are required: <br><br>
 The package can be installed with the following command.
 ```
 cd <Your ROS workspace>
-git clone [INSERT URL HERE]
+git clone https://github.com/tu-darmstadt-ros-pkg/hector_radiation_mapping
 catkin build
 ```
 
@@ -97,7 +94,7 @@ The Radiation Mapping node provides the following services.
 We provide an processed ros-bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
 
 <p align="center">
-    <img src="./hector_radiation_mapping/images/sample_map.jpg" alt="drawing" width="480"/>
+    <img src="./hector_radiation_mapping/images/sample_map.jpg" alt="drawing" width="360"/>
 </p>
 
 ## Additional reading
