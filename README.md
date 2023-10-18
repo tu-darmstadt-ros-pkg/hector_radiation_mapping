@@ -21,10 +21,11 @@ With 3D mapping enabled, a colored pointcloud is also provided, containing predi
 - C++ 17
 - [ROS Noetic](https://wiki.ros.org/noetic)
 - [Eigen3](https://eigen.tuxfamily.org)
-- [Point Cloud Library (PCL)](https://wiki.ros.org/pcl/Overview)
-- [ANYbotics grid_map](https://github.com/ANYbotics/grid_map)
 - [PyTorch](https://pytorch.org/)
 - [GPyTorch](https://gpytorch.ai/)
+- [Point Cloud Library (PCL)](https://wiki.ros.org/pcl/Overview)
+- [ANYbotics grid_map](https://github.com/ANYbotics/grid_map)
+- [Point Cloud Accumulator](https://github.com/tu-darmstadt-ros-pkg/pointcloud_accumulator)
 
 TODO: RadEye messages for test data??
 TODO: PointCloud Accumulator?
@@ -96,7 +97,7 @@ The Radiation Mapping node provides the following services.
 We provide an processed ros-bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
 
 <p align="center">
-    <img src="./hector_radiation_mapping/images/sample_map.jpg" alt="drawing" width="360"/>
+    <img src="./hector_radiation_mapping/images/sample_map.jpg" alt="drawing" width="480"/>
 </p>
 
 ## Additional reading
