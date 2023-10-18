@@ -95,7 +95,8 @@ The Radiation Mapping node provides the following services.
 
 ## Test Data
 We provide a processed ROS bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
-You can play the bag file using
+
+You can play the bag file by running
 ```
 rosbag play telemax_run2_processed_straight_init.bag
 ```
