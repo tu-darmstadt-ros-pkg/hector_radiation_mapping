@@ -2,7 +2,9 @@
 
 This project provides a method for radiation mapping and source localization utilizing Gaussian Processes, for use on mobile robots. The project was developed by [Team Hector](https://www.teamhector.de/) for the [ENRICH 2023](https://enrich.european-robotics.eu/) hackathon.
 
-[INSERT SOME PRETTY IMAGES HERE]
+<p align="center">
+    <img src="./hector_radiation_mapping/media/enrich_2023.gif" alt="drawing" width="480"/>
+</p>
 
 ## Instructions
 
@@ -94,7 +96,7 @@ The Radiation Mapping node provides the following services.
 We provide an processed ros-bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
 
 <p align="center">
-    <img src="./hector_radiation_mapping/images/sample_map.jpg" alt="drawing" width="360"/>
+    <img src="./hector_radiation_mapping/media/sample_map.jpg" alt="drawing" width="360"/>
 </p>
 
 ## Additional reading
