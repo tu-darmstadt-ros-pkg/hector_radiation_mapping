@@ -1,11 +1,14 @@
+#include <std_msgs/Float64MultiArray.h>
+#include <eigen_conversions/eigen_msg.h>
+
+#include "pch.h"
 #include "models/gpython/gpython.h"
+#include "models/gpython/gpython2D.h"
+#include "models/gpython/gpython3D.h"
 #include "util/parameters.h"
-#include "hector_radiation_mapping/sampleManager.h"
 #include "util/dddynamic_reconfigure.h"
 #include "util/util.h"
 #include "util/clock_cpu.h"
-#include "pch.h"
-
 #include "hector_radiation_mapping_msgs/GPEvaluationService.h"
 #include "hector_radiation_mapping_msgs/GPEvaluationServiceRequest.h"
 #include "hector_radiation_mapping_msgs/GPEvaluationServiceResponse.h"
@@ -14,10 +17,7 @@
 #include "hector_radiation_mapping_msgs/AddSamplesServiceResponse.h"
 #include "hector_radiation_mapping_msgs/Samples.h"
 #include "hector_radiation_mapping_msgs/Sample.h"
-#include "std_msgs/Float64MultiArray.h"
-#include "eigen_conversions/eigen_msg.h"
-#include "models/gpython/gpython2D.h"
-#include "models/gpython/gpython3D.h"
+#include "hector_radiation_mapping/sampleManager.h"
 
 GPython::GPython() {
     // Define ROS service clients

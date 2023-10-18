@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "maps/gridmap.h"
 #include "util/parameters.h"
-#include "pch.h"
 
 GridMap::GridMap(const std::string &name, double resolution,
                  Eigen::Vector3d origin) {

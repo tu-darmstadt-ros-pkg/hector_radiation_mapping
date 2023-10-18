@@ -1,9 +1,8 @@
 #ifndef RADIATION_MAPPING_GP_PY_MANAGER_H
 #define RADIATION_MAPPING_GP_PY_MANAGER_H
 
-#include <utility>
-#include "hector_radiation_mapping/sample.h"
 #include "pch.h"
+#include "hector_radiation_mapping/sample.h"
 
 /**
  * @brief The GPython class

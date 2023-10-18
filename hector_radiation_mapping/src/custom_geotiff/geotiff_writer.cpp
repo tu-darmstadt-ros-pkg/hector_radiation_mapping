@@ -6,7 +6,6 @@
 #include <QFile>
 #include <QImageWriter>
 #include <QPainter>
-//#include <QtCore/QDateTime>
 #include <QTime>
 #include <QTextStream>
 #include <QFontDatabase>

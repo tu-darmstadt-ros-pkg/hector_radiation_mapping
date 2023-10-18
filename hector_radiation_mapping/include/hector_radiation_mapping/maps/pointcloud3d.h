@@ -7,8 +7,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-
-#include "pcl_ros/point_cloud.h"
+#include <pcl_ros/point_cloud.h>
 
 /**
  * @brief The PointCloud3D class

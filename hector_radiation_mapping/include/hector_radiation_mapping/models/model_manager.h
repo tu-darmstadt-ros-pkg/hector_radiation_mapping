@@ -1,14 +1,14 @@
 #ifndef RADIATION_MAPPING_MODEL_MANAGER_H
 #define RADIATION_MAPPING_MODEL_MANAGER_H
 
+#include <std_msgs/String.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include <std_msgs/String.h>
-#include "custom_geotiff/geotiff_writer.h"
 
 #include "hector_radiation_mapping_msgs/ResetService.h"
 #include "hector_radiation_mapping_msgs/ResetServiceRequest.h"
 #include "hector_radiation_mapping_msgs/ResetServiceResponse.h"
+#include "custom_geotiff/geotiff_writer.h"
 
 class PointCloud3D;
 class Source;

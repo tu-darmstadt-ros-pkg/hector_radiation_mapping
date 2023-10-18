@@ -1,8 +1,8 @@
+#include "pch.h"
 #include "marker/marker.h"
 #include "marker/marker_manager.h"
 #include "util/color.h"
 #include "util/util.h"
-#include "pch.h"
 
 TrajectoryMarker::TrajectoryMarker(const Eigen::Vector3d &origin, const Eigen::Vector4d &color) : Marker() {
     marker_.header.frame_id = "world";

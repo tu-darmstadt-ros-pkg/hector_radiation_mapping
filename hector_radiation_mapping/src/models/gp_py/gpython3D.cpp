@@ -1,9 +1,8 @@
 #include "util/parameters.h"
-#include "hector_radiation_mapping/sampleManager.h"
-#include "models/gpython/gpython3D.h"
 #include "util/dddynamic_reconfigure.h"
+#include "hector_radiation_mapping/sampleManager.h"
 #include "models/model_manager.h"
-
+#include "models/gpython/gpython3D.h"
 
 GPython3D::GPython3D() {
     groupName_ = "GPython3D";

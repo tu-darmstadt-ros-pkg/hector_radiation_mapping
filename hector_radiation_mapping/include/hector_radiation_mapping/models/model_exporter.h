@@ -1,11 +1,10 @@
 #ifndef RADIATION_MAPPING_MODEL_EXPORTER_H
 #define RADIATION_MAPPING_MODEL_EXPORTER_H
 
-#include "custom_geotiff/geotiff_writer.h"
-
 #include "hector_radiation_mapping_msgs/ExportService.h"
 #include "hector_radiation_mapping_msgs/ExportServiceRequest.h"
 #include "hector_radiation_mapping_msgs/ExportServiceResponse.h"
+#include "custom_geotiff/geotiff_writer.h"
 
 class Source;
 class PointCloud3D;

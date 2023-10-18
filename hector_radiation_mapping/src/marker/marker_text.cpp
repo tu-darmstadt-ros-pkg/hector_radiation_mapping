@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "marker/marker.h"
 #include "marker/marker_manager.h"
-#include "pch.h"
 
 TextMarker::TextMarker(const Eigen::Vector3d &origin, const std::string &text, double zOffset,
                        const Eigen::Vector4d &color) : Marker(), sphere(origin, color) {

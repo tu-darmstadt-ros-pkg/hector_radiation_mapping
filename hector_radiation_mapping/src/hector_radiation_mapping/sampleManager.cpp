@@ -1,11 +1,11 @@
-#include "hector_radiation_mapping/sampleManager.h"
-#include "util/parameters.h"
-#include "models/model_manager.h"
-#include "hector_radiation_mapping/sample.h"
-#include "models/gpython/gpython.h"
-#include "hector_radiation_mapping/source.h"
-#include "util/util.h"
 #include "pch.h"
+#include "hector_radiation_mapping/sampleManager.h"
+#include "hector_radiation_mapping/source.h"
+#include "hector_radiation_mapping/sample.h"
+#include "util/parameters.h"
+#include "util/util.h"
+#include "models/model_manager.h"
+#include "models/gpython/gpython.h"
 
 SampleManager::SampleManager() {
     // Fix topic name if necessary

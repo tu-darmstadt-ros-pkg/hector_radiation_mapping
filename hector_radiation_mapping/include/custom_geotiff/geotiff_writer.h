@@ -4,19 +4,15 @@
 #ifndef RADIATION_MAPPING_GEOTIFFWRITER_H__
 #define RADIATION_MAPPING_GEOTIFFWRITER_H__
 
-#include "hector_geotiff/map_writer_interface.h"
-
-#include <Eigen/Geometry>
-
-#include <nav_msgs/OccupancyGrid.h>
-#include <nav_msgs/MapMetaData.h>
-
 #include <QImage>
 #include <QApplication>
 #include <QFont>
+#include <Eigen/Geometry>
+#include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/MapMetaData.h>
 
 #include "hector_map_tools/HectorMapTools.h"
-
+#include "hector_geotiff/map_writer_interface.h"
 #include "util/color.h"
 
 #if  __cplusplus < 201703L

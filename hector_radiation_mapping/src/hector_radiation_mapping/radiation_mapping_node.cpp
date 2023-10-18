@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "hector_radiation_mapping/radiation_mapping_node.h"
 #include "hector_radiation_mapping/sampleManager.h"
 #include "models/model_manager.h"
@@ -5,8 +6,6 @@
 #include "util/parameters.h"
 #include "util/dddynamic_reconfigure.h"
 #include "marker/marker_manager.h"
-#include "pch.h"
-
 
 RadiationMapper::RadiationMapper() {
     // Initialize Subsystems

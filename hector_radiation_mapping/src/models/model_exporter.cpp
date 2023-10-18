@@ -3,16 +3,16 @@
 
 #include "models/model_exporter.h"
 #include "models/model_manager.h"
-
-#include "maps/pointcloud3d.h"
-#include "hector_radiation_mapping/source.h"
-#include "hector_radiation_mapping/sampleManager.h"
 #include "models/gpython/gpython.h"
+#include "models/gpython/gpython3D.h"
+#include "models/gpython/gpython2D.h"
+#include "maps/pointcloud3d.h"
 #include "util/color.h"
 #include "util/parameters.h"
 #include "util/util.h"
-#include "models/gpython/gpython3D.h"
-#include "models/gpython/gpython2D.h"
+#include "hector_radiation_mapping/source.h"
+#include "hector_radiation_mapping/sampleManager.h"
+
 
 
 ModelExporter::ModelExporter() {
