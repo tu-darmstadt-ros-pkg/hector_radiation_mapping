@@ -95,7 +95,9 @@ The Radiation Mapping node provides the following services.
 ## Test Data
 We provide an processed ros-bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
 
-[INSERT PRETTY IMAGES]
+<p align="center">
+    <img src="./hector_radiation_mapping/images/sample_map.jpg" alt="drawing" width="360"/>
+</p>
 
 ## Additional reading
 
