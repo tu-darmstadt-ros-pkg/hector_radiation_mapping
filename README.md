@@ -106,6 +106,15 @@ in another terminal window, before launching the Radiation Mapping node.
     <img src="./hector_radiation_mapping/media/3DComplete.jpg" alt="drawing" width="400"/>
 </p>
 
-## Additional reading
+## Paper 
 
-This method is based upon the paper [cite].
+Thank you for citing [Paper Link coming soon! (SSRR-2023)]() if you use any of this code. 
+
+
+```latex
+@INPROCEEDINGS{suess_radiation_mapping,
+  author={Suess, Jonas and Volz, Martin and Daun, Kevin and von Stryk, Oskar},
+  booktitle={2023 IEEE International Symposium on Safety, Security, and Rescue Robotics (SSRR)}, 
+  title={Online 2D-3D Radiation Mapping and Source Localization using Gaussian Processes with Mobile Ground Robots}, 
+  year={2023}}
+```
