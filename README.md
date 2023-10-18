@@ -48,7 +48,7 @@ The system is able to handle a variety of different input radiation messages, wh
 
 The config keys **messageKey_cps** and **messageKey_rate** are used to configure the keys of the fields of the input radiation messages, that store the received Counts per Second (CPS) and Equivalent dose rate respectively. The unit of the dose rate (eg. microSievert/hour) can be specified using the key **radiationUnit**.
 
-If the utilized message type does not contain both CPS and dose rate information, the  missing field can be set to an empty string. [TODO: IMPLEMENT] The key **messageKey_frameId** sets the frame relative to which the radiation messages are given.
+If the utilized message type does not contain both CPS and dose rate information, the  missing field can be set to an empty string. The key **messageKey_frameId** sets the frame relative to which the radiation messages are given.
 
 The topics of the occupancy grid (`nav_msgs/OccupancyGrid`) and the accumulated pointcloud (`sensor_msgs/PointCloud2`) are configured using the keys **environmentMapTopic** and **environmentCloudTopic** respectively.
 
