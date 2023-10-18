@@ -4,8 +4,8 @@ This project provides a method for radiation mapping and source localization uti
 
 <p align="center">
     <img src="./hector_radiation_mapping/media/enrich_2023.gif" alt="drawing" width="480"/>
+    <img src="./hector_radiation_mapping/media/sample_map.jpg" alt="drawing" width="425"/>
 </p>
-
 ## Instructions
 
 ### Overview
@@ -94,10 +94,6 @@ The Radiation Mapping node provides the following services.
 
 ## Test Data
 We provide an processed ros-bag file from ENRICH 2023 at [TUdatalib](https://tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/3974?locale-attribute=en).
-
-<p align="center">
-    <img src="./hector_radiation_mapping/media/sample_map.jpg" alt="drawing" width="360"/>
-</p>
 
 ## Additional reading
 
