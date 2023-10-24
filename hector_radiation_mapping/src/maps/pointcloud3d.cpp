@@ -1,5 +1,4 @@
 #include <pcl/io/ply_io.h>
-
 #include "maps/pointcloud3d.h"
 #include "util/print.h"
 #include "util/parameters.h"

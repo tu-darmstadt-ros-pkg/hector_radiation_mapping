@@ -1,27 +1,27 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>hector_radiation_mapping_msgs</name>
-  <version>1.0.0</version>
-  <description>
-    This package provides radiation message structures to communicate between the nodes of the radiation mapping project
-  </description>
-  <maintainer email="martin.volz@stud.tu-darmstadt.de">Martin Volz</maintainer>
+    <name>hector_radiation_mapping_msgs</name>
+    <version>1.0.0</version>
+    <description>
+        This package provides radiation message structures to communicate between the nodes of the radiation mapping
+        project
+    </description>
 
-  <license>BSD</license>
+    <maintainer email="martin.volz@stud.tu-darmstadt.de">Martin Volz</maintainer>
+    <maintainer email="jonas.suess@stud.tu-darmstadt.de">Jonas Suess</maintainer>
 
-  <author email="martin.volz@stud.tu-darmstadt.de">Martin Volz</author>
+    <license>MIT</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+    <!-- dependencies -->
+    <buildtool_depend>catkin</buildtool_depend>
+    <build_depend>message_generation</build_depend>
+    <build_depend>std_msgs</build_depend>
+    <build_export_depend>std_msgs</build_export_depend>
+    <exec_depend>message_runtime</exec_depend>
+    <exec_depend>std_msgs</exec_depend>
 
+    <export>
+        <!-- Other tools can request additional information be placed here -->
 
-  <build_depend>message_generation</build_depend>
-  <build_depend>std_msgs</build_depend>
-
-  <build_export_depend>std_msgs</build_export_depend>
-
-  <exec_depend>message_runtime</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-
-  <export>
-  </export>
+    </export>
 </package>
