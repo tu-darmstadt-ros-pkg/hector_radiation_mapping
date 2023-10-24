@@ -21,8 +21,8 @@
 
 GPython::GPython() {
     // Define ROS service clients
-    evaluationServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>("/radiation_mapping/gp_evaluation");
-    sampleServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::AddSamplesService>("/radiation_mapping/gp_samples");
+    evaluationServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>("/hector_radiation_mapping/gp_evaluation");
+    sampleServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::AddSamplesService>("/hector_radiation_mapping/gp_samples");
 
     // Create dynamic reconfigure parameters
     param1_ptr = new double[1];

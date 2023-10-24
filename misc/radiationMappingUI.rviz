@@ -101,7 +101,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /radiation_mapping/marker
+      Marker Topic: /hector_radiation_mapping/marker
       Name: Marker
       Namespaces:
         "": true
@@ -130,7 +130,7 @@ Visualization Manager:
       Size (Pixels): 5
       Size (m): 0.029999999329447746
       Style: Points
-      Topic: /radiation_mapping/pointCloud3D
+      Topic: /hector_radiation_mapping/pointCloud3D
       Unreliable: true
       Use Fixed Frame: true
       Use rainbow: true
@@ -164,7 +164,7 @@ Visualization Manager:
       Min Intensity: 0
       Name: GridMap
       Show Grid Lines: false
-      Topic: /radiation_mapping/grid_map_0
+      Topic: /hector_radiation_mapping/grid_map_0
       Unreliable: false
       Use ColorMap: true
       Value: true
@@ -205,7 +205,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 14.213077545166016
+      Distance: 12.655919075012207
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -213,17 +213,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 12.985573768615723
-        Y: 17.147579193115234
-        Z: 2.4986588954925537
+        X: 1.7560510635375977
+        Y: 1.476909875869751
+        Z: 8.584505081176758
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5797964334487915
+      Pitch: 0.9697960615158081
       Target Frame: <Fixed Frame>
-      Yaw: 0.5440582036972046
+      Yaw: 3.2290751934051514
     Saved: ~
 Window Geometry:
   Displays:

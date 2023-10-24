@@ -5,7 +5,7 @@ MarkerManager::MarkerManager() {
     nodeHandle_ = Parameters::instance().nodeHandle_;
     markerPublisher_ = std::make_shared<ros::Publisher>(
             nodeHandle_->advertise<visualization_msgs::Marker>("marker", 1000));
-    interactiveMarkerServer_ = std::make_shared<interactive_markers::InteractiveMarkerServer>("source_markers");
+    interactiveMarkerServer_ = std::make_shared<interactive_markers::InteractiveMarkerServer>("hector_radiation_mapping/source_markers");
 }
 
 MarkerManager &MarkerManager::instance() {
@@ -30,5 +30,5 @@ void MarkerManager::deleteMarker(visualization_msgs::Marker &marker) {
 
 void MarkerManager::deleteAllInteractiveMarkers() {
     interactiveMarkerServer_.reset();
-    interactiveMarkerServer_ = std::make_shared<interactive_markers::InteractiveMarkerServer>("source_markers");
+    interactiveMarkerServer_ = std::make_shared<interactive_markers::InteractiveMarkerServer>("hector_radiation_mapping/source_markers");
 }

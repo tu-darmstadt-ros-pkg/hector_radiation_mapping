@@ -1,10 +1,10 @@
-roslaunch radiation_mapping mapping.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
-roslaunch radiation_mapping mapping_legacy.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
-roslaunch radiation_mapping test_mapping.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
+roslaunch hector_radiation_mapping mapping.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
+roslaunch hector_radiation_mapping mapping_legacy.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
+roslaunch hector_radiation_mapping test_mapping.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
 rviz >/dev/null 2>&1
 
 Services
-rosservice call /radiation_mapping/exportModel "path: ''"
+rosservice call /hector_radiation_mapping/exportModel "path: ''"
 
 Simulation
 hector sim >/dev/null 2>&1
