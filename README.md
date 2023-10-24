@@ -3,8 +3,8 @@
 This project provides a method for radiation mapping and source localization utilizing Gaussian Processes, for use on mobile robots. The project was developed by [Team Hector](https://www.teamhector.de/) for the [ENRICH 2023](https://enrich.european-robotics.eu/) hackathon.
 
 <p align="center">
-    <img src="./hector_radiation_mapping/media/enrich_2023.gif" alt="drawing" width="360"/>
-    <img src="./hector_radiation_mapping/media/rviz_screenshot.jpg" alt="drawing" width="440"/>
+    <img src="./misc/media/enrich_2023.gif" alt="drawing" width="360"/>
+    <img src="./misc/media/rviz_screenshot.jpg" alt="drawing" width="440"/>
 </p>
 
 ## Instructions
@@ -102,8 +102,8 @@ rosbag play telemax_run2_processed_straight_init.bag
 ```
 in another terminal window, before launching the Radiation Mapping node.
 <p align="center">
-    <img src="./hector_radiation_mapping/media/sample_map.jpg" alt="drawing" width="400"/>
-    <img src="./hector_radiation_mapping/media/3DComplete.jpg" alt="drawing" width="400"/>
+    <img src="./misc/media/sample_map.jpg" alt="drawing" width="400"/>
+    <img src="./misc/media/3DComplete.jpg" alt="drawing" width="400"/>
 </p>
 
 ## Paper 
