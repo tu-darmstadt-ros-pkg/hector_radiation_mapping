@@ -11,6 +11,7 @@ Panels:
         - /PointCloud21
         - /PointCloud21/Status1
         - /GridMap1
+        - /InteractiveMarkers1
       Splitter Ratio: 0.5
     Tree Height: 919
   - Class: rviz/Selection
@@ -135,15 +136,6 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-    - Class: rviz/InteractiveMarkers
-      Enable Transparency: true
-      Enabled: true
-      Name: InteractiveMarkers
-      Show Axes: false
-      Show Descriptions: true
-      Show Visual Aids: false
-      Update Topic: /radiation_source_marker/update
-      Value: true
     - Alpha: 0.6000000238418579
       Autocompute Intensity Bounds: true
       Class: grid_map_rviz_plugin/GridMap
@@ -175,7 +167,7 @@ Visualization Manager:
       Show Axes: false
       Show Descriptions: true
       Show Visual Aids: false
-      Update Topic: /source_markers/update
+      Update Topic: /hector_radiation_mapping/source_markers/update
       Value: true
   Enabled: true
   Global Options:
@@ -205,7 +197,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 12.655919075012207
+      Distance: 21.129478454589844
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -213,17 +205,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 1.7560510635375977
-        Y: 1.476909875869751
-        Z: 8.584505081176758
+        X: 5.312014579772949
+        Y: 13.380874633789062
+        Z: -0.5707861185073853
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9697960615158081
+      Pitch: 0.7297970056533813
       Target Frame: <Fixed Frame>
-      Yaw: 3.2290751934051514
+      Yaw: 3.8090853691101074
     Saved: ~
 Window Geometry:
   Displays:
