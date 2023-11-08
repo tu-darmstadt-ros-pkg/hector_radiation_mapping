@@ -9,9 +9,12 @@ Panels:
         - /Map1
         - /Marker1
         - /PointCloud21
-        - /PointCloud21/Status1
         - /GridMap1
         - /InteractiveMarkers1
+        - /PointCloudFilter1
+        - /PointCloudFilter1/Enable filtering1
+        - /PointCloudFilter1/Enable filtering1/Radial Filter1
+        - /PointCloudFilter1/Enable filtering1/Z Filter1
       Splitter Ratio: 0.5
     Tree Height: 919
   - Class: rviz/Selection
@@ -31,7 +34,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: PointCloudFilter
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -120,7 +123,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: true
       Max Color: 255; 255; 255
       Min Color: 0; 0; 0
@@ -135,7 +138,7 @@ Visualization Manager:
       Unreliable: true
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
     - Alpha: 0.6000000238418579
       Autocompute Intensity Bounds: true
       Class: grid_map_rviz_plugin/GridMap
@@ -169,6 +172,52 @@ Visualization Manager:
       Show Visual Aids: false
       Update Topic: /hector_radiation_mapping/source_markers/update
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: prediction
+      Class: hector_rviz_plugins/PointCloudFilter
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enable filtering:
+        Frame: world
+        Radial Filter:
+          Radius: 3
+          Value: false
+        Value: true
+        X Filter:
+          Max Value: 2
+          Min Value: -2
+          Value: false
+        Y Filter:
+          Max Value: 2
+          Min Value: -2
+          Value: false
+        Z Filter:
+          Max Value: 1
+          Min Value: 0
+          Value: true
+      Enabled: true
+      Invert Rainbow: true
+      Max Color: 255; 255; 255
+      Min Color: 0; 0; 0
+      Name: PointCloudFilter
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 5
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic: /hector_radiation_mapping/pointCloud3D
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -197,7 +246,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 21.129478454589844
+      Distance: 18.515869140625
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -205,17 +254,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 5.312014579772949
-        Y: 13.380874633789062
-        Z: -0.5707861185073853
+        X: 1.8459725379943848
+        Y: 3.9920520782470703
+        Z: 1.736727237701416
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7297970056533813
+      Pitch: 0.11479682475328445
       Target Frame: <Fixed Frame>
-      Yaw: 3.8090853691101074
+      Yaw: 5.792205810546875
     Saved: ~
 Window Geometry:
   Displays:

@@ -1,8 +1,6 @@
 #ifndef RADIATION_MAPPING_PARAMETERS_H
 #define RADIATION_MAPPING_PARAMETERS_H
 
-#include "pch.h"
-
 class Parameters {
 public:
     static Parameters &instance() {
@@ -16,35 +14,38 @@ public:
     // General
     int doseSubSize;
     int rosSpinnerThreads;
-    bool useDoseRate;
     bool enableOnline3DEvaluation;
+    std::string exportPath;
+    bool enableSpatialSampleFiltering;
+
+    // ROS topics
+    bool useDoseRate;
     std::string subscribeTopic;
     std::string environmentCloudTopic;
     std::string environmentMapTopic;
     std::string messageKey_rate;
     std::string messageKey_cps;
     std::string messageKey_frameId;
-
-    // MapExport
     std::string radiationUnit;
-    std::string exportPath;
 
-    // GPython2D
+    // Source prediction
     double meanFactor;
     double minSourceStrength;
+
+    // 2D model
     double circleRadius;
     double minDistanceBetweenSamples2d;
     int minUpdateTime2d;
 
-    // GPython3D
+    // GridMap
+    double gridMapResolution;
+
+    // 3D model
     double gpLocalRadius;
     double minDistanceBetweenSamples3d;
     int minUpdateTime3d;
 
-    // GridMap
-    double gridMapResolution;
-
-    // PointCloud3D
+    // 3D Point cloud
     std::vector<double> distanceCutoffLevels;
     std::vector<int> pointCloud3DSizeLevels;
 
@@ -64,27 +65,34 @@ private:
         // General
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/rosSpinnerThreads", rosSpinnerThreads);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableOnline3DEvaluation", enableOnline3DEvaluation);
+        success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableSpatialSampling", enableSpatialSampleFiltering);
+
+        // ROS topics
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/subscribeTopic", subscribeTopic);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/environmentMapTopic", environmentMapTopic);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/environmentCloudTopic", environmentCloudTopic);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/messageKey_rate", messageKey_rate);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/messageKey_cps", messageKey_cps);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/messageKey_frameId", messageKey_frameId);
-        // MapExport
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/radiationUnit", radiationUnit);
 
-        // GPython2D
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minDistanceBetweenSamples2d", minDistanceBetweenSamples2d);
+        // Source prediction
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/meanFactor", meanFactor);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/minSourceStrength", minSourceStrength);
+
+        // 2D model
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/circleRadius", circleRadius);
+        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minDistanceBetweenSamples2d", minDistanceBetweenSamples2d);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/minUpdateTime2d", minUpdateTime2d);
-        // GPython3D
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minDistanceBetweenSamples3d", minDistanceBetweenSamples3d);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/gpLocalRadius", gpLocalRadius);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minUpdateTime3d", minUpdateTime3d);
+
         // GridMap
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/gridMapResolution", gridMapResolution);
+
+        // 3D model
+        success = success & nodeHandle_->getParam("/hector_radiation_mapping/gpLocalRadius", gpLocalRadius);
+        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minDistanceBetweenSamples3d", minDistanceBetweenSamples3d);
+        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minUpdateTime3d", minUpdateTime3d);
+
         // PointCloud3D
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/distanceCutoffLevels", distanceCutoffLevels);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/pointCloud3DSizeLevels", pointCloud3DSizeLevels);
@@ -96,7 +104,7 @@ private:
         // Set useDoseRate to true, if messageKey_rate is set
         useDoseRate = !messageKey_rate.empty();
 
-        exportPath = "/exports/";
+        exportPath = "/../exports/";
     }
 
     Parameters(const Parameters &) = delete;

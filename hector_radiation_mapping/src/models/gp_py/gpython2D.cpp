@@ -18,6 +18,7 @@ GPython2D::GPython2D() {
     gridMap_->addLayer(layerNameMean_);
     gridMap_->addLayer(layerNameStdDev_);
     useCircle_ = true;
+    doEvaluation_ = false;
     groupName_ = "GPython2D";
     minUpdateTime_ = Parameters::instance().minUpdateTime2d;
     DDDynamicReconfigure::instance().registerVariable<bool>(groupName_ + "_useCircleEvaluation", useCircle_,

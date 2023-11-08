@@ -32,9 +32,9 @@ GPython::GPython() {
     *param2_ptr = 1.0;
     *param3_ptr = 1.0;
     groupName_ = "gpython";
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param1", param1_ptr, boost::bind(&GPython::paramCallback, this), "param1", 0.0, 4.0, groupName_);
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param2", param2_ptr, boost::bind(&GPython::paramCallback, this), "param2", 0.0, 100.0, groupName_);
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param3", param3_ptr, boost::bind(&GPython::paramCallback, this), "param3", 0.0, 100.0, groupName_);
+    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_kernel_lengthscale", param1_ptr, boost::bind(&GPython::paramCallback, this), "param1", 0.0, 4.0, groupName_);
+    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_outputscale", param2_ptr, boost::bind(&GPython::paramCallback, this), "param2", 0.0, 20.0, groupName_);
+    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_likelihood_noise", param3_ptr, boost::bind(&GPython::paramCallback, this), "param3", 0.0, 20.0, groupName_);
     DDDynamicReconfigure::instance().publish();
     STREAM_DEBUG("GPython params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
 

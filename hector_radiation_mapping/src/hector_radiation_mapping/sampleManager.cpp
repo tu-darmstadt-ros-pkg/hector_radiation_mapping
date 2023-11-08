@@ -1,9 +1,7 @@
-#include "pch.h"
 #include "hector_radiation_mapping/sampleManager.h"
 #include "hector_radiation_mapping/source.h"
 #include "hector_radiation_mapping/sample.h"
 #include "util/parameters.h"
-#include "util/util.h"
 #include "models/model_manager.h"
 #include "models/gpython/gpython.h"
 
@@ -56,9 +54,33 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
         Eigen::Vector3d pos(trans.translation.x, trans.translation.y, trans.translation.z);
 
         updateTrajectory(Parameters::instance().useDoseRate ? doseRate : cps, pos);
-        Sample sample(pos, cps, doseRate, ros::Time::now());
-        processSample(sample);
 
+        static bool calculated_background_radiation = false;
+        if (!calculated_background_radiation) {
+            static std::vector<double> cpsVec;
+            static std::vector<double> doseRateVec;
+            static std::vector<Eigen::Vector3d> posVec;
+            static std::vector<ros::Time> timeVec;
+            cpsVec.push_back(cps);
+            doseRateVec.push_back(doseRate);
+            posVec.push_back(pos);
+            timeVec.push_back(ros::Time::now());
+            backgroundRadiationCps_ += cps / 10.0;
+            backgroundRadiationDoseRate_ += doseRate / 10.0;
+
+            if (cpsVec.size() >= 10) {
+                for (int i = 0; i < cpsVec.size(); i++) {
+                    processSampleData(posVec[i], cpsVec[i], doseRateVec[i], timeVec[i]);
+                }
+                cpsVec.clear();
+                doseRateVec.clear();
+                posVec.clear();
+                timeVec.clear();
+                calculated_background_radiation = true;
+            }
+        } else {
+            processSampleData(pos, cps, doseRate, ros::Time::now());
+        }
 
         //double time = sample.time_.toSec() - Parameters::instance().startTime_;
         //std::string exportPath = Util::getExportPath("samples");
@@ -71,26 +93,21 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
 }
 
 
-void SampleManager::processSample(const Sample &newSample) {
+void SampleManager::processSampleData(Vector3d pos, double cps, double doseRate, ros::Time time) {
     /// Get background radiation from average of first few samples
-    if (samples_.size() == 0 && sampleQueue_.size() <= 10) {
-        Sample sample(newSample.position_, 0, 0, newSample.time_);
-        sampleQueue_.push_back(sample);
-        backgroundRadiationCps_ += newSample.cps_ / 10;
-        backgroundRadiationDoseRate_ += newSample.doseRate_ / 10;
+    double adjCps = fmax(cps - backgroundRadiationCps_, 0.0);
+    double adjDoseRate = fmax(doseRate - backgroundRadiationDoseRate_, 0.0);
+    Sample sample(pos, adjCps, adjDoseRate, time);
+
+    if(!Parameters::instance().enableSpatialSampleFiltering){
+        double minDist2 = 0.2 * 0.2;
+        if (samples_.empty() || (sample.position_ - getLastSamplePos()).squaredNorm() > minDist2 || sample.doseRate_ > 20.0) {
+            addSample(sample);
+        }
         return;
     }
-    double adjCps = fmax(newSample.cps_ - backgroundRadiationCps_, 0.0);
-    double adjDoseRate = fmax(newSample.doseRate_ - backgroundRadiationDoseRate_, 0.0);
-    Sample sample(newSample.position_, adjCps, adjDoseRate, newSample.time_);
 
-    //double minDist2 = 0.2 * 0.2;
-    //if (samples_.empty() || (sample.position_ - getLastSamplePos()).squaredNorm() > minDist2 || sample.doseRate_ > 20.0) {
-        addSample(sample);
-    //}
-
-    /*
-    const double distCutoff = 0.01;
+    const double distCutoff = 0.005;
     const double distCutoff2 = distCutoff * distCutoff;
 
     if (sampleQueue_.empty()) {
@@ -99,7 +116,7 @@ void SampleManager::processSample(const Sample &newSample) {
     else {
         /// if position has changed considerably, add new sample and the mean of the old ones that are left in the Queue
         if((sample.position_ - sampleQueue_.back().position_).squaredNorm() > distCutoff2) {
-            Sample meanSample = getMeanSample(sampleQueue_, true);
+            Sample meanSample = getMeanSample(sampleQueue_, false);
             for(int i = 0; i < ceil((double)sampleQueue_.size()/ 5.0); i++){
                 addSample(meanSample);
             }
@@ -127,7 +144,7 @@ void SampleManager::processSample(const Sample &newSample) {
                 sampleQueue_.clear();
             }
         }
-    }*/
+    }
 }
 
 void SampleManager::addSample(Sample &sample) {
@@ -189,7 +206,7 @@ Sample SampleManager::getMeanSample(const std::vector<Sample> &samples, bool wei
         meanCps = meanCps + weight * sample.cps_;
         meanDoseRate = meanDoseRate + weight * sample.doseRate_;
         totalWeight += weight;
-        weight += 0.5;
+        //weight += 0.5;
     }
 
     meanPos /= totalWeight;
