@@ -68,10 +68,6 @@ class GPModel:
         self.parameters = params
         print("Trained GP model", self.parameters)
         #print("Training GP model", self.data_x.shape, self.data_y.shape)
-        #self.model.covar_module.base_kernel.lengthscale = self.parameters[0]
-        #self.model.covar_module.outputscale = self.parameters[1]
-        #self.model.likelihood.noise = self.parameters[2]
-
         self.model = ExactGPModel(self.data_x, self.data_y, gpytorch.likelihoods.GaussianLikelihood())
         self.model.covar_module.base_kernel.lengthscale = self.parameters[0]
         self.model.covar_module.outputscale = self.parameters[1]

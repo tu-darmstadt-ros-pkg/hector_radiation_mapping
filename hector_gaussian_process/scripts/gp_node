@@ -31,8 +31,8 @@ class GPNode:
         print("CUDA available: ", torch.cuda.is_available())
 
         rospy.init_node('gp_node')
-        rospy.Service('/radiation_mapping/gp_samples', AddSamplesService, self.add_samples_callback)
-        rospy.Service('/radiation_mapping/gp_evaluation', GPEvaluationService, self.gp_evaluation_callback)
+        rospy.Service('/hector_radiation_mapping/gp_samples', AddSamplesService, self.add_samples_callback)
+        rospy.Service('/hector_radiation_mapping/gp_evaluation', GPEvaluationService, self.gp_evaluation_callback)
         rospy.spin()
 
         # save_list_to_file(self.evaluationTimes, file_path, 'evaluationTimes.txt')

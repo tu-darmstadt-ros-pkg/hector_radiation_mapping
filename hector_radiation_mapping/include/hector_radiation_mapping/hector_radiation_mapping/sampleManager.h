@@ -26,9 +26,9 @@ public:
 
     /**
      * Processes the given sample. It adds the sample to the sample queue and updates the background radiation.
-     * @param sample The sample to process.
+     * @param newSample The sample to process.
      */
-    void processSample(const Sample& sample);
+    void processSampleData(Vector3d pos, double cps, double doseRate, ros::Time time);
 
     /**
      * Adds the given sample to the radiation models.

@@ -2,6 +2,7 @@
 #include "maps/pointcloud3d.h"
 #include "util/print.h"
 #include "util/parameters.h"
+#include "util/dddynamic_reconfigure.h"
 
 PointCloud3D::PointCloud3D(const std::string &name) {
     name_ = name;
@@ -14,6 +15,13 @@ PointCloud3D::PointCloud3D(const std::string &name) {
     longDistSize_ = Parameters::instance().pointCloud3DSizeLevels[2];
     midDistSize_ = Parameters::instance().pointCloud3DSizeLevels[1];
     shortDistSize_ = Parameters::instance().pointCloud3DSizeLevels[0];
+
+    // zlevel cutoff
+    zCutoff_ = new double[1];
+    *zCutoff_ = 10.0;
+    std::string groupName_ = "pointCloud";
+    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_zCutoff", zCutoff_, "zCutoff", 0.0, 5.0, groupName_);
+    DDDynamicReconfigure::instance().publish();
 }
 
 void PointCloud3D::generatePointCloudFromEnvironmentCloud(
@@ -60,7 +68,10 @@ void PointCloud3D::generatePointCloudFromEnvironmentCloud(
     int index = 0;
 
     while (index < numPoints - stepSize) {
-        pointCloud_.push_back(transformPoint(environmentCloud->at(indices[index]), environmentCloudTransform));
+        PointCloud3D::PointXYZPC point = transformPoint(environmentCloud->at(indices[index]), environmentCloudTransform);
+        if (*zCutoff_ > point.z){
+            pointCloud_.push_back(point);
+        }
         index = index + stepSize;
     }
 }

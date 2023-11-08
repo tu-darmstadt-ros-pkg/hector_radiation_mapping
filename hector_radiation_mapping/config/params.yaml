@@ -12,7 +12,8 @@ rosSpinnerThreads: 4
 # Set to true to enable the online evaluation of the 3D model
 enableOnline3DEvaluation: true
 
-
+# Set to true to enable spatial filtering of samples
+enableSpatialSampleFiltering: false
 
 # *** ROS topics ***
 

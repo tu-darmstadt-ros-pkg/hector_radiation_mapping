@@ -133,6 +133,7 @@ private:
     int longDistSize_;
     int midDistSize_;
     int shortDistSize_;
+    double* zCutoff_;
 
     std::mutex mapMutex_;
     ros::Publisher mapPublisher_;

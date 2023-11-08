@@ -3,8 +3,8 @@
 This project provides a method for radiation mapping and source localization utilizing Gaussian Processes, for use on mobile robots. The project was developed by [Team Hector](https://www.teamhector.de/) for the [ENRICH 2023](https://enrich.european-robotics.eu/) hackathon.
 
 <p align="center">
-    <img src="./hector_radiation_mapping/media/enrich_2023.gif" alt="drawing" width="360"/>
-    <img src="./hector_radiation_mapping/media/rviz_screenshot.jpg" alt="drawing" width="440"/>
+    <img src="./misc/media/enrich_2023.gif" alt="drawing" width="360"/>
+    <img src="./misc/media/rviz_screenshot.jpg" alt="drawing" width="440"/>
 </p>
 
 ## Instructions
@@ -26,6 +26,7 @@ With 3D mapping enabled, a colored pointcloud is also provided, containing predi
 - [Eigen3](https://eigen.tuxfamily.org)
 - [PyTorch](https://pytorch.org/)
 - [GPyTorch](https://gpytorch.ai/)
+- [QT5](https://www.qt.io/)
 - [Point Cloud Library (PCL)](https://wiki.ros.org/pcl/Overview)
 - [ANYbotics grid_map](https://github.com/ANYbotics/grid_map)
 - [Point Cloud Accumulator](https://github.com/tu-darmstadt-ros-pkg/pointcloud_accumulator)
@@ -56,12 +57,12 @@ The topics of the occupancy grid (`nav_msgs/OccupancyGrid`) and the accumulated 
 ### Launching the node 
 The Radiation Mapping node can be launched with 2D and 3D mapping enabled using
 ```
-roslaunch radiation_mapping mapping.launch
+roslaunch hector_radiation_mapping mapping.launch
 ```
 
 If only 2D mapping is required, the node can be launched with
 ```
-roslaunch radiation_mapping mapping_2D_only.launch
+roslaunch hector_radiation_mapping mapping_2D_only.launch
 ```
 
 ## ROS topics and services
@@ -76,11 +77,12 @@ The following topics are used to communicate with the Radiation Mapping node.
 |`/pointcloud_accumulated`|`sensor_msgs/PointCloud2`|Pointcloud scan of the environment|
 
 #### Output
-| Topic name | Type | Description |
-| ------ | ------ | ------ |
-|`/radiation_mapping/grid_map_*`|`grid_map_msgs/GridMap`|Environment map with predictions and uncertainty overlaid|
-|`/radiation_mapping/pointCloud3D`|`sensor_msgs/PointCloud2`|Environment scan, colored using predictions and uncertainty|
-|`/radiation_mapping/marker`|`visualization_msgs/Marker`|Trajectory of the robot, colored according to radiation measurements|
+| Topic name                                   | Type | Description                                                          |
+|----------------------------------------------| ------ |----------------------------------------------------------------------|
+| `/hector_radiation_mapping/grid_map_*`       |`grid_map_msgs/GridMap`| Environment map with predictions and uncertainty overlaid            |
+| `/hector_radiation_mapping/pointCloud3D`     |`sensor_msgs/PointCloud2`| Environment scan, colored using predictions and uncertainty          |
+| `/hector_radiation_mapping/marker`           |`visualization_msgs/Marker`| Trajectory of the robot, colored according to radiation measurements |
+| `/hector_radiation_mapping/source_markers/*` |`visualization_msgs/InteractiveMarkerUpdate`| Radiation source markers for confirmation|
 
 Additionally, interactive markers for predicted radiation sources in 2D and 3D are provided by the system.
 
@@ -89,8 +91,8 @@ The Radiation Mapping node provides the following services.
 
 | Service name | Input | Description |
 | ------ | ------ | ------ |
-|`/radiation_mapping/exportModel`|`String`|Exports the 2D and 3D representations of the model to the specified path|
-|`/radiation_mapping/resetModel`|-|Resets the model|
+|`/hector_radiation_mapping/exportModel`|`String`|Exports the 2D and 3D representations of the model to the specified path|
+|`/hector_radiation_mapping/resetModel`|-|Resets the model|
 
 
 ## Test Data
@@ -102,8 +104,8 @@ rosbag play telemax_run2_processed_straight_init.bag
 ```
 in another terminal window, before launching the Radiation Mapping node.
 <p align="center">
-    <img src="./hector_radiation_mapping/media/sample_map.jpg" alt="drawing" width="400"/>
-    <img src="./hector_radiation_mapping/media/3DComplete.jpg" alt="drawing" width="400"/>
+    <img src="./misc/media/sample_map.jpg" alt="drawing" width="400"/>
+    <img src="./misc/media/3DComplete.jpg" alt="drawing" width="400"/>
 </p>
 
 ## Paper 

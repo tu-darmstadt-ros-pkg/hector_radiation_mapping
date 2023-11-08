@@ -10,7 +10,7 @@ def save_list_to_file(list, folder: str, file_name: str):
     :param file_name:  file name
     :return: None
     """
-    export_path = rospkg.RosPack().get_path('radiation_mapping') + '/radiation_mapping_exports/'
+    export_path = rospkg.RosPack().get_path('hector_radiation_mapping') + '/radiation_mapping_exports/'
     with open(export_path + folder + "/" + file_name, 'w') as f:
         for item in list:
             f.write(str(item) + "\n")

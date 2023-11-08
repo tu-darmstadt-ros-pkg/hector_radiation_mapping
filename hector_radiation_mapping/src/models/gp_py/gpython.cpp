@@ -21,8 +21,8 @@
 
 GPython::GPython() {
     // Define ROS service clients
-    evaluationServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>("/radiation_mapping/gp_evaluation");
-    sampleServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::AddSamplesService>("/radiation_mapping/gp_samples");
+    evaluationServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>("/hector_radiation_mapping/gp_evaluation");
+    sampleServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::AddSamplesService>("/hector_radiation_mapping/gp_samples");
 
     // Create dynamic reconfigure parameters
     param1_ptr = new double[1];
@@ -32,9 +32,9 @@ GPython::GPython() {
     *param2_ptr = 1.0;
     *param3_ptr = 1.0;
     groupName_ = "gpython";
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param1", param1_ptr, boost::bind(&GPython::paramCallback, this), "param1", 0.0, 4.0, groupName_);
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param2", param2_ptr, boost::bind(&GPython::paramCallback, this), "param2", 0.0, 100.0, groupName_);
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_param3", param3_ptr, boost::bind(&GPython::paramCallback, this), "param3", 0.0, 100.0, groupName_);
+    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_kernel_lengthscale", param1_ptr, boost::bind(&GPython::paramCallback, this), "param1", 0.0, 4.0, groupName_);
+    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_outputscale", param2_ptr, boost::bind(&GPython::paramCallback, this), "param2", 0.0, 20.0, groupName_);
+    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_likelihood_noise", param3_ptr, boost::bind(&GPython::paramCallback, this), "param3", 0.0, 20.0, groupName_);
     DDDynamicReconfigure::instance().publish();
     STREAM_DEBUG("GPython params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
 
