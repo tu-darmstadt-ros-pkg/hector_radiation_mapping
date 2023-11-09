@@ -65,7 +65,7 @@ private:
         // General
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/rosSpinnerThreads", rosSpinnerThreads);
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableOnline3DEvaluation", enableOnline3DEvaluation);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableSpatialSampling", enableSpatialSampleFiltering);
+        success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableSpatialSampleFiltering", enableSpatialSampleFiltering);
 
         // ROS topics
         success = success & nodeHandle_->getParam("/hector_radiation_mapping/subscribeTopic", subscribeTopic);

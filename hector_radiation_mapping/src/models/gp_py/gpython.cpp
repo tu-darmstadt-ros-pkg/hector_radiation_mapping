@@ -30,7 +30,7 @@ GPython::GPython() {
     param3_ptr = new double[1];
     *param1_ptr = 1.0;
     *param2_ptr = 1.0;
-    *param3_ptr = 1.0;
+    *param3_ptr = 10.0;
     groupName_ = "gpython";
     DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_kernel_lengthscale", param1_ptr, boost::bind(&GPython::paramCallback, this), "param1", 0.0, 4.0, groupName_);
     DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_outputscale", param2_ptr, boost::bind(&GPython::paramCallback, this), "param2", 0.0, 20.0, groupName_);

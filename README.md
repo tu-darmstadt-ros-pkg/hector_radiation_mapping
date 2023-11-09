@@ -30,6 +30,7 @@ With 3D mapping enabled, a colored pointcloud is also provided, containing predi
 - [Point Cloud Library (PCL)](https://wiki.ros.org/pcl/Overview)
 - [ANYbotics grid_map](https://github.com/ANYbotics/grid_map)
 - [Point Cloud Accumulator](https://github.com/tu-darmstadt-ros-pkg/pointcloud_accumulator)
+- [Hector RViz plugins](https://github.com/tu-darmstadt-ros-pkg/hector_rviz_plugins) (for RViz configuration)
 
 The following ROS modules are required: <br><br>
 `roscpp`, `std_msgs`, `geometry_msgs`, `grid_map_ros`, `grid_map_msgs`, `nav_msgs`, `tf2_ros`, `pcl_ros`, `interactive_markers`, `ros_babel_fish`,`cv_bridge`
