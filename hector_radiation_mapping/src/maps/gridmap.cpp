@@ -15,14 +15,18 @@ void GridMap::initGridMap(Eigen::Vector3d &origin, double resolution) {
     const grid_map::Length mapLength(5.0, 5.0);
     const grid_map::Position mapPosition(origin.x(), origin.y());
     map_.setGeometry(mapLength, resolution, mapPosition);
-    map_.setFrameId("world");
+    map_.setFrameId(Parameters::instance().worldFrame);
     tmpMap_.setGeometry(mapLength, resolution, mapPosition);
-    tmpMap_.setFrameId("world");
+    tmpMap_.setFrameId(Parameters::instance().worldFrame);
     ROS_INFO("Created map with size %f x %f m (%i x %i cells).", map_.getLength().x(), map_.getLength().y(),
              map_.getSize()(0), map_.getSize()(1));
 }
 
 void GridMap::addLayer(const std::string &layerName) {
+    if (existsLayer(layerName)) {
+        STREAM_DEBUG("GridMap: addLayer() Layer name \"" << layerName << "\" already exists.");
+        return;
+    }
     map_.add(layerName, 0.0);
 }
 

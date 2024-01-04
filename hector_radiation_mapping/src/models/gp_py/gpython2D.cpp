@@ -9,12 +9,9 @@
 
 
 GPython2D::GPython2D() {
-    int id = 0;
-    std::string mapName = "grid_map_" + std::to_string(id);
-    std::string modelName = "GPGlobal_" + std::to_string(id);
     layerNameMean_ = "prediction";
     layerNameStdDev_ = "stdDev";
-    gridMap_ = std::make_shared<GridMap>(mapName, Parameters::instance().gridMapResolution);
+    gridMap_ = std::make_shared<GridMap>(Parameters::instance().gpGridMapTopic, Parameters::instance().gridMapResolution);
     gridMap_->addLayer(layerNameMean_);
     gridMap_->addLayer(layerNameStdDev_);
     useCircle_ = true;

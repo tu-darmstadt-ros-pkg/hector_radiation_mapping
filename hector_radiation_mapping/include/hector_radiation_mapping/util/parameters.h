@@ -16,6 +16,7 @@ public:
     int rosSpinnerThreads;
     bool enableOnline3DEvaluation;
     std::string exportPath;
+    std::string worldFrame;
     bool enableSpatialSampleFiltering;
 
     // ROS topics
@@ -32,24 +33,37 @@ public:
     double meanFactor;
     double minSourceStrength;
 
+    // Gaussian Process
     // 2D model
     double circleRadius;
     double minDistanceBetweenSamples2d;
     int minUpdateTime2d;
-
     // GridMap
+    std::string gpGridMapTopic;
     double gridMapResolution;
-
     // 3D model
     double gpLocalRadius;
     double minDistanceBetweenSamples3d;
     int minUpdateTime3d;
-
     // 3D Point cloud
     std::vector<double> distanceCutoffLevels;
     std::vector<int> pointCloud3DSizeLevels;
 
+    //
+
 private:
+
+    // templated method for loading a parameter from the parameter server
+    template<typename T>
+    bool loadParam(const std::string &paramName, T &param, const T &defaultValue = T()) {
+        std::string completeName = "/hector_radiation_mapping/" + paramName;
+        if (!nodeHandle_->param(completeName, param, defaultValue)) {
+            ROS_ERROR("Could not load parameter %s using default value", completeName.c_str());
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Constructor for the Parameters class.
      * Loads all parameters from the parameter server.
@@ -57,54 +71,49 @@ private:
     Parameters() {
         nodeHandle_ = std::make_shared<ros::NodeHandle>("hector_radiation_mapping");
 
-        bool success = true;
         startTime_ = ros::Time::now().toSec();
-
         doseSubSize = 100;
 
         // General
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/rosSpinnerThreads", rosSpinnerThreads);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableOnline3DEvaluation", enableOnline3DEvaluation);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/enableSpatialSampleFiltering", enableSpatialSampleFiltering);
+        loadParam("rosSpinnerThreads", rosSpinnerThreads);
+        loadParam("enableOnline3DEvaluation", enableOnline3DEvaluation);
+        loadParam("enableSpatialSampleFiltering", enableSpatialSampleFiltering);
+        loadParam("exportPath", exportPath);
+        loadParam("worldFrame", worldFrame);
 
         // ROS topics
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/subscribeTopic", subscribeTopic);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/environmentMapTopic", environmentMapTopic);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/environmentCloudTopic", environmentCloudTopic);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/messageKey_rate", messageKey_rate);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/messageKey_cps", messageKey_cps);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/messageKey_frameId", messageKey_frameId);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/radiationUnit", radiationUnit);
+        loadParam("subscribeTopic", subscribeTopic);
+        loadParam("environmentMapTopic", environmentMapTopic);
+        loadParam("environmentCloudTopic", environmentCloudTopic);
+        loadParam("messageKey_rate", messageKey_rate);
+        loadParam("messageKey_cps", messageKey_cps);
+        loadParam("messageKey_frameId", messageKey_frameId);
+        loadParam("radiationUnit", radiationUnit);
 
         // Source prediction
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/meanFactor", meanFactor);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minSourceStrength", minSourceStrength);
+        loadParam("meanFactor", meanFactor);
+        loadParam("minSourceStrength", minSourceStrength);
 
+        // Gaussian Process
         // 2D model
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/circleRadius", circleRadius);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minDistanceBetweenSamples2d", minDistanceBetweenSamples2d);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minUpdateTime2d", minUpdateTime2d);
-
+        loadParam("circleRadius", circleRadius);
+        loadParam("minDistanceBetweenSamples2d", minDistanceBetweenSamples2d);
+        loadParam("minUpdateTime2d", minUpdateTime2d);
         // GridMap
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/gridMapResolution", gridMapResolution);
-
+        loadParam("gpGridMapTopic", gpGridMapTopic);
+        loadParam("gridMapResolution", gridMapResolution);
         // 3D model
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/gpLocalRadius", gpLocalRadius);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minDistanceBetweenSamples3d", minDistanceBetweenSamples3d);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/minUpdateTime3d", minUpdateTime3d);
-
+        loadParam("gpLocalRadius", gpLocalRadius);
+        loadParam("minDistanceBetweenSamples3d", minDistanceBetweenSamples3d);
+        loadParam("minUpdateTime3d", minUpdateTime3d);
         // PointCloud3D
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/distanceCutoffLevels", distanceCutoffLevels);
-        success = success & nodeHandle_->getParam("/hector_radiation_mapping/pointCloud3DSizeLevels", pointCloud3DSizeLevels);
+        loadParam("distanceCutoffLevels", distanceCutoffLevels);
+        loadParam("pointCloud3DSizeLevels", pointCloud3DSizeLevels);
 
-        if (!success) {
-            ROS_ERROR("Could not load all parameters!");
-        }
+        //
 
         // Set useDoseRate to true, if messageKey_rate is set
         useDoseRate = !messageKey_rate.empty();
-
-        exportPath = "/../exports/";
     }
 
     Parameters(const Parameters &) = delete;

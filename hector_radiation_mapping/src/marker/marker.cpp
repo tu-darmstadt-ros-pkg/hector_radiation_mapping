@@ -1,10 +1,14 @@
 #include "pch.h"
 #include "marker/marker.h"
 #include "marker/marker_manager.h"
+#include "util/parameters.h"
 
 Marker::Marker() {
     id_ = idCounter_;
     idCounter_++;
+    marker_.header.frame_id = Parameters::instance().worldFrame;
+    marker_.header.stamp = ros::Time();
+    marker_.id = id_;
 }
 
 void Marker::deleteMarker() {

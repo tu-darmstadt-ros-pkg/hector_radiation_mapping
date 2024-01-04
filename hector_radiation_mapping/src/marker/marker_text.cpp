@@ -4,12 +4,9 @@
 
 TextMarker::TextMarker(const Eigen::Vector3d &origin, const std::string &text, double zOffset,
                        const Eigen::Vector4d &color) : Marker(), sphere(origin, color) {
-    marker_.header.frame_id = "world";
-    marker_.header.stamp = ros::Time();
     marker_.type = visualization_msgs::Marker::TEXT_VIEW_FACING;
     marker_.action = visualization_msgs::Marker::MODIFY;
     marker_.text = text;
-    marker_.id = id_;
     zOffset_ = zOffset;
 
     setPos(origin.x(), origin.y(), origin.z(), false);
