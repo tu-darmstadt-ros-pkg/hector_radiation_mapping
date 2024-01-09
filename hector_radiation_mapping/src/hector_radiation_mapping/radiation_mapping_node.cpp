@@ -14,7 +14,7 @@ RadiationMapper::RadiationMapper() {
     ModelManager::instance();
 
     STREAM("hector_radiation_mapping node initialized!");
-    ros::MultiThreadedSpinner spinner(Parameters::instance().rosSpinnerThreads);
+    ros::MultiThreadedSpinner spinner(Parameters::instance().ros_spinner_threads);
     spinner.spin();
 }
 

@@ -6,11 +6,10 @@
 		<arg name="resolution" value="0.05" />
   	</include>
 
-	<node name="hector_gp_node" pkg="hector_gaussian_process" type="gp_node"  output="screen" />
-
 	<node name="hector_radiation_mapping" pkg="hector_radiation_mapping" type="radiation_mapping_node" output="screen">
+	
         <param name="mode" value="0" type="int" /> <!-- MODE: 0 = normal, 1 = test-->
-        <param name="messageKey_rate" value="rate" type="string" />
-		<param name="enableOnline3DEvaluation" value="true" type="bool" />
+        <param name="message_key_rate" value="rate" type="string" />
+		<param name="enable_online_3d_evaluation" value="true" type="bool" />
 	</node>
 </launch>

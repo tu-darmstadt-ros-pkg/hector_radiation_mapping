@@ -3,6 +3,7 @@
 
 #include "pch.h"
 #include "hector_radiation_mapping/sample.h"
+#include "models/model.h"
 
 /**
  * @brief The GPython class
@@ -10,14 +11,14 @@
  * samples to the model and to evaluate the model at given positions and check if a sample is already in the model.
  * Runs in a separate thread.
  */
-class GPython {
+class GPython : public Model {
 public:
     /**
      * Struct for storing the result of a GP evaluation.
      */
     struct GPResult {
         Vector mean;
-        Vector stdDev;
+        Vector std_dev;
     };
 
     /**
@@ -35,40 +36,32 @@ public:
      * Returns the instance of the GPython class.
      * @return The instance of the GPython class.
      */
-    static GPython &instance();
+    static GPython &instance(){
+        static GPython instance;
+        return instance;
+    }
 
     /**
-     * Returns if the GPython class is active.
-     * @return True if the GPython class is active.
+     * Resets the model.
      */
-    bool isActive() const;
+    void reset() override;
 
     /**
      * Deactivates the GPython class.
      */
-    void deactivate();
+    void deactivate() override;
 
     /**
      * Activates the GPython class.
      */
-    void activate();
+    void activate() override;
 
     /**
      * Shuts down the GPython class.
      */
-    void shutDown();
+    void shutDown() override;
 
-    /**
-     * Adds a sample to the model.
-     * @param sample The sample to add.
-     */
-    void addSample(SampleGP &sample);
-
-    /**
-     * Adds a vector of samples to the model.
-     * @param samples The vector of samples to add.
-     */
-    void addSamples(std::vector<SampleGP> &samples);
+    static std::vector<SampleGP> samplesToSamplesGP(std::vector<Sample> &samples);
 
     /**
      * Adds all samples within a radius to the model.
@@ -90,19 +83,13 @@ public:
      * Get all sample ids of the 2D model
      * @return The sample ids of the 2D model
      */
-    std::vector<int> getSampleIds2d() { return sampleIds2d_; };
+    std::vector<int> getSampleIds2d() { return sample_ids_2d_; };
 
     /**
      * Get all sample ids of the 3D model
      * @return The sample ids of the 3D model
      */
-    std::vector<int> getSampleIds3d() { return sampleIds3d_; };
-
-    /**
-     * Get the mutex for the model
-     * @return The mutex for the model
-     */
-    std::mutex &getModelMutex() { return model_mtx_; };
+    std::vector<int> getSampleIds3d() { return sample_ids_3d_; };
 
 private:
     GPython();
@@ -110,21 +97,14 @@ private:
     GPython &operator=(const GPython &) = delete;
 
     /**
-     * Converts a vector of variances to a vector of standard deviations.
-     * @param variance The vector of variances.
-     * @return The vector of standard deviations.
-     */
-    static Vector varianceToStdDeviation(Vector &variance);
-
-    /**
      * Updates the model in a loop. It is called in a separate thread.
-     * It sends all samples in the samplesQueue_ to the GPython model.
+     * It sends all samples in the samples_add_queue_ to the GPython model.
      * It also updates the parameters of the GPython model.
      */
-    void updateLoop();
+    void updateLoop() override;
 
     /**
-     * Sends a vector of samples to the GPython model via the sampleServiceClient_.
+     * Sends a vector of samples to the GPython model via the sample_service_client_.
      * @param samples The vector of samples to send.
      */
     void addSamplesToModel(const std::vector<SampleGP> &samples);
@@ -144,39 +124,29 @@ private:
     bool isSampleIn3DModel(const Sample &sample);
 
     /**
-     * Callback for the dynamic reconfigure parameters. Sets the paramUpdate_ flag that signals that the parameters
+     * Callback for the dynamic reconfigure parameters. Sets the param_update_ flag that signals that the parameters
      * have changed. The parameters are updated in the updateLoop().
      */
     void paramCallback();
 
     // ROS
-    ros::ServiceClient evaluationServiceClient_;
-    ros::ServiceClient sampleServiceClient_;
+    ros::ServiceClient evaluation_service_client_;
+    ros::ServiceClient sample_service_client_;
 
     // Model
-    int modelSize_;
-    std::vector<SampleGP> samplesQueue_;
-    std::vector<int> sampleIds2d_;
-    std::vector<int> sampleIds3d_;
+    int model_size_;
+    std::vector<int> sample_ids_2d_;
+    std::vector<int> sample_ids_3d_;
 
     // Dynamic reconfigure parameters
-    std::string groupName_;
     double *param1_ptr;
     double *param2_ptr;
     double *param3_ptr;
-    volatile bool paramUpdate_;
+    volatile bool param_update_;
 
     // For runtime evaluation
-    std::vector<double> updateTimes_;
-    std::vector<double> updateSizes_;
-
-    // For thread management
-    volatile bool active_;
-    std::thread updateThread_;
-    std::condition_variable waitCondition_;
-    std::mutex activation_mtx_;
-    std::mutex sampleQueue_mtx_;
-    std::mutex model_mtx_;
+    std::vector<double> update_times_;
+    std::vector<double> update_sizes_;
 };
 
 #endif //RADIATION_MAPPING_GP_PY_MANAGER_H

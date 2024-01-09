@@ -8,48 +8,63 @@ public:
         return instance;
     }
 
-    std::shared_ptr<ros::NodeHandle> nodeHandle_;
+    std::shared_ptr<ros::NodeHandle> node_handle_ptr_;
     double startTime_;
 
     // General
-    int doseSubSize;
-    int rosSpinnerThreads;
-    bool enableOnline3DEvaluation;
-    std::string exportPath;
-    std::string worldFrame;
-    bool enableSpatialSampleFiltering;
+    int dose_sub_size;
+    int ros_spinner_threads;
+    bool enable_online_3d_evaluation;
+    std::string export_path;
+    std::string world_frame;
+    bool enable_spatial_sample_filtering;
 
     // ROS topics
-    bool useDoseRate;
-    std::string subscribeTopic;
-    std::string environmentCloudTopic;
-    std::string environmentMapTopic;
-    std::string messageKey_rate;
-    std::string messageKey_cps;
-    std::string messageKey_frameId;
-    std::string radiationUnit;
-
-    // Source prediction
-    double meanFactor;
-    double minSourceStrength;
+    bool use_dose_rate;
+    std::string subscribe_topic;
+    std::string environment_cloud_topic;
+    std::string environment_map_topic;
+    std::string message_key_rate;
+    std::string message_key_cps;
+    std::string message_key_frame_id;
+    std::string radiation_unit;
 
     // Gaussian Process
+    // Source prediction
+    double gp_mean_factor;
+    double gp_min_source_strength;
     // 2D model
-    double circleRadius;
-    double minDistanceBetweenSamples2d;
-    int minUpdateTime2d;
+    double gp_circle_radius;
+    double gp_min_distance_between_samples_2d;
+    int gp_min_update_time_2d;
     // GridMap
-    std::string gpGridMapTopic;
-    double gridMapResolution;
+    std::string gp_grid_map_topic;
+    double gp_grid_map_resolution;
     // 3D model
-    double gpLocalRadius;
-    double minDistanceBetweenSamples3d;
-    int minUpdateTime3d;
+    double gp_local_radius;
+    double gp_min_distance_between_samples_3d;
+    int gp_min_update_time_3d;
     // 3D Point cloud
-    std::vector<double> distanceCutoffLevels;
-    std::vector<int> pointCloud3DSizeLevels;
+    std::vector<double> gp_distance_cutoff_levels;
+    std::vector<int> gp_point_cloud_3d_size_levels;
 
-    //
+    // Least Squares
+    double ls_circle_radius;
+    int ls_min_update_time;
+    std::string ls_grid_map_topic;
+    double ls_grid_map_resolution;
+
+    // Bayesian Inference
+    double bi_circle_radius;
+    int bi_min_update_time;
+    std::string bi_grid_map_topic;
+    double bi_grid_map_resolution;
+
+    // Field Propagation
+    double fp_circle_radius;
+    int fp_min_update_time;
+    std::string fp_grid_map_topic;
+    double fp_grid_map_resolution;
 
 private:
 
@@ -57,7 +72,7 @@ private:
     template<typename T>
     bool loadParam(const std::string &paramName, T &param, const T &defaultValue = T()) {
         std::string completeName = "/hector_radiation_mapping/" + paramName;
-        if (!nodeHandle_->param(completeName, param, defaultValue)) {
+        if (!node_handle_ptr_->param(completeName, param, defaultValue)) {
             ROS_ERROR("Could not load parameter %s using default value", completeName.c_str());
             return false;
         }
@@ -69,51 +84,67 @@ private:
      * Loads all parameters from the parameter server.
      */
     Parameters() {
-        nodeHandle_ = std::make_shared<ros::NodeHandle>("hector_radiation_mapping");
+        node_handle_ptr_ = std::make_shared<ros::NodeHandle>("hector_radiation_mapping");
 
         startTime_ = ros::Time::now().toSec();
-        doseSubSize = 100;
+        dose_sub_size = 100;
 
         // General
-        loadParam("rosSpinnerThreads", rosSpinnerThreads);
-        loadParam("enableOnline3DEvaluation", enableOnline3DEvaluation);
-        loadParam("enableSpatialSampleFiltering", enableSpatialSampleFiltering);
-        loadParam("exportPath", exportPath);
-        loadParam("worldFrame", worldFrame);
+        loadParam("ros_spinner_threads", ros_spinner_threads);
+        loadParam("enable_online_3d_evaluation", enable_online_3d_evaluation);
+        loadParam("enable_spatial_sample_filtering", enable_spatial_sample_filtering);
+        loadParam("export_path", export_path);
+        loadParam("world_frame", world_frame);
 
         // ROS topics
-        loadParam("subscribeTopic", subscribeTopic);
-        loadParam("environmentMapTopic", environmentMapTopic);
-        loadParam("environmentCloudTopic", environmentCloudTopic);
-        loadParam("messageKey_rate", messageKey_rate);
-        loadParam("messageKey_cps", messageKey_cps);
-        loadParam("messageKey_frameId", messageKey_frameId);
-        loadParam("radiationUnit", radiationUnit);
+        loadParam("subscribe_topic", subscribe_topic);
+        loadParam("environment_map_topic", environment_map_topic);
+        loadParam("environment_cloud_topic", environment_cloud_topic);
+        loadParam("message_key_rate", message_key_rate);
+        loadParam("message_key_cps", message_key_cps);
+        loadParam("message_key_frame_id", message_key_frame_id);
+        loadParam("radiation_unit", radiation_unit);
 
         // Source prediction
-        loadParam("meanFactor", meanFactor);
-        loadParam("minSourceStrength", minSourceStrength);
+        loadParam("gp_mean_factor", gp_mean_factor);
+        loadParam("gp_min_source_strength", gp_min_source_strength);
 
         // Gaussian Process
         // 2D model
-        loadParam("circleRadius", circleRadius);
-        loadParam("minDistanceBetweenSamples2d", minDistanceBetweenSamples2d);
-        loadParam("minUpdateTime2d", minUpdateTime2d);
+        loadParam("gp_circle_radius", gp_circle_radius);
+        loadParam("gp_min_distance_between_samples_2d", gp_min_distance_between_samples_2d);
+        loadParam("gp_min_update_time_2d", gp_min_update_time_2d);
         // GridMap
-        loadParam("gpGridMapTopic", gpGridMapTopic);
-        loadParam("gridMapResolution", gridMapResolution);
+        loadParam("gp_grid_map_topic", gp_grid_map_topic);
+        loadParam("gp_grid_map_resolution", gp_grid_map_resolution);
         // 3D model
-        loadParam("gpLocalRadius", gpLocalRadius);
-        loadParam("minDistanceBetweenSamples3d", minDistanceBetweenSamples3d);
-        loadParam("minUpdateTime3d", minUpdateTime3d);
+        loadParam("gp_local_radius", gp_local_radius);
+        loadParam("gp_min_distance_between_samples_3d", gp_min_distance_between_samples_3d);
+        loadParam("gp_min_update_time_3d", gp_min_update_time_3d);
         // PointCloud3D
-        loadParam("distanceCutoffLevels", distanceCutoffLevels);
-        loadParam("pointCloud3DSizeLevels", pointCloud3DSizeLevels);
+        loadParam("gp_distance_cutoff_levels", gp_distance_cutoff_levels);
+        loadParam("gp_point_cloud_3d_size_levels", gp_point_cloud_3d_size_levels);
 
-        //
+        // Least Squares
+        loadParam("ls_circle_radius", ls_circle_radius);
+        loadParam("ls_min_update_time", ls_min_update_time);
+        loadParam("ls_grid_map_topic", ls_grid_map_topic);
+        loadParam("ls_grid_map_resolution", ls_grid_map_resolution);
 
-        // Set useDoseRate to true, if messageKey_rate is set
-        useDoseRate = !messageKey_rate.empty();
+        // Bayesian Inference
+        loadParam("bi_circle_radius", bi_circle_radius);
+        loadParam("bi_min_update_time", bi_min_update_time);
+        loadParam("bi_grid_map_topic", bi_grid_map_topic);
+        loadParam("bi_grid_map_resolution", bi_grid_map_resolution);
+
+        // Field Propagation
+        loadParam("fp_circle_radius", fp_circle_radius);
+        loadParam("fp_min_update_time", fp_min_update_time);
+        loadParam("fp_grid_map_topic", fp_grid_map_topic);
+        loadParam("fp_grid_map_resolution", fp_grid_map_resolution);
+
+        // Set use_dose_rate to true, if message_key_rate is set
+        use_dose_rate = !message_key_rate.empty();
     }
 
     Parameters(const Parameters &) = delete;

@@ -105,6 +105,14 @@ public:
      * @param colToRemove column to remove
      */
     static void removeColumn(Matrix& matrix, unsigned int colToRemove);
+
+    /**
+     * Converts a vector of variances to a vector of standard deviations.
+     * @param variance The vector of variances.
+     * @return The vector of standard deviations.
+     */
+    static Vector varianceToStdDeviation(Vector &variance);
+
 private:
     Util() = default;
 };

@@ -37,7 +37,7 @@ public:
     double getCps() const { return cps_; };
 
     /**
-     * Get the strength of the source. Either cps or dose rate depending on the parameter useDoseRate which can be
+     * Get the strength of the source. Either cps or dose rate depending on the parameter use_dose_rate which can be
      * configured in the config file
      * @return strength of the source
      */

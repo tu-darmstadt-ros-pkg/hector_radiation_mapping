@@ -12,9 +12,7 @@
 
 class PointCloud3D;
 class Source;
-class GPython2D;
-class GPython3D;
-class GPython;
+class Model;
 
 class ModelManager {
 public:
@@ -45,6 +43,8 @@ public:
      */
     void sysCmdCallback(const std_msgs::String::ConstPtr &msg);
 
+    std::vector<Model*> getModels() const;
+
 private:
     /**
      * Private constructor for singleton pattern.
@@ -55,8 +55,9 @@ private:
     ModelManager(const ModelManager&) = delete;
     ModelManager& operator=(const ModelManager&) = delete;
 
-    ros::ServiceServer resetService_;
-    ros::Subscriber sysCmdSub_;
+    std::vector<Model*> models_;
+    ros::ServiceServer reset_service_;
+    ros::Subscriber sys_cmd_sub_;
 };
 
 #endif //RADIATION_MAPPING_MODEL_MANAGER_H

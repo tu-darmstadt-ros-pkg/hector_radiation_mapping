@@ -51,12 +51,16 @@ add_executable(radiation_mapping_node
         src/models/gp_py/gpython3D.cpp
         src/models/model_manager.cpp
         src/models/model_exporter.cpp
+        src/models/model.cpp
         src/hector_radiation_mapping/source_interactive.cpp
         src/hector_radiation_mapping/source.cpp
         src/util/util.cpp
         src/util/color.cpp
         src/util/dddynamic_reconfigure.cpp
-        )
+        src/models/least_squares/least_squares.cpp
+        src/models/field_propagation/field_propagation.cpp
+        src/models/baysian_inference/baysian_inference.cpp
+)
 
 target_precompile_headers(radiation_mapping_node PRIVATE include/pch.h)
 

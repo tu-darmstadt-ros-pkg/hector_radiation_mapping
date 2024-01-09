@@ -7,14 +7,14 @@
 PointCloud3D::PointCloud3D(const std::string &name) {
     name_ = name;
     stepSize_ = 1;
-    mapPublisher_ = Parameters::instance().nodeHandle_->advertise<sensor_msgs::PointCloud2>(name_, 1, true);
+    mapPublisher_ = Parameters::instance().node_handle_ptr_->advertise<sensor_msgs::PointCloud2>(name_, 1, true);
 
-    longDist_ = Parameters::instance().distanceCutoffLevels[2];
-    midDist_ = Parameters::instance().distanceCutoffLevels[1];
-    shortDist_ = Parameters::instance().distanceCutoffLevels[0];
-    longDistSize_ = Parameters::instance().pointCloud3DSizeLevels[2];
-    midDistSize_ = Parameters::instance().pointCloud3DSizeLevels[1];
-    shortDistSize_ = Parameters::instance().pointCloud3DSizeLevels[0];
+    longDist_ = Parameters::instance().gp_distance_cutoff_levels[2];
+    midDist_ = Parameters::instance().gp_distance_cutoff_levels[1];
+    shortDist_ = Parameters::instance().gp_distance_cutoff_levels[0];
+    longDistSize_ = Parameters::instance().gp_point_cloud_3d_size_levels[2];
+    midDistSize_ = Parameters::instance().gp_point_cloud_3d_size_levels[1];
+    shortDistSize_ = Parameters::instance().gp_point_cloud_3d_size_levels[0];
 
     // zlevel cutoff
     zCutoff_ = new double[1];

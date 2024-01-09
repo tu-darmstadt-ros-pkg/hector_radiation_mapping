@@ -19,8 +19,8 @@ ModelExporter::ModelExporter() {
     exporting_ = false;
     geotiff_writer_ = std::make_shared<geotiff::GeotiffWriter>();
     exportService_ = ros::ServiceServer(
-            Parameters::instance().nodeHandle_->advertiseService("exportModel", &ModelExporter::exportServiceCallback,
-                                                                 this));
+            Parameters::instance().node_handle_ptr_->advertiseService("exportModel", &ModelExporter::exportServiceCallback,
+                                                                      this));
 }
 
 ModelExporter &ModelExporter::instance() {
@@ -91,7 +91,7 @@ void ModelExporter::export2DMap(std::string path) {
             if (layerName == "confidence") {
                 createGeoTiff(layerName, path, finalData, sources, trajectory, *slamGrid, combinedGrid, false);
             } else if (layerName == "prediction") {
-                if (Parameters::instance().useDoseRate) {
+                if (Parameters::instance().use_dose_rate) {
                     finalData = finalData.array() + SampleManager::instance().getBackgroundRadiationDoseRate();
                 } else {
                     finalData = (finalData * cpsToMikroSievertPerHour_).array() +
@@ -196,7 +196,7 @@ void ModelExporter::createGeoTiff(const std::string &fileName, const std::string
 
     geotiff_writer_->setMapFileName(fileName);
     geotiff_writer_->setMapFilePath(path);
-    geotiff_writer_->setUnit(Parameters::instance().radiationUnit);
+    geotiff_writer_->setUnit(Parameters::instance().radiation_unit);
     geotiff_writer_->setupTransforms(combinedGrid);
     geotiff_writer_->setupImageSize();
     geotiff_writer_->setupData(data_copy, turbo_colormap);

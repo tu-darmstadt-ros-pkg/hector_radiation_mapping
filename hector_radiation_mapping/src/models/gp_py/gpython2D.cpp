@@ -7,30 +7,29 @@
 #include "util/util.h"
 #include "util/clock_cpu.h"
 
-
 GPython2D::GPython2D() {
-    layerNameMean_ = "prediction";
-    layerNameStdDev_ = "stdDev";
-    gridMap_ = std::make_shared<GridMap>(Parameters::instance().gpGridMapTopic, Parameters::instance().gridMapResolution);
-    gridMap_->addLayer(layerNameMean_);
-    gridMap_->addLayer(layerNameStdDev_);
-    useCircle_ = true;
-    doEvaluation_ = false;
-    groupName_ = "GPython2D";
-    minUpdateTime_ = Parameters::instance().minUpdateTime2d;
-    DDDynamicReconfigure::instance().registerVariable<bool>(groupName_ + "_useCircleEvaluation", useCircle_,
+    layer_name_mean_ = "prediction";
+    layer_name_std_dev_ = "std_dev";
+    grid_map_ = std::make_shared<GridMap>(Parameters::instance().gp_grid_map_topic, Parameters::instance().gp_grid_map_resolution);
+    grid_map_->addLayer(layer_name_mean_);
+    grid_map_->addLayer(layer_name_std_dev_);
+    use_circle_ = true;
+    do_evaluation_ = false;
+    group_name_ = "GPython2D";
+    min_update_time_ = Parameters::instance().gp_min_update_time_2d;
+    DDDynamicReconfigure::instance().registerVariable<bool>(group_name_ + "_useCircleEvaluation", use_circle_,
                                                             boost::bind(&GPython2D::setUseCircle, this, _1), "on/off",
-                                                            false, true, groupName_);
-    DDDynamicReconfigure::instance().registerVariable<int>(groupName_ + "_minUpdateTime", minUpdateTime_,
+                                                            false, true, group_name_);
+    DDDynamicReconfigure::instance().registerVariable<int>(group_name_ + "_minUpdateTime", min_update_time_,
                                                            boost::bind(&GPython2D::setMinUpdateTime, this, _1),
                                                            "min/max",
-                                                           0, 5000, groupName_);
+                                                           0, 5000, group_name_);
     DDDynamicReconfigure::instance().publish();
 
-    slamMapSubscriber_ = std::make_shared<ros::Subscriber>(
-            Parameters::instance().nodeHandle_->subscribe(Parameters::instance().environmentMapTopic,
-                                                          Parameters::instance().doseSubSize,
-                                                          &GPython2D::slamMapCallback, this));
+    slam_map_subscriber_ = std::make_shared<ros::Subscriber>(
+            Parameters::instance().node_handle_ptr_->subscribe(Parameters::instance().environment_map_topic,
+                                                               Parameters::instance().dose_sub_size,
+                                                               &GPython2D::slamMapCallback, this));
 
     active_ = false;
     activate();
@@ -49,7 +48,7 @@ void GPython2D::activate() {
     std::lock_guard<std::mutex> lock{activation_mtx_};
     if (active_) return;
     this->active_ = true;
-    updateThread_ = std::thread(&GPython2D::updateLoop, this);
+    update_thread_ = std::thread(&GPython2D::updateLoop, this);
     STREAM_DEBUG("GPython2D activated");
 }
 
@@ -57,79 +56,79 @@ void GPython2D::deactivate() {
     std::lock_guard<std::mutex> lock{activation_mtx_};
     if (!active_) return;
     this->active_ = false;
-    updateThread_.join();
+    update_thread_.join();
     STREAM_DEBUG("GPython2D deactivated");
 }
 
 void GPython2D::updateLoop() {
     Clock clock;
-    std::vector<double> evaluationTimes;
-    std::vector<double> sourcePredTimes;
-    std::vector<double> evaluationSizes;
+    std::vector<double> evaluation_times;
+    std::vector<double> source_pred_times;
+    std::vector<double> evaluation_sizes;
     while (active_ && ros::ok()) {
         clock.tick();
-        if (doEvaluation_) {
-            doEvaluation_ = false;
-            bool useCircle = useCircle_;
+        if (do_evaluation_) {
+            do_evaluation_ = false;
+            bool use_circle = use_circle_;
             Vector2d center = SampleManager::instance().getLastSamplePos().topRows(2);
-            std::shared_ptr<nav_msgs::OccupancyGrid> slamMap = slamMap_;
+            std::shared_ptr<nav_msgs::OccupancyGrid> slamMap = slam_map_;
             {
-                std::lock_guard<std::mutex> lock1{GPython::instance().getModelMutex()};
-                std::lock_guard<std::mutex> lock{gridMap_->getGridMapMutex()};
-                Matrix samplePositions = getSamplePositions(slamMap, useCircle, center);
-                GPython::GPResult gpResult = GPython::instance().evaluate(samplePositions);
-                updateMap(gpResult.mean, gpResult.stdDev, useCircle, center);
-                evaluationTimes.push_back((double) clock.tock());
+                std::lock_guard<std::recursive_mutex> lock1{GPython::instance().getModelMutex()};
+                std::lock_guard<std::mutex> lock{grid_map_->getGridMapMutex()};
+                Matrix sample_positions = getSamplePositions(slamMap, use_circle, center);
+                GPython::GPResult gp_result = GPython::instance().evaluate(sample_positions);
+                updateMap(gp_result.mean, gp_result.std_dev, use_circle, center);
+                evaluation_times.push_back((double) clock.tock());
                 clock.tick();
-                updateSourcePrediction(samplePositions, gpResult.mean);
-                sourcePredTimes.push_back((double) clock.tock());
+                updateSourcePrediction(sample_positions, gp_result.mean);
+                source_pred_times.push_back((double) clock.tock());
             }
-            evaluationSizes.push_back((double) GPython::instance().getSampleIds2d().size());
+            evaluation_sizes.push_back((double) GPython::instance().getSampleIds2d().size());
         }
-        int sleepTime = std::max(0, minUpdateTime_ - (int) clock.tock());
+        int sleepTime = std::max(0, min_update_time_ - (int) clock.tock());
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
     }
-    //std::string exportPath = Util::getExportPath("runtime");
-    //Util::exportVectorToTxtFile(evaluationTimes, exportPath, "evaluationTimes", Util::TxtExportType::NEW, true);
-    //Util::exportVectorToTxtFile(sourcePredTimes, exportPath, "sourcePredTimes", Util::TxtExportType::NEW, true);
-    //Util::exportVectorToTxtFile(evaluationSizes, exportPath, "evaluationSizes", Util::TxtExportType::NEW, true);
+    //std::string export_path = Util::getExportPath("runtime");
+    //Util::exportVectorToTxtFile(evaluation_times, export_path, "evaluation_times", Util::TxtExportType::NEW, true);
+    //Util::exportVectorToTxtFile(source_pred_times, export_path, "source_pred_times", Util::TxtExportType::NEW, true);
+    //Util::exportVectorToTxtFile(evaluation_sizes, export_path, "evaluation_sizes", Util::TxtExportType::NEW, true);
 }
 
-Matrix GPython2D::getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slamMap, bool useCircle,
+Matrix GPython2D::getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map, bool use_circle,
                                      const Vector2d &center) {
-    double radius = Parameters::instance().circleRadius;
-    if (slamMap != nullptr) {
-        gridMap_->updateGridDimensionWithSlamMap(slamMap);
+    double radius = Parameters::instance().gp_circle_radius;
+    if (slam_map != nullptr) {
+        grid_map_->updateGridDimensionWithSlamMap(slam_map);
     }
-    return useCircle ? gridMap_->getCircleSamplePositions(center, radius)
-                     : gridMap_->getMapSamplePositions();
+    return use_circle ? grid_map_->getCircleSamplePositions(center, radius)
+                      : grid_map_->getMapSamplePositions();
 }
 
-void GPython2D::updateMap(const Vector &mean, const Vector &std_dev, bool useCircle, const Vector2d &center) {
-    double radius = Parameters::instance().circleRadius;
-    if (useCircle) {
-        gridMap_->updateLayer(layerNameMean_, mean, center, radius);
-        gridMap_->updateLayer(layerNameStdDev_, std_dev, center, radius);
+void GPython2D::updateMap(const Vector &mean, const Vector &std_dev, bool use_circle, const Vector2d &center) {
+    double radius = Parameters::instance().gp_circle_radius;
+    if (use_circle) {
+        grid_map_->updateLayer(layer_name_mean_, mean, center, radius);
+        grid_map_->updateLayer(layer_name_std_dev_, std_dev, center, radius);
     } else {
-        gridMap_->updateLayer(layerNameMean_, mean);
-        gridMap_->updateLayer(layerNameStdDev_, std_dev);
+        grid_map_->updateLayer(layer_name_mean_, mean);
+        grid_map_->updateLayer(layer_name_std_dev_, std_dev);
     }
-    gridMap_->publish();
+    grid_map_->publish();
 }
 
 std::pair<grid_map::GridMap, std::shared_ptr<nav_msgs::OccupancyGrid>> GPython2D::getExportGridMap() {
-    std::lock_guard<std::mutex> lock{gridMap_->getGridMapMutex()};
-    std::lock_guard<std::mutex> lock1{GPython::instance().getModelMutex()};
-    std::shared_ptr<nav_msgs::OccupancyGrid> slamMap = slamMap_;
-    Matrix samplePositions = getSamplePositions(slamMap);
-    GPython::GPResult gpResult = GPython::instance().evaluate(samplePositions);
-    updateMap(gpResult.mean, gpResult.stdDev);
-    return {gridMap_->getGridMap(), slamMap};
+    std::lock_guard<std::mutex> lock{grid_map_->getGridMapMutex()};
+    std::lock_guard<std::recursive_mutex> lock1{GPython::instance().getModelMutex()};
+    std::shared_ptr<nav_msgs::OccupancyGrid> slam_map = slam_map_;
+    Matrix sample_positions = getSamplePositions(slam_map);
+    GPython::GPResult gp_result = GPython::instance().evaluate(sample_positions);
+    updateMap(gp_result.mean, gp_result.std_dev);
+    return {grid_map_->getGridMap(), slam_map};
 }
 
 void GPython2D::updateSourcePrediction(const Matrix &positions, const Vector &predictions) {
-    int maxOptimizerSteps = 1000;
-    double minSourceDistance = 2 * gridMap_->getResolution();
+    int max_optimizer_steps = 1000;
+    double min_source_distance = 2 * grid_map_->getResolution();
     int dim = 2;
 
     // Update all existing sources (check if they are still a maximum)
@@ -150,63 +149,63 @@ void GPython2D::updateSourcePrediction(const Matrix &positions, const Vector &pr
     }
     STREAM_DEBUG("GP2D Kept " << sources_.size() << " sources.");
 
-    // Generate start positions (All points in trajectory with at least minDist to each other)
-    Eigen::Matrix3Xd startPositions;
-    Vector3d lastPos;
-    Vector3d pos3D;
-    lastPos << -DBL_MAX, -DBL_MAX, -DBL_MAX;
+    // Generate start positions (All points in trajectory with at least min_dist to each other)
+    Eigen::Matrix3Xd start_positions;
+    Vector3d last_pos;
+    Vector3d pos_3d;
+    last_pos << -DBL_MAX, -DBL_MAX, -DBL_MAX;
     double mean = 0;
-    double minDist = 1;
+    double min_dist = 1;
     double dist;
 
     std::vector<Sample> samples = SampleManager::instance().getSamples();
     for (const Sample &sample: samples) {
-        pos3D = sample.position_;
-        if (!gridMap_->isInside(pos3D.topRows(dim))) {
+        pos_3d = sample.position_;
+        if (!grid_map_->isInside(pos_3d.topRows(dim))) {
             continue;
         }
-        dist = (pos3D - lastPos).norm();
-        if (dist > minDist) {
-            startPositions.conservativeResize(3, startPositions.cols() + 1);
-            startPositions.col(startPositions.cols() - 1) = pos3D;
-            lastPos = pos3D;
-            mean += gridMap_->atPosition("prediction", pos3D.topRows(dim));
+        dist = (pos_3d - last_pos).norm();
+        if (dist > min_dist) {
+            start_positions.conservativeResize(3, start_positions.cols() + 1);
+            start_positions.col(start_positions.cols() - 1) = pos_3d;
+            last_pos = pos_3d;
+            mean += grid_map_->atPosition("prediction", pos_3d.topRows(dim));
         }
     }
-    mean = mean / startPositions.cols();
-    STREAM_DEBUG("GP2D Start positions: " << startPositions.cols() << " Mean: " << mean);
+    mean = mean / start_positions.cols();
+    STREAM_DEBUG("GP2D Start positions: " << start_positions.cols() << " Mean: " << mean);
 
     // Gradient ascent for each start position
     int steps;
     double dosage = 0.0;
-    bool tooClose;
+    bool too_close;
 
-    for (int i = 0; i < startPositions.cols(); i++) {
-        pos3D = startPositions.col(i);
-        dir = computeGradientStep(pos3D);
+    for (int i = 0; i < start_positions.cols(); i++) {
+        pos_3d = start_positions.col(i);
+        dir = computeGradientStep(pos_3d);
 
         steps = 0;
-        while (!dir.isApprox(dirZero) && steps < maxOptimizerSteps) {
-            dir = computeGradientStep(pos3D);
-            pos3D.topRows(dim) += dir * gridMap_->getResolution();
+        while (!dir.isApprox(dirZero) && steps < max_optimizer_steps) {
+            dir = computeGradientStep(pos_3d);
+            pos_3d.topRows(dim) += dir * grid_map_->getResolution();
             steps += 1;
-            dosage = gridMap_->atPosition("prediction", pos3D.topRows(dim));
+            dosage = grid_map_->atPosition("prediction", pos_3d.topRows(dim));
         }
 
-        tooClose = false;
+        too_close = false;
         for (std::shared_ptr<SourceInteractive> &source: sources_) {
-            if ((source->getPos() - pos3D).topRows(dim).squaredNorm() < minSourceDistance * minSourceDistance) {
-                tooClose = true;
+            if ((source->getPos() - pos_3d).topRows(dim).squaredNorm() < min_source_distance * min_source_distance) {
+                too_close = true;
                 break;
             }
         }
 
-        if (!tooClose && dosage > Parameters::instance().meanFactor * mean) {
+        if (!too_close && dosage > Parameters::instance().gp_mean_factor * mean) {
             if (dosage < 0.1) {
                 continue;
             }
             STREAM_DEBUG("GP2D Adding source: ");
-            Vector3d pos = Vector3d(pos3D.x(), pos3D.y(), 0.0);
+            Vector3d pos = Vector3d(pos_3d.x(), pos_3d.y(), 0.0);
             std::shared_ptr<SourceInteractive> source = std::make_shared<SourceInteractive>(pos, dosage, dosage,
                                                                                             boost::bind(
                                                                                                     &GPython2D::interactiveMarkerCallback,
@@ -223,32 +222,32 @@ Vector GPython2D::computeGradientStep(const Vector &position) {
     Vector direction = Vector::Zero(dim);
     Vector pos = position.topRows(dim);
 
-    if (!gridMap_->isInside(pos) || position.size() < dim) {
+    if (!grid_map_->isInside(pos) || position.size() < dim) {
         return direction;
     }
 
-    double delta = gridMap_->getResolution();
-    double pred = gridMap_->atPosition("prediction", pos);
-    Vector posMinor(dim);
-    Vector posMajor(dim);
-    double predMinor;
-    double predMajor;
+    double delta = grid_map_->getResolution();
+    double pred = grid_map_->atPosition("prediction", pos);
+    Vector pos_minor(dim);
+    Vector pos_major(dim);
+    double pred_minor;
+    double pred_major;
 
     for (int i = 0; i < dim; i++) {
-        posMinor = pos;
-        posMajor = pos;
-        posMinor[i] -= delta;
-        posMajor[i] += delta;
+        pos_minor = pos;
+        pos_major = pos;
+        pos_minor[i] -= delta;
+        pos_major[i] += delta;
 
-        if (gridMap_->isInside(posMinor)) {
-            predMinor = gridMap_->atPosition("prediction", posMinor);
-            if (predMinor > pred) {
+        if (grid_map_->isInside(pos_minor)) {
+            pred_minor = grid_map_->atPosition("prediction", pos_minor);
+            if (pred_minor > pred) {
                 direction[i] = -1;
             }
         }
-        if (gridMap_->isInside(posMajor)) {
-            predMajor = gridMap_->atPosition("prediction", posMajor);
-            if (predMajor > pred && predMajor > predMinor) {
+        if (grid_map_->isInside(pos_major)) {
+            pred_major = grid_map_->atPosition("prediction", pos_major);
+            if (pred_major > pred && pred_major > pred_minor) {
                 direction[i] = 1;
             }
         }
@@ -256,15 +255,15 @@ Vector GPython2D::computeGradientStep(const Vector &position) {
     return direction;
 }
 
-void GPython2D::confirmSource(int sourceId) {
+void GPython2D::confirmSource(int source_id) {
     for (std::shared_ptr<SourceInteractive> &source: sources_) {
-        if (source->getId() == sourceId) {
+        if (source->getId() == source_id) {
             if (source->isConfirmed()) {
-                STREAM("Source " << sourceId << " unconfirmed.");
+                STREAM("Source " << source_id << " unconfirmed.");
                 source->setConfirmed(false);
             } else {
                 if (!source->wasConfirmed()) {
-                    STREAM("Source " << sourceId << " confirmed.");
+                    STREAM("Source " << source_id << " confirmed.");
                     GPython3D::instance().addSourceCandidate(source);
                 }
                 source->setConfirmed(true);
@@ -281,20 +280,20 @@ void GPython2D::interactiveMarkerCallback(const visualization_msgs::InteractiveM
     }
 }
 
-void GPython2D::setUseCircle(bool useCircle) {
-    STREAM("GPython2D set use circle = " << useCircle);
-    useCircle_ = useCircle;
+void GPython2D::setUseCircle(bool use_circle) {
+    STREAM("GPython2D set use circle = " << use_circle);
+    use_circle_ = use_circle;
 }
 
-void GPython2D::slamMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &gridMsgPtr) {
-    slamMap_ = std::make_shared<nav_msgs::OccupancyGrid>(*gridMsgPtr);
+void GPython2D::slamMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &grid_msg_ptr) {
+    slam_map_ = std::make_shared<nav_msgs::OccupancyGrid>(*grid_msg_ptr);
 }
 
 void GPython2D::setMinUpdateTime(int time) {
-    STREAM(groupName_ + " set min map update time = " << time);
-    this->minUpdateTime_ = time;
+    STREAM(group_name_ + " set min map update time = " << time);
+    this->min_update_time_ = time;
 }
 
 void GPython2D::triggerEvaluation() {
-    doEvaluation_ = true;
+    do_evaluation_ = true;
 }

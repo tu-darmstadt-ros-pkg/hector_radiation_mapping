@@ -6,7 +6,7 @@
 Marker::Marker() {
     id_ = idCounter_;
     idCounter_++;
-    marker_.header.frame_id = Parameters::instance().worldFrame;
+    marker_.header.frame_id = Parameters::instance().world_frame;
     marker_.header.stamp = ros::Time();
     marker_.id = id_;
 }

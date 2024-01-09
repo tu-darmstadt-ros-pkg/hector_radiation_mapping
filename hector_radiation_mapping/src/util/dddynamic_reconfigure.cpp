@@ -1,7 +1,7 @@
 #include "util/dddynamic_reconfigure.h"
 
 DDDynamicReconfigure::DDDynamicReconfigure(){
-    DDR_ = std::make_shared<ddynamic_reconfigure::DDynamicReconfigure>(*Parameters::instance().nodeHandle_);
+    DDR_ = std::make_shared<ddynamic_reconfigure::DDynamicReconfigure>(*Parameters::instance().node_handle_ptr_);
 }
 
 DDDynamicReconfigure &DDDynamicReconfigure::instance() {
@@ -19,7 +19,7 @@ void DDDynamicReconfigure::publish() {
     };
 
     // reset parameter publisher (clears all variables that where published there from this radiationMappingNode)
-    DDR_.reset(new ddynamic_reconfigure::DDynamicReconfigure(*Parameters::instance().nodeHandle_));
+    DDR_.reset(new ddynamic_reconfigure::DDynamicReconfigure(*Parameters::instance().node_handle_ptr_));
 
     // iterate over all variables stored in this class and publish them.
     for (boost::variant<RecVariable<bool>, RecVariable<int>, RecVariable<double>, RecVariable<std::string>> &var: vars_) {
@@ -120,6 +120,6 @@ void DDDynamicReconfigure::deleteGroup(const std::string &group) {
 }
 
 void DDDynamicReconfigure::reset() {
-    DDR_.reset(new ddynamic_reconfigure::DDynamicReconfigure(*Parameters::instance().nodeHandle_));
+    DDR_.reset(new ddynamic_reconfigure::DDynamicReconfigure(*Parameters::instance().node_handle_ptr_));
     vars_.clear();
 }

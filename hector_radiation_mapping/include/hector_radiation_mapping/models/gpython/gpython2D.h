@@ -42,7 +42,7 @@ public:
      * Returns the grid map.
      * @return The grid map.
      */
-    std::shared_ptr<GridMap> getGridMap() { return gridMap_; };
+    std::shared_ptr<GridMap> getGridMap() { return grid_map_; };
 
     /**
      * Get the sources.
@@ -54,19 +54,19 @@ public:
      * Check if the GPython2D class has a slam map.
      * @return True if the GPython2D class has a slam map.
      */
-    bool hasSlamMap() { return slamMap_ != nullptr; };
+    bool hasSlamMap() { return slam_map_ != nullptr; };
 
     /**
      * Get the slam map.
      * @return The slam map.
      */
-    std::shared_ptr<nav_msgs::OccupancyGrid> getSlamMap() { return slamMap_; };
+    std::shared_ptr<nav_msgs::OccupancyGrid> getSlamMap() { return slam_map_; };
 
     /**
      * Set whether to use evaluate the gridmap in a circle with certain diameter or evaluate the whole map.
-     * @param useCircle
+     * @param use_circle
      */
-    void setUseCircle(bool useCircle);
+    void setUseCircle(bool use_circle);
 
     /**
      * Get the grid map and the slam map as a pair.
@@ -94,20 +94,20 @@ private:
      * Updates the grid map with the given mean and standard deviation.
      * @param mean
      * @param std_dev
-     * @param useCircle
+     * @param use_circle
      * @param center
      */
-    void updateMap(const Vector &mean, const Vector &std_dev, bool useCircle = false,
+    void updateMap(const Vector &mean, const Vector &std_dev, bool use_circle = false,
                    const Vector2d &center = Vector2d(0, 0));
 
     /**
      * Get the positions of the grid map to evaluate.
-     * @param slamMap
-     * @param useCircle
+     * @param slam_map
+     * @param use_circle
      * @param center
      * @return The positions of the grid map to evaluate.
      */
-    Matrix getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slamMap, bool useCircle = false,
+    Matrix getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map, bool use_circle = false,
                               const Vector2d &center = Vector2d(0, 0));
 
     /**
@@ -132,15 +132,15 @@ private:
 
     /**
      * Callback for the slam map.
-     * @param gridMsgPtr
+     * @param grid_msg_ptr
      */
-    void slamMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &gridMsgPtr);
+    void slamMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &grid_msg_ptr);
 
     /**
      * Confirm a source by its id.
-     * @param sourceId
+     * @param source_id
      */
-    void confirmSource(int sourceId);
+    void confirmSource(int source_id);
 
     /**
      * Callback for the interactive marker feedback of the interactive markers of the sources. It confirms the source if
@@ -149,21 +149,21 @@ private:
      */
     void interactiveMarkerCallback(const visualization_msgs::InteractiveMarkerFeedbackConstPtr &feedback);
 
-    std::shared_ptr<GridMap> gridMap_;
-    std::string layerNameStdDev_;
-    std::string layerNameMean_;
-    std::shared_ptr<nav_msgs::OccupancyGrid> slamMap_;
+    std::shared_ptr<GridMap> grid_map_;
+    std::string layer_name_std_dev_;
+    std::string layer_name_mean_;
+    std::shared_ptr<nav_msgs::OccupancyGrid> slam_map_;
     std::vector<std::shared_ptr<SourceInteractive>> sources_;
-    volatile bool useCircle_;
-    volatile int minUpdateTime_;
-    std::string groupName_;
-    std::shared_ptr<ros::Subscriber> slamMapSubscriber_;
+    volatile bool use_circle_;
+    volatile int min_update_time_;
+    std::string group_name_;
+    std::shared_ptr<ros::Subscriber> slam_map_subscriber_;
 
     // Threading
     volatile bool active_;
-    volatile bool doEvaluation_;
-    std::thread updateThread_;
-    std::condition_variable waitCondition_;
+    volatile bool do_evaluation_;
+    std::thread update_thread_;
+    std::condition_variable update_condition_;
     std::mutex activation_mtx_;
 };
 

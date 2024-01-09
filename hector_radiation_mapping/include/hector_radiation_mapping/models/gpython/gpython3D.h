@@ -148,7 +148,7 @@ private:
 
     // Threading
     volatile bool active_;
-    volatile bool doEvaluation_;
+    volatile bool doEvaluation_{};
     std::thread updateThread_;
     std::condition_variable waitCondition_;
     std::mutex activation_mtx_;

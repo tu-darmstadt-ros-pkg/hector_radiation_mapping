@@ -16,41 +16,41 @@ public:
 
     /**
      * Adds a layer to the grid map with the given name.
-     * @param layerName
+     * @param layer_name
      */
-    void addLayer(const std::string &layerName);
+    void addLayer(const std::string &layer_name);
 
     /**
      * Updates the layer with the given name with the given values.
-     * @param layerName
+     * @param layer_name
      * @param values
      */
-    void updateLayer(const std::string &layerName, const Vector &values);
+    void updateLayer(const std::string &layer_name, const Vector &values);
 
     /**
      * Updates the layer with the given name with the given values. Only updates the values within the submap.
      * The submap is defined by the parameters left, right, top and bottom and is the smallest bounding box around the
      * current occupancy grid.
-     * @param layerName
+     * @param layer_name
      * @param values
      */
-    void updateSubMapLayer(const std::string &layerName, const Vector &values);
+    void updateSubMapLayer(const std::string &layer_name, const Vector &values);
 
     /**
      * Updates the layer with the given name with the given values. Only updates the values within the circle with the
      * given center and radius.
-     * @param layerName
+     * @param layer_name
      * @param values
      * @param center
      * @param radius
      */
-    void updateLayer(const std::string &layerName, const Vector &values, const Eigen::Vector2d &center, double radius);
+    void updateLayer(const std::string &layer_name, const Vector &values, const Eigen::Vector2d &center, double radius);
 
     /**
      * Updates the grid map with the given slam map. The slam map is used to update the submap of the grid map.
-     * @param slamMap
+     * @param slam_map
      */
-    void updateGridDimensionWithSlamMap(const std::shared_ptr<nav_msgs::OccupancyGrid> &slamMap);
+    void updateGridDimensionWithSlamMap(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map);
 
     /**
      * Checks if the given position is inside the grid map.
@@ -61,10 +61,10 @@ public:
 
     /**
      * Checks if the given layer exists.
-     * @param layerName
+     * @param layer_name
      * @return true if the given layer exists, false otherwise
      */
-    bool existsLayer(const std::string &layerName);
+    bool existsLayer(const std::string &layer_name);
 
     /**
      * Returns the value of the given layer at the given position.
@@ -111,7 +111,7 @@ public:
      * Get the grid map mutex.
      * @return The grid map mutex.
      */
-    std::mutex &getGridMapMutex() { return mapMutex_; }
+    std::mutex &getGridMapMutex() { return map_mutex_; }
 
 private:
     /**
@@ -132,11 +132,11 @@ private:
 
     // Map
     grid_map::GridMap map_;
-    grid_map::GridMap tmpMap_;
-    std::mutex mapMutex_;
+    grid_map::GridMap tmp_map_;
+    std::mutex map_mutex_;
 
     // ROS
-    ros::Publisher mapPublisher_;
+    ros::Publisher map_publisher_;
 };
 
 #endif //RADIATION_MAPPING_MAP2D_H

@@ -6,22 +6,23 @@
 
 GPython3D::GPython3D() {
     groupName_ = "GPython3D";
-    minUpdateTime_ = Parameters::instance().minUpdateTime3d;
+    minUpdateTime_ = Parameters::instance().gp_min_update_time_3d;
     environmentCloudSub_ = std::make_shared<ros::Subscriber>(
-            Parameters::instance().nodeHandle_->subscribe(Parameters::instance().environmentCloudTopic,
-                                                          Parameters::instance().doseSubSize,
-                                                          &GPython3D::environmentCloudCallback, this));
+            Parameters::instance().node_handle_ptr_->subscribe(Parameters::instance().environment_cloud_topic,
+                                                               Parameters::instance().dose_sub_size,
+                                                               &GPython3D::environmentCloudCallback, this));
     DDDynamicReconfigure::instance().registerVariable<int>(groupName_ + "_minUpdateTime", minUpdateTime_,
                                                            boost::bind(&GPython3D::setMinUpdateTime, this, _1),
                                                            "min/max",
                                                            0, 5000, groupName_);
-    update_ = Parameters::instance().enableOnline3DEvaluation;
+    update_ = Parameters::instance().enable_online_3d_evaluation;
     DDDynamicReconfigure::instance().registerVariable<bool>(groupName_ + "_update", update_,
                                                             boost::bind(&GPython3D::setUpdate, this, _1), "on/off",
                                                             false, true, groupName_);
     DDDynamicReconfigure::instance().publish();
     pointCloud_ = std::make_shared<PointCloud3D>("pointCloud3D");
     active_ = false;
+    doEvaluation_ = false;
     activate();
 }
 
@@ -56,11 +57,11 @@ void GPython3D::updateLoop() {
         clock.tick();
         if (update_ && doEvaluation_) {
             doEvaluation_ = false;
-            std::lock_guard<std::mutex> lock1{GPython::instance().getModelMutex()};
+            std::lock_guard<std::recursive_mutex> lock1{GPython::instance().getModelMutex()};
             std::lock_guard<std::mutex> lock{pointCloud_->getPointCloudMutex()};
             Matrix samplePositions = getSamplePositions(SampleManager::instance().getLastSamplePos());
             GPython::GPResult gpResult = GPython::instance().evaluate(samplePositions);
-            updatePointCloud(gpResult.mean, gpResult.stdDev);
+            updatePointCloud(gpResult.mean, gpResult.std_dev);
             currentSource_ = getSourcePrediction(samplePositions, gpResult.mean);
         }
         int sleepTime = std::max(0, minUpdateTime_ - (int) clock.tock());
@@ -136,11 +137,13 @@ void GPython3D::addSourceCandidate(std::shared_ptr<SourceInteractive> &sourceCan
         }
         sourceCandidates_.push_back(sourceCandidate);
     }
-    GPython::instance().addSamplesWithinRadius(sourceCandidate->getPos(), Parameters::instance().gpLocalRadius, false, true);
+
+    std::vector<Sample> samples = SampleManager::instance().getSamplesWithinRadius(sourceCandidate->getPos(), Parameters::instance().gp_local_radius);
+    GPython::instance().addSamples(samples);
 }
 
 pcl::PointCloud<PointCloud3D::PointXYZPC> GPython3D::getExportPointCloud() {
-    std::lock_guard<std::mutex> lock1{GPython::instance().getModelMutex()};
+    std::lock_guard<std::recursive_mutex> lock1{GPython::instance().getModelMutex()};
     sources_.clear();
     pcl::PointCloud<PointCloud3D::PointXYZPC> exportPointCloud;
     int stepSize = 1;
@@ -163,7 +166,7 @@ pcl::PointCloud<PointCloud3D::PointXYZPC> GPython3D::getExportPointCloud() {
         // Generate PointCloud3D from SourceCandidate
         Matrix samplePositions = getSamplePositions(sourcePositon);
         GPython::GPResult gpResult = GPython::instance().evaluate(samplePositions);
-        pointCloud_->updateMapValues(gpResult.mean, gpResult.stdDev);
+        pointCloud_->updateMapValues(gpResult.mean, gpResult.std_dev);
 
         // Make source prediction from PointCloud3D
         std::shared_ptr<Source> source = getSourcePrediction(samplePositions, gpResult.mean);

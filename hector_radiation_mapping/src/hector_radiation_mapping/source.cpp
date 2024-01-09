@@ -11,7 +11,7 @@ Source::Source(const Eigen::Vector3d &position, double cps, double doseRate, boo
     doseRate_ = doseRate + SampleManager::instance().getBackgroundRadiationDoseRate();
     confirmed_ = false;
     name_ = std::to_string(id_);
-    if (Parameters::instance().useDoseRate) {
+    if (Parameters::instance().use_dose_rate) {
         description_ = "(" + name_ + ") " + std::to_string(doseRate_);
     } else {
         description_ = "(" + name_ + ") " + std::to_string(cps_);
@@ -32,5 +32,5 @@ void Source::setConfirmed(bool confirmed) {
 }
 
 double Source::getStrength() const {
-    return Parameters::instance().useDoseRate ? doseRate_ : cps_;
+    return Parameters::instance().use_dose_rate ? doseRate_ : cps_;
 }

@@ -2,7 +2,7 @@
 #include "util/parameters.h"
 
 MarkerManager::MarkerManager() {
-    nodeHandle_ = Parameters::instance().nodeHandle_;
+    nodeHandle_ = Parameters::instance().node_handle_ptr_;
     markerPublisher_ = std::make_shared<ros::Publisher>(
             nodeHandle_->advertise<visualization_msgs::Marker>("marker", 1000));
     interactiveMarkerServer_ = std::make_shared<interactive_markers::InteractiveMarkerServer>("hector_radiation_mapping/source_markers");

@@ -7,24 +7,24 @@
 
 SampleManager::SampleManager() {
     // Fix topic name if necessary
-    if (Parameters::instance().subscribeTopic.at(0) != '/') {
-        Parameters::instance().subscribeTopic = "/" + Parameters::instance().subscribeTopic;
+    if (Parameters::instance().subscribe_topic.at(0) != '/') {
+        Parameters::instance().subscribe_topic = "/" + Parameters::instance().subscribe_topic;
     }
 
     // Init message parser
-    babelFish_ = std::make_shared<ros_babel_fish::BabelFish>();
-    universalSub_ = std::make_shared<ros::Subscriber>(
-            Parameters::instance().nodeHandle_->subscribe<ros_babel_fish::BabelFishMessage>(
-                    Parameters::instance().subscribeTopic,
-                    Parameters::instance().doseSubSize,
+    babel_fish_ = std::make_shared<ros_babel_fish::BabelFish>();
+    universal_sub_ = std::make_shared<ros::Subscriber>(
+            Parameters::instance().node_handle_ptr_->subscribe<ros_babel_fish::BabelFishMessage>(
+                    Parameters::instance().subscribe_topic,
+                    Parameters::instance().dose_sub_size,
                     &SampleManager::doseCallbackFish, this
             ));
-    tfListener_ = std::make_shared<tf2_ros::TransformListener>(tfBuffer_);
+    tf_listener_ = std::make_shared<tf2_ros::TransformListener>(tf_buffer_);
 
     // initialize vars
-    backgroundRadiationCps_ = 0.0;
-    backgroundRadiationDoseRate_ = 0.0;
-    trajectoryMarker_ = std::make_shared<TrajectoryMarker>();
+    background_radiation_cps_ = 0.0;
+    background_radiation_dose_rate_ = 0.0;
+    trajectory_marker_ = std::make_shared<TrajectoryMarker>();
 }
 
 SampleManager &SampleManager::instance() {
@@ -33,10 +33,10 @@ SampleManager &SampleManager::instance() {
 }
 
 void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::ConstPtr &msg) {
-    std::string keyRate = Parameters::instance().messageKey_rate;
-    std::string keyCps = Parameters::instance().messageKey_cps;
-    std::string keyFrameId = Parameters::instance().messageKey_frameId;
-    ros_babel_fish::TranslatedMessage::Ptr translated = babelFish_->translateMessage(msg);
+    std::string keyRate = Parameters::instance().message_key_rate;
+    std::string keyCps = Parameters::instance().message_key_cps;
+    std::string keyFrameId = Parameters::instance().message_key_frame_id;
+    ros_babel_fish::TranslatedMessage::Ptr translated = babel_fish_->translateMessage(msg);
     auto &compound = translated->translated_message->as<ros_babel_fish::CompoundMessage>();
     double doseRate = compound[keyRate].value<float>();
     double cps = -1;
@@ -49,11 +49,11 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
     }
 
     try {
-        geometry_msgs::Transform trans = tfBuffer_.lookupTransform("world", frameId, ros::Time(0),
-                                                                   ros::Duration(1)).transform;
+        geometry_msgs::Transform trans = tf_buffer_.lookupTransform("world", frameId, ros::Time(0),
+                                                                    ros::Duration(1)).transform;
         Eigen::Vector3d pos(trans.translation.x, trans.translation.y, trans.translation.z);
 
-        updateTrajectory(Parameters::instance().useDoseRate ? doseRate : cps, pos);
+        updateTrajectory(Parameters::instance().use_dose_rate ? doseRate : cps, pos);
 
         static bool calculated_background_radiation = false;
         if (!calculated_background_radiation) {
@@ -65,8 +65,8 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
             doseRateVec.push_back(doseRate);
             posVec.push_back(pos);
             timeVec.push_back(ros::Time::now());
-            backgroundRadiationCps_ += cps / 10.0;
-            backgroundRadiationDoseRate_ += doseRate / 10.0;
+            background_radiation_cps_ += cps / 10.0;
+            background_radiation_dose_rate_ += doseRate / 10.0;
 
             if (cpsVec.size() >= 10) {
                 for (int i = 0; i < cpsVec.size(); i++) {
@@ -83,23 +83,23 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
         }
 
         //double time = sample.time_.toSec() - Parameters::instance().startTime_;
-        //std::string exportPath = Util::getExportPath("samples");
-        //Util::appendDoubleToTxtFile(cps, exportPath, "cps");
-        //Util::appendDoubleToTxtFile(doseRate, exportPath, "doseRate");
-        //Util::appendDoubleToTxtFile(time, exportPath, "time");
+        //std::string export_path = Util::getExportPath("samples");
+        //Util::appendDoubleToTxtFile(cps, export_path, "cps");
+        //Util::appendDoubleToTxtFile(doseRate, export_path, "doseRate");
+        //Util::appendDoubleToTxtFile(time, export_path, "time");
     } catch (tf2::TransformException &exception) {
         ROS_WARN_STREAM(exception.what());
     }
 }
 
 
-void SampleManager::processSampleData(Vector3d pos, double cps, double doseRate, ros::Time time) {
+void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate, ros::Time time) {
     /// Get background radiation from average of first few samples
-    double adjCps = fmax(cps - backgroundRadiationCps_, 0.0);
-    double adjDoseRate = fmax(doseRate - backgroundRadiationDoseRate_, 0.0);
+    double adjCps = fmax(cps - background_radiation_cps_, 0.0);
+    double adjDoseRate = fmax(dose_rate - background_radiation_dose_rate_, 0.0);
     Sample sample(pos, adjCps, adjDoseRate, time);
 
-    if(!Parameters::instance().enableSpatialSampleFiltering){
+    if(!Parameters::instance().enable_spatial_sample_filtering){
         double minDist2 = 0.2 * 0.2;
         if (samples_.empty() || (sample.position_ - getLastSamplePos()).squaredNorm() > minDist2 || sample.doseRate_ > 20.0) {
             addSample(sample);
@@ -110,38 +110,38 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double doseRate,
     const double distCutoff = 0.005;
     const double distCutoff2 = distCutoff * distCutoff;
 
-    if (sampleQueue_.empty()) {
-        sampleQueue_.push_back(sample);
+    if (sample_queue_.empty()) {
+        sample_queue_.push_back(sample);
     }
     else {
         /// if position has changed considerably, add new sample and the mean of the old ones that are left in the Queue
-        if((sample.position_ - sampleQueue_.back().position_).squaredNorm() > distCutoff2) {
-            Sample meanSample = getMeanSample(sampleQueue_, false);
-            for(int i = 0; i < ceil((double)sampleQueue_.size()/ 5.0); i++){
+        if((sample.position_ - sample_queue_.back().position_).squaredNorm() > distCutoff2) {
+            Sample meanSample = getMeanSample(sample_queue_, false);
+            for(int i = 0; i < ceil((double)sample_queue_.size() / 5.0); i++){
                 addSample(meanSample);
             }
             addSample(sample);
-            sampleQueue_.clear();
+            sample_queue_.clear();
         }
         else {
-            sampleQueue_.push_back(sample);
+            sample_queue_.push_back(sample);
 
             /// if position has not changed much, add mean of all Samples in the Queue if largest distance exceeds threshold
             double maxDist, distSqr = 0.0;
-            for(int i = 0; i < sampleQueue_.size() - 1; ++i) {
-                for(int j = i + 1; j < sampleQueue_.size(); j++){
-                    distSqr = (sampleQueue_[i].position_ - sampleQueue_[j].position_).squaredNorm();
+            for(int i = 0; i < sample_queue_.size() - 1; ++i) {
+                for(int j = i + 1; j < sample_queue_.size(); j++){
+                    distSqr = (sample_queue_[i].position_ - sample_queue_[j].position_).squaredNorm();
                     if(distSqr > maxDist){
                         maxDist = distSqr;
                     }
                 }
             }
             if(maxDist > distCutoff2){
-                Sample meanSample = getMeanSample(sampleQueue_, true);
-                for(int i = 0; i < ceil((double)sampleQueue_.size()/ 5.0); i++){
+                Sample meanSample = getMeanSample(sample_queue_, true);
+                for(int i = 0; i < ceil((double)sample_queue_.size() / 5.0); i++){
                     addSample(meanSample);
                 }
-                sampleQueue_.clear();
+                sample_queue_.clear();
             }
         }
     }
@@ -156,12 +156,20 @@ void SampleManager::addSample(Sample &sample) {
             max = sample.doseRate_;
         }
     }
-    GPython::SampleGP sampleGP(sample, true, true);
-    GPython::instance().addSample(sampleGP);
+
+
+    // Position with 2 decimals
+    double pos_x = round(sample.position_[0] * 100) / 100;
+    double pos_y = round(sample.position_[1] * 100) / 100;
+    double pos_z = round(sample.position_[2] * 100) / 100;
+    STREAM("Added sample with dose rate " << sample.doseRate_ << " " << Parameters::instance().radiation_unit
+                            << " at [" << pos_x << ", " << pos_y << ", " << pos_z << "].\n");
+
+    GPython::instance().addSample(sample);
 }
 
 void SampleManager::updateTrajectory(const double &value, const Eigen::Vector3d &position) {
-    trajectoryMarker_->addPoint(value, position);
+    trajectory_marker_->addPoint(value, position);
 }
 
 Eigen::Vector3d SampleManager::getLastSamplePos() {
@@ -173,8 +181,9 @@ Eigen::Vector3d SampleManager::getLastSamplePos() {
 
 std::vector<Sample> SampleManager::getSamplesWithinRadius(const Eigen::Vector3d &position, double radius) {
     std::vector<Sample> inSphere;
+    double radius2 = radius * radius;
     for (const Sample &sample: samples_) {
-        if ((position - sample.position_).squaredNorm() < radius * radius) {
+        if ((position - sample.position_).squaredNorm() < radius2) {
             inSphere.push_back(sample);
         }
     }
@@ -233,5 +242,14 @@ std::vector<Sample> SampleManager::getSamples() {
 }
 
 tf2_ros::Buffer &SampleManager::getTfBuffer() {
-    return tfBuffer_;
+    return tf_buffer_;
+}
+
+Sample SampleManager::getSampleById(int id) {
+    for (const Sample &sample: samples_) {
+        if (sample.id_ == id) {
+            return sample;
+        }
+    }
+    return Sample(); // return empty sample if no sample with id was found
 }

@@ -33,6 +33,7 @@ class GPNode:
         rospy.init_node('gp_node')
         rospy.Service('/hector_radiation_mapping/gp_samples', AddSamplesService, self.add_samples_callback)
         rospy.Service('/hector_radiation_mapping/gp_evaluation', GPEvaluationService, self.gp_evaluation_callback)
+        print("GPython Node initialized")
         rospy.spin()
 
         # save_list_to_file(self.evaluationTimes, file_path, 'evaluationTimes.txt')

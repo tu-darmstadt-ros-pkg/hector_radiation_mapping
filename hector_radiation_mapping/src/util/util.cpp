@@ -134,7 +134,7 @@ void Util::exportVectorToTxtFile(const std::vector<double>& data, const std::str
 }
 
 std::string Util::getExportPath(const std::string &folder) {
-    std::string path = ros::package::getPath("hector_radiation_mapping") + Parameters::instance().exportPath + folder;
+    std::string path = ros::package::getPath("hector_radiation_mapping") + Parameters::instance().export_path + folder;
     if (!std::filesystem::exists(path)) {
         std::filesystem::create_directories(path);
     }
@@ -142,7 +142,7 @@ std::string Util::getExportPath(const std::string &folder) {
 }
 
 bool Util::fileExists(const std::string& filePath) {
-    struct stat buffer;
+    struct stat buffer{};
     return (stat(filePath.c_str(), &buffer) == 0);
 }
 
@@ -157,4 +157,8 @@ std::string Util::getUniqueFileName(const std::string& path, const std::string& 
         uniqueFilename = oss.str();
     }
     return uniqueFilename;
+}
+
+Vector Util::varianceToStdDeviation(Vector &variance) {
+    return variance.array().sqrt();
 }

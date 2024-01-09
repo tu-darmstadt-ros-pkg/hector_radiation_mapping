@@ -1,5 +1,6 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <eigen_conversions/eigen_msg.h>
+#include <cstdlib>
 
 #include "pch.h"
 #include "models/gpython/gpython.h"
@@ -8,7 +9,8 @@
 #include "util/parameters.h"
 #include "util/dddynamic_reconfigure.h"
 #include "util/util.h"
-#include "util/clock_cpu.h"
+#include "hector_radiation_mapping/sampleManager.h"
+
 #include "hector_radiation_mapping_msgs/GPEvaluationService.h"
 #include "hector_radiation_mapping_msgs/GPEvaluationServiceRequest.h"
 #include "hector_radiation_mapping_msgs/GPEvaluationServiceResponse.h"
@@ -17,12 +19,14 @@
 #include "hector_radiation_mapping_msgs/AddSamplesServiceResponse.h"
 #include "hector_radiation_mapping_msgs/Samples.h"
 #include "hector_radiation_mapping_msgs/Sample.h"
-#include "hector_radiation_mapping/sampleManager.h"
 
-GPython::GPython() {
+
+GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS) {
     // Define ROS service clients
-    evaluationServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>("/hector_radiation_mapping/gp_evaluation");
-    sampleServiceClient_ = Parameters::instance().nodeHandle_->serviceClient<hector_radiation_mapping_msgs::AddSamplesService>("/hector_radiation_mapping/gp_samples");
+    evaluation_service_client_ = Parameters::instance().node_handle_ptr_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>(
+            "/hector_radiation_mapping/gp_evaluation");
+    sample_service_client_ = Parameters::instance().node_handle_ptr_->serviceClient<hector_radiation_mapping_msgs::AddSamplesService>(
+            "/hector_radiation_mapping/gp_samples");
 
     // Create dynamic reconfigure parameters
     param1_ptr = new double[1];
@@ -31,110 +35,115 @@ GPython::GPython() {
     *param1_ptr = 1.0;
     *param2_ptr = 1.0;
     *param3_ptr = 10.0;
-    groupName_ = "gpython";
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_kernel_lengthscale", param1_ptr, boost::bind(&GPython::paramCallback, this), "param1", 0.0, 4.0, groupName_);
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_outputscale", param2_ptr, boost::bind(&GPython::paramCallback, this), "param2", 0.0, 20.0, groupName_);
-    DDDynamicReconfigure::instance().registerVariable<double>(groupName_ + "_likelihood_noise", param3_ptr, boost::bind(&GPython::paramCallback, this), "param3", 0.0, 20.0, groupName_);
+    std::string group_name = getModelTypeName(model_type_);
+    DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_kernel_lengthscale", param1_ptr,
+                                                              boost::bind(&GPython::paramCallback, this), "param1", 0.0,
+                                                              4.0, group_name);
+    DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_outputscale", param2_ptr,
+                                                              boost::bind(&GPython::paramCallback, this), "param2", 0.0,
+                                                              20.0, group_name);
+    DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_likelihood_noise", param3_ptr,
+                                                              boost::bind(&GPython::paramCallback, this), "param3", 0.0,
+                                                              20.0, group_name);
     DDDynamicReconfigure::instance().publish();
     STREAM_DEBUG("GPython params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
 
+    // Start the GPython node
+    const char *command = "rosrun hector_gaussian_process gp_node &";
+    int result = system(command);
+    if (result != 0) {
+        // Handle error
+    }
+
     // Initialize variables
     active_ = false;
-    paramUpdate_ = false;
-    modelSize_ = 0;
-    activate();
-}
+    param_update_ = false;
+    model_size_ = 0;
 
-GPython &GPython::instance() {
-    static GPython instance;
-    return instance;
+    GPython2D::instance();
+    GPython3D::instance();
 }
 
 void GPython::shutDown() {
     deactivate();
-}
-
-bool GPython::isActive() const {
-    return active_;
+    GPython2D::instance().shutDown();
+    GPython3D::instance().shutDown();
+    ROS_INFO_STREAM(getModelTypeName(model_type_) << " shut down");
 }
 
 void GPython::activate() {
     std::lock_guard<std::mutex> lock{activation_mtx_};
+    GPython2D::instance().activate();
+    GPython3D::instance().activate();
+
     if (active_) return;
     this->active_ = true;
-    updateThread_ = std::thread(&GPython::updateLoop, this);
-    STREAM_DEBUG("GPython activated");
+    update_thread_ = std::thread(&GPython::updateLoop, this);
+    ROS_INFO_STREAM(getModelTypeName(model_type_) << " activated");
 }
 
 void GPython::deactivate() {
     std::lock_guard<std::mutex> lock{activation_mtx_};
+    GPython2D::instance().deactivate();
+    GPython3D::instance().deactivate();
+
     if (!active_) return;
     this->active_ = false;
-    waitCondition_.notify_one();
-    updateThread_.join();
-    STREAM_DEBUG("GPython deactivated");
+    update_condition_.notify_one();
+    update_thread_.join();
+    ROS_INFO_STREAM(getModelTypeName(model_type_) << " deactivated");
 }
 
-void GPython::addSample(SampleGP &sample) {
-    std::lock_guard<std::mutex> lock{sampleQueue_mtx_};
-    samplesQueue_.push_back(sample);
-    waitCondition_.notify_one();
-    modelSize_++;
-    // Position with 2 decimals
-    double pos_x = round(sample.sample.position_[0] * 100) / 100;
-    double pos_y = round(sample.sample.position_[1] * 100) / 100;
-    double pos_z = round(sample.sample.position_[2] * 100) / 100;
-
-    STREAM("Added sample #" << modelSize_ << " with dose rate " << sample.sample.doseRate_ << " " << Parameters::instance().radiationUnit 
-        << " at [" << pos_x << ", " << pos_y << ", " << pos_z << "].\n");
-
+void GPython::reset() {
+    // TODO: implement
+    ROS_INFO_STREAM(getModelTypeName(model_type_) << " reset");
 }
 
-void GPython::addSamples(std::vector<SampleGP> &samples) {
-    std::lock_guard<std::mutex> lock{sampleQueue_mtx_};
-    samplesQueue_.insert(samplesQueue_.end(), samples.begin(), samples.end());
-    waitCondition_.notify_one();
+std::vector<GPython::SampleGP> GPython::samplesToSamplesGP(std::vector<Sample> &samples) {
+    std::vector<GPython::SampleGP> samples_gp;
+    samples_gp.reserve(samples.size());
+    for (const Sample &sample: samples) {
+        samples_gp.emplace_back(sample, true, true);
+    }
+    return samples_gp;
 }
 
 void GPython::updateLoop() {
     Clock clock;
-    std::vector<SampleGP> samplesQueueCopy;
+    std::vector<SampleGP> samples_gp_queue;
     while (active_ && ros::ok()) {
         {
-            std::unique_lock<std::mutex> lock{sampleQueue_mtx_};
-            waitCondition_.wait(lock, [this]() { return (!samplesQueue_.empty()) || !active_ || paramUpdate_;});
+            std::unique_lock<std::mutex> lock{sample_queue_mtx_};
+            update_condition_.wait(lock,
+                                   [this]() { return (!samples_add_queue_.empty()) || !active_ || param_update_; });
             if (!active_) break;
-            paramUpdate_ = false;
+            param_update_ = false;
             GPython2D::instance().triggerEvaluation();
             GPython3D::instance().triggerEvaluation();
 
             // create copy of samples
-            samplesQueueCopy = samplesQueue_;
-            samplesQueue_.clear();
+            samples_gp_queue = samplesToSamplesGP(samples_add_queue_);
+            samples_add_queue_.clear();
         }
-
         {
-            std::lock_guard<std::mutex> lock{model_mtx_};
+            std::lock_guard<std::recursive_mutex> lock{model_mtx_};
             clock.tick();
-            addSamplesToModel(samplesQueueCopy);
-            updateTimes_.push_back((double) clock.tock());
+            addSamplesToModel(samples_gp_queue);
+            update_times_.push_back((double) clock.tock());
         }
-        updateSizes_.push_back((double) sampleIds2d_.size());
+        update_sizes_.push_back((double) sample_ids_2d_.size());
     }
-    //std::string exportPath = Util::getExportPath("runtime");
-    //Util::exportVectorToTxtFile(updateTimes_, exportPath, "updateTimes_", Util::TxtExportType::NEW, true);
-    //Util::exportVectorToTxtFile(updateSizes_, exportPath, "updateSizes_", Util::TxtExportType::NEW, true);
-}
-
-Vector GPython::varianceToStdDeviation(Vector &variance) {
-    return variance.array().sqrt();
+    //std::string export_path = Util::getExportPath("runtime");
+    //Util::exportVectorToTxtFile(update_times_, export_path, "update_times_", Util::TxtExportType::NEW, true);
+    //Util::exportVectorToTxtFile(update_sizes_, export_path, "update_sizes_", Util::TxtExportType::NEW, true);
 }
 
 GPython::GPResult GPython::evaluate(Matrix &positions) {
     // check if positions are 2D or 3D
     if (positions.cols() != 2 && positions.cols() != 3) {
         STREAM_ERROR("GPython: evaluate() positions must be 2D or 3D");
-        return {{}, {}};
+        return {{},
+                {}};
     }
 
     hector_radiation_mapping_msgs::GPEvaluationServiceRequest req;
@@ -145,7 +154,7 @@ GPython::GPResult GPython::evaluate(Matrix &positions) {
 
     //{
     //    std::lock_guard<std::mutex> lock{model_mtx_};
-        evaluationServiceClient_.call(req, res);
+    evaluation_service_client_.call(req, res);
     //}
 
     std_msgs::Float64MultiArray mean = res.mean;
@@ -160,7 +169,7 @@ GPython::GPResult GPython::evaluate(Matrix &positions) {
         variance_vec[i] = variance.data[i];
     }
 
-    Vector std_dev_vec = varianceToStdDeviation(variance_vec);
+    Vector std_dev_vec = Util::varianceToStdDeviation(variance_vec);
     return {mean_vec, variance_vec};
 }
 
@@ -180,8 +189,8 @@ void GPython::addSamplesToModel(const std::vector<SampleGP> &samples) {
         if (!add2d && !add3d) continue;
 
         // add sample id to id list
-        if (add2d) sampleIds2d_.push_back(s.id_);
-        if (add3d) sampleIds3d_.push_back(s.id_);
+        if (add2d) sample_ids_2d_.push_back(s.id_);
+        if (add3d) sample_ids_3d_.push_back(s.id_);
 
         // create sample message
         hector_radiation_mapping_msgs::Sample sample_msg;
@@ -208,31 +217,20 @@ void GPython::addSamplesToModel(const std::vector<SampleGP> &samples) {
     STREAM_DEBUG("Params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
     //{
     //    std::lock_guard<std::mutex> lock{model_mtx_};
-        sampleServiceClient_.call(req, res);
+    sample_service_client_.call(req, res);
     //}
 }
 
-bool GPython::isSampleIn2DModel(const Sample &sample){
-    return std::find(sampleIds2d_.begin(), sampleIds2d_.end(), sample.id_) != sampleIds2d_.end();
+bool GPython::isSampleIn2DModel(const Sample &sample) {
+    return std::find(sample_ids_2d_.begin(), sample_ids_2d_.end(), sample.id_) != sample_ids_2d_.end();
 }
 
-bool GPython::isSampleIn3DModel(const Sample &sample){
-    return std::find(sampleIds3d_.begin(), sampleIds3d_.end(), sample.id_) != sampleIds3d_.end();
-}
-
-void GPython::addSamplesWithinRadius(const Vector3d& position, double radius, bool for2d, bool for3d) {
-    std::vector<SampleGP> samples;
-    double radius2 = radius * radius;
-    for (const Sample &sample: SampleManager::instance().getSamples()) {
-        if ((position - sample.position_).squaredNorm() < radius2) {
-            samples.emplace_back(sample, for2d, for3d);
-        }
-    }
-    addSamples(samples);
+bool GPython::isSampleIn3DModel(const Sample &sample) {
+    return std::find(sample_ids_3d_.begin(), sample_ids_3d_.end(), sample.id_) != sample_ids_3d_.end();
 }
 
 void GPython::paramCallback() {
     STREAM_DEBUG("GPython params changed " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
-    paramUpdate_ = true;
-    waitCondition_.notify_one();
+    param_update_ = true;
+    update_condition_.notify_one();
 }
