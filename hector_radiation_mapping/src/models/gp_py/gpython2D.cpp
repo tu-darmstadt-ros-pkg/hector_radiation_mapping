@@ -8,6 +8,8 @@
 #include "util/clock_cpu.h"
 
 GPython2D::GPython2D() {
+    group_name_ = GPython::instance().getShortModelName();
+    std::string prefix = group_name_ + "2D";
     layer_name_mean_ = "prediction";
     layer_name_std_dev_ = "std_dev";
     grid_map_ = std::make_shared<GridMap>(Parameters::instance().gp_grid_map_topic, Parameters::instance().gp_grid_map_resolution);
@@ -15,12 +17,11 @@ GPython2D::GPython2D() {
     grid_map_->addLayer(layer_name_std_dev_);
     use_circle_ = true;
     do_evaluation_ = false;
-    group_name_ = "GPython2D";
     min_update_time_ = Parameters::instance().gp_min_update_time_2d;
-    DDDynamicReconfigure::instance().registerVariable<bool>(group_name_ + "_useCircleEvaluation", use_circle_,
+    DDDynamicReconfigure::instance().registerVariable<bool>(prefix + "_useCircleEvaluation", use_circle_,
                                                             boost::bind(&GPython2D::setUseCircle, this, _1), "on/off",
                                                             false, true, group_name_);
-    DDDynamicReconfigure::instance().registerVariable<int>(group_name_ + "_minUpdateTime", min_update_time_,
+    DDDynamicReconfigure::instance().registerVariable<int>(prefix + "_minUpdateTime", min_update_time_,
                                                            boost::bind(&GPython2D::setMinUpdateTime, this, _1),
                                                            "min/max",
                                                            0, 5000, group_name_);

@@ -62,3 +62,10 @@ void TrajectoryMarker::addPoint(const double &value, const Eigen::Vector3d &posi
         MarkerManager::instance().publishMarker(marker_);
     }
 }
+
+void TrajectoryMarker::reset() {
+    marker_.points.clear();
+    marker_.colors.clear();
+    values_ = Vector();
+    MarkerManager::instance().publishMarker(marker_);
+}

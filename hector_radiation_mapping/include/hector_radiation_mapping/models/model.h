@@ -14,15 +14,38 @@ public:
         // Add more model types here
     };
 
-    static std::string getModelTypeName(ModelType type) {
-        switch (type) {
-            case GAUSSIAN_PROCESS: return "GAUSSIAN_PROCESS";
-            case LEAST_SQUARES: return "LEAST_SQUARES";
-            case FIELD_PROPAGATION: return "FIELD_PROPAGATION";
-            case BAYESIAN_INFERENCE: return "BAYESIAN_INFERENCE";
-            // Add more model types here
-            default: return "UNKNOWN";
+    static std::string modelTypeToName(ModelType type, bool short_name = false) {
+        if (short_name) {
+            switch (type) {
+                case GAUSSIAN_PROCESS: return "GP";
+                case LEAST_SQUARES: return "LS";
+                case FIELD_PROPAGATION: return "FP";
+                case BAYESIAN_INFERENCE: return "BI";
+                // Add more model types here
+                default: return "UNKNOWN";
+            }
+        } else {
+            switch (type) {
+                case GAUSSIAN_PROCESS: return "Gaussian_Process";
+                case LEAST_SQUARES: return "Least_Squares";
+                case FIELD_PROPAGATION: return "Field_Propagation";
+                case BAYESIAN_INFERENCE: return "Bayesian_Inference";
+                // Add more model types here
+                default: return "UNKNOWN";
+            }
         }
+    }
+
+    std::string getModelName() {
+        return modelTypeToName(model_type_);
+    }
+
+    std::string getShortModelName() {
+        return modelTypeToName(model_type_, true);
+    }
+
+    ModelType getModelType() {
+        return model_type_;
     }
 
     /**
@@ -81,7 +104,7 @@ public:
 protected:
     Model(ModelType model_type){
         model_type_ = model_type;
-        ROS_INFO_STREAM(getModelTypeName(model_type_) << " created");
+        ROS_INFO_STREAM(modelTypeToName(model_type_) << " created");
     }
 
     virtual void updateLoop() = 0;

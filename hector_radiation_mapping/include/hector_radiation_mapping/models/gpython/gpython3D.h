@@ -44,19 +44,19 @@ public:
      * Returns the point cloud.
      * @return The point cloud.
      */
-    std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> getEnvironmentCloud() { return environmentCloud_; };
+    std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> getEnvironmentCloud() { return environment_cloud_; };
 
     /**
      * Returns the transform of the point cloud.
      * @return The transform of the point cloud.
      */
-    geometry_msgs::TransformStamped getEnvironmentCloudTransform() { return environmentCloudTransform_; };
+    geometry_msgs::TransformStamped getEnvironmentCloudTransform() { return environment_cloud_transform_; };
 
     /**
      * Check if the GPython3D class has a point cloud.
      * @return True if the GPython3D class has a point cloud.
      */
-    bool hasEnvironmentCloud() { return environmentCloud_ != nullptr; };
+    bool hasEnvironmentCloud() { return environment_cloud_ != nullptr; };
 
     /**
      * Get the sources.
@@ -67,9 +67,9 @@ public:
     /**
      * Adds a source Candidate to the model. These Candidates are used to find the positions to evaluate the model at
      * and to find the source in 3D, as the interactive SourceCandidates come the 2D model.
-     * @param sourceCandidate The source Candidates to add.
+     * @param source_candidate The source Candidates to add.
      */
-    void addSourceCandidate(std::shared_ptr<SourceInteractive> &sourceCandidate);
+    void addSourceCandidate(std::shared_ptr<SourceInteractive> &source_candidate);
 
     /**
      * Get the PointCloud of the Model used for the export.
@@ -129,31 +129,31 @@ private:
 
     /**
      * Callback for the environment cloud topic. It updates the environment cloud used as PointCloud for the model.
-     * @param pointCloudMsgPtr The message.
+     * @param point_cloud_msg_ptr The message.
      */
-    void environmentCloudCallback(const sensor_msgs::PointCloud2_<std::allocator<void>>::ConstPtr &pointCloudMsgPtr);
+    void environmentCloudCallback(const sensor_msgs::PointCloud2_<std::allocator<void>>::ConstPtr &point_cloud_msg_ptr);
 
-    std::shared_ptr<Source> currentSource_;
+    std::shared_ptr<Source> current_source_;
     std::vector<std::shared_ptr<Source>> sources_;
-    std::vector<std::shared_ptr<SourceInteractive>> sourceCandidates_;
+    std::vector<std::shared_ptr<SourceInteractive>> source_candidates_;
 
-    std::string groupName_;
-    volatile int minUpdateTime_;
+    std::string group_name_;
+    volatile int min_update_time_;
 
-    std::shared_ptr<PointCloud3D> pointCloud_;
-    std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> environmentCloud_;
-    geometry_msgs::TransformStamped environmentCloudTransform_;
-    std::shared_ptr<ros::Subscriber> environmentCloudSub_;
+    std::shared_ptr<PointCloud3D> point_cloud_;
+    std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> environment_cloud_;
+    geometry_msgs::TransformStamped environment_cloud_transform_;
+    std::shared_ptr<ros::Subscriber> environment_cloud_sub_;
     volatile bool update_;
 
     // Threading
     volatile bool active_;
-    volatile bool doEvaluation_{};
-    std::thread updateThread_;
-    std::condition_variable waitCondition_;
+    volatile bool do_evaluation_{};
+    std::thread update_thread_;
+    std::condition_variable update_condition_;
     std::mutex activation_mtx_;
-    std::mutex addSource_mtx_;
-    std::mutex environmentCloud_mtx_;
+    std::mutex add_source_mtx_;
+    std::mutex environment_cloud_mtx_;
 };
 
 #endif //RADIATION_MAPPING_GPYTHON3D_H

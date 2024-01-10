@@ -1,7 +1,6 @@
 #include <hector_radiation_mapping/sampleManager.h>
 #include "models/model.h"
 
-
 bool Model::isActive() const {
     return active_;
 }
@@ -11,7 +10,7 @@ void Model::activate() {
     if (active_) return;
     this->active_ = true;
     update_thread_ = std::thread(&Model::updateLoop, this);
-    ROS_INFO_STREAM(getModelTypeName(model_type_) << " activated");
+    ROS_INFO_STREAM(modelTypeToName(model_type_) << " activated");
 }
 
 void Model::deactivate() {
@@ -20,7 +19,7 @@ void Model::deactivate() {
     this->active_ = false;
     update_condition_.notify_one();
     update_thread_.join();
-    ROS_INFO_STREAM(getModelTypeName(model_type_) << " deactivated");
+    ROS_INFO_STREAM(modelTypeToName(model_type_) << " deactivated");
 }
 
 void Model::shutDown() {
@@ -29,7 +28,7 @@ void Model::shutDown() {
         samples_add_queue_.clear();
     }
     deactivate();
-    ROS_INFO_STREAM(getModelTypeName(model_type_) << " shut down");
+    ROS_INFO_STREAM(modelTypeToName(model_type_) << " shut down");
 }
 
 void Model::addSample(Sample &sample) {

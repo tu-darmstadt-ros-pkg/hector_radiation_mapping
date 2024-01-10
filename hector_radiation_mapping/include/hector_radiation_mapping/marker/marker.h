@@ -164,6 +164,11 @@ public:
      */
     void addPoint(const double &value, const Eigen::Vector3d &position);
 
+    /**
+     * Reset the trajectory.
+     */
+    void reset();
+
 private:
     Vector values_;
 };

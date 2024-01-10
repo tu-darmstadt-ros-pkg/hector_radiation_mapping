@@ -1,18 +1,7 @@
 #ifndef RADIATION_MAPPING_MODEL_MANAGER_H
 #define RADIATION_MAPPING_MODEL_MANAGER_H
 
-#include <std_msgs/String.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-
-#include "hector_radiation_mapping_msgs/ResetService.h"
-#include "hector_radiation_mapping_msgs/ResetServiceRequest.h"
-#include "hector_radiation_mapping_msgs/ResetServiceResponse.h"
-#include "custom_geotiff/geotiff_writer.h"
-
-class PointCloud3D;
-class Source;
-class Model;
+#include "models/model.h"
 
 class ModelManager {
 public:
@@ -29,21 +18,12 @@ public:
     void shutDown();
 
     /**
-     * Callback for the reset service. It resets the models.
-     * @param req The request.
-     * @param res The response.
-     * @return True.
+     * Get all radiation models.
+     * @return all radiation models
      */
-    bool resetServiceCallback(hector_radiation_mapping_msgs::ResetService::Request &req,
-                              hector_radiation_mapping_msgs::ResetService::Response &res);
-
-    /**
-     * Callback for the syscommand topic. It resets the models if the message is "reset".
-     * @param msg The message.
-     */
-    void sysCmdCallback(const std_msgs::String::ConstPtr &msg);
-
     std::vector<Model*> getModels() const;
+
+    void toggleModel(bool active, std::string model_name);
 
 private:
     /**
@@ -56,8 +36,6 @@ private:
     ModelManager& operator=(const ModelManager&) = delete;
 
     std::vector<Model*> models_;
-    ros::ServiceServer reset_service_;
-    ros::Subscriber sys_cmd_sub_;
 };
 
 #endif //RADIATION_MAPPING_MODEL_MANAGER_H

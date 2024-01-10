@@ -15,11 +15,11 @@ FieldPropagation::FieldPropagation() : Model(ModelType::FIELD_PROPAGATION) {
             Parameters::instance().node_handle_ptr_->subscribe<nav_msgs::OccupancyGrid>(
                     Parameters::instance().environment_map_topic, 1, &FieldPropagation::slamMapCallback, this));
 
-    DDDynamicReconfigure::instance().registerVariable<int>(getModelTypeName(model_type_) + "_minUpdateTime",
+    DDDynamicReconfigure::instance().registerVariable<int>(getShortModelName() + "_minUpdateTime",
                                                            min_update_time_,
                                                            boost::bind(&FieldPropagation::setMinUpdateTime, this, _1),
                                                            "min/max",
-                                                           0, 5000, getModelTypeName(model_type_));
+                                                           0, 5000, getShortModelName());
     DDDynamicReconfigure::instance().publish();
 }
 
@@ -53,7 +53,7 @@ void FieldPropagation::paramCallback() {
 }
 
 void FieldPropagation::setMinUpdateTime(int time) {
-    STREAM(getModelTypeName(model_type_) + " set min map update time = " << time);
+    STREAM(modelTypeToName(model_type_) + " set min map update time = " << time);
     min_update_time_ = time;
 }
 

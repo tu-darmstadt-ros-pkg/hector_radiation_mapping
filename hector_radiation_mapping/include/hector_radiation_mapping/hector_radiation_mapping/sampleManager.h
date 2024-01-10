@@ -19,6 +19,14 @@ public:
     static SampleManager& instance();
 
     /**
+     * Get the TF buffer.
+     * @return The TF buffer.
+     */
+    tf2_ros::Buffer& getTfBuffer();
+
+    void reset();
+
+    /**
      * Callback for the babel fish topic to receive samples.
      * @param msg
      */
@@ -44,12 +52,16 @@ public:
     void updateTrajectory(const double &value, const Eigen::Vector3d &position);
 
     /**
-     * Returns the samples that are within the given radius of the given position.
-     * @param position position to search from
-     * @param radius radius to search in
-     * @return vector of samples that are within the given radius of the given position
+     * Get the Background Radiation in Cps
+     * @return The Background Radiation in Cps
      */
-    std::vector<Sample> getSamplesWithinRadius(const Eigen::Vector3d& position, double radius);
+    double getBackgroundRadiationCps() const{return background_radiation_cps_;};
+
+    /**
+     * Get the Background Radiation as Dose Rate
+     * @return The Background Radiation as Dose Rate
+     */
+    double getBackgroundRadiationDoseRate() const{return background_radiation_dose_rate_;};
 
     /**
      * Get all samples.
@@ -58,10 +70,12 @@ public:
     std::vector<Sample> getSamples();
 
     /**
-     * Get the TF buffer.
-     * @return The TF buffer.
+     * Returns the samples that are within the given radius of the given position.
+     * @param position position to search from
+     * @param radius radius to search in
+     * @return vector of samples that are within the given radius of the given position
      */
-    tf2_ros::Buffer& getTfBuffer();
+    std::vector<Sample> getSamplesWithinRadius(const Eigen::Vector3d& position, double radius);
 
     /**
      * Get the position of the latest sample.
@@ -76,18 +90,6 @@ public:
      * @return The mean sample of the given samples.
      */
     Sample getMeanSample(const std::vector<Sample>& samples, bool weighted = false);
-
-    /**
-     * Get the Background Radiation in Cps
-     * @return The Background Radiation in Cps
-     */
-    double getBackgroundRadiationCps(){return background_radiation_cps_;};
-
-    /**
-     * Get the Background Radiation as Dose Rate
-     * @return The Background Radiation as Dose Rate
-     */
-    double getBackgroundRadiationDoseRate(){return background_radiation_dose_rate_;};
 
     /**
      * Returns the nearest sample to the given position

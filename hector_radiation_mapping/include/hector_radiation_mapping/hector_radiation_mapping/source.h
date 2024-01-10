@@ -4,7 +4,7 @@
 #include "marker/marker.h"
 
 const double cpsToMikroSievertPerHour_ = (1.0 / 3.0) * ((79.76 / 18372.0) + (8.36 / 1974.0) + (191.01 / 43815.0));
-const double mikroSievertPerHourToCps_ = 1 / cpsToMikroSievertPerHour_;
+const double mikro_sievert_per_hour_to_cps_ = 1 / cpsToMikroSievertPerHour_;
 
 /**
  * @brief The Source class

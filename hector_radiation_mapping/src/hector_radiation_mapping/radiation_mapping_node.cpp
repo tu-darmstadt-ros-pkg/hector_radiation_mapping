@@ -7,6 +7,11 @@
 #include "marker/marker_manager.h"
 
 RadiationMapper::RadiationMapper() {
+    sys_cmd_sub_ = ros::Subscriber(
+            Parameters::instance().node_handle_ptr_->subscribe("/syscommand", 10, &RadiationMapper::sysCmdCallback));
+    reset_service_ = ros::ServiceServer(
+            Parameters::instance().node_handle_ptr_->advertiseService("resetModel", &RadiationMapper::resetServiceCallback));
+
     // Initialize Subsystems
     DDDynamicReconfigure::instance();
     MarkerManager::instance();
@@ -27,6 +32,18 @@ void RadiationMapper::sigintHandler(int sig) {
 
     DDDynamicReconfigure::instance().reset();
     ros::shutdown();
+}
+
+bool RadiationMapper::resetServiceCallback(hector_radiation_mapping_msgs::ResetService::Request &req,
+                                           hector_radiation_mapping_msgs::ResetService::Response &res) {
+    ModelManager::instance().resetModels();
+    return true;
+}
+
+void RadiationMapper::sysCmdCallback(const std_msgs::String_<std::allocator<void>>::ConstPtr &msg) {
+    if (msg->data == "reset") {
+        ModelManager::instance().resetModels();
+    }
 }
 
 int main(int argc, char **argv) {

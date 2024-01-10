@@ -15,11 +15,11 @@ BayesianInference::BayesianInference() : Model(ModelType::BAYESIAN_INFERENCE) {
             Parameters::instance().node_handle_ptr_->subscribe<nav_msgs::OccupancyGrid>(
                     Parameters::instance().environment_map_topic, 1, &BayesianInference::slamMapCallback, this));
 
-    DDDynamicReconfigure::instance().registerVariable<int>(getModelTypeName(model_type_) + "_minUpdateTime",
+    DDDynamicReconfigure::instance().registerVariable<int>(getShortModelName() + "_minUpdateTime",
                                                            min_update_time_,
                                                            boost::bind(&BayesianInference::setMinUpdateTime, this, _1),
                                                            "min/max",
-                                                           0, 5000, getModelTypeName(model_type_));
+                                                           0, 5000, getShortModelName());
     DDDynamicReconfigure::instance().publish();
 }
 
@@ -53,7 +53,7 @@ void BayesianInference::paramCallback() {
 }
 
 void BayesianInference::setMinUpdateTime(int time) {
-    STREAM(getModelTypeName(model_type_) + " set min map update time = " << time);
+    STREAM(modelTypeToName(model_type_) + " set min map update time = " << time);
     min_update_time_ = time;
 }
 

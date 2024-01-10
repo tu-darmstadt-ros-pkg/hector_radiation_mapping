@@ -35,7 +35,7 @@ GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS) {
     *param1_ptr = 1.0;
     *param2_ptr = 1.0;
     *param3_ptr = 10.0;
-    std::string group_name = getModelTypeName(model_type_);
+    std::string group_name = getShortModelName();
     DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_kernel_lengthscale", param1_ptr,
                                                               boost::bind(&GPython::paramCallback, this), "param1", 0.0,
                                                               4.0, group_name);
@@ -59,16 +59,13 @@ GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS) {
     active_ = false;
     param_update_ = false;
     model_size_ = 0;
-
-    GPython2D::instance();
-    GPython3D::instance();
 }
 
 void GPython::shutDown() {
     deactivate();
     GPython2D::instance().shutDown();
     GPython3D::instance().shutDown();
-    ROS_INFO_STREAM(getModelTypeName(model_type_) << " shut down");
+    ROS_INFO_STREAM(modelTypeToName(model_type_) << " shut down");
 }
 
 void GPython::activate() {
@@ -79,7 +76,7 @@ void GPython::activate() {
     if (active_) return;
     this->active_ = true;
     update_thread_ = std::thread(&GPython::updateLoop, this);
-    ROS_INFO_STREAM(getModelTypeName(model_type_) << " activated");
+    ROS_INFO_STREAM(modelTypeToName(model_type_) << " activated");
 }
 
 void GPython::deactivate() {
@@ -91,12 +88,12 @@ void GPython::deactivate() {
     this->active_ = false;
     update_condition_.notify_one();
     update_thread_.join();
-    ROS_INFO_STREAM(getModelTypeName(model_type_) << " deactivated");
+    ROS_INFO_STREAM(modelTypeToName(model_type_) << " deactivated");
 }
 
 void GPython::reset() {
     // TODO: implement
-    ROS_INFO_STREAM(getModelTypeName(model_type_) << " reset");
+    ROS_INFO_STREAM(modelTypeToName(model_type_) << " reset");
 }
 
 std::vector<GPython::SampleGP> GPython::samplesToSamplesGP(std::vector<Sample> &samples) {
