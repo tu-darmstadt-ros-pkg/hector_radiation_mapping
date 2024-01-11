@@ -87,6 +87,17 @@ public:
     grid_map::GridMap getGridMap() { return map_; };
 
     /**
+     * Get the positions of the grid map to evaluate.
+     * @param slam_map
+     * @param use_circle
+     * @param radius
+     * @param center
+     * @return The positions of the grid map to evaluate.
+     */
+    Matrix getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map, bool use_circle = false, double radius = 0.0,
+                              const Vector2d &center = Vector2d(0, 0));
+
+    /**
      * Get the map sample positions.
      * @return The map sample positions as a matrix. The columns contain x and y coordinates.
      */

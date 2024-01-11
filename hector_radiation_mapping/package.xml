@@ -23,6 +23,7 @@
     <depend>std_msgs</depend>
     <depend>tf2_ros</depend>
     <depend>eigen</depend>
+    <depend>ceres_catkin</depend>
     <depend>interactive_markers</depend>
     <depend>hector_radiation_mapping_msgs</depend>
     <export>

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5)
 project(hector_radiation_mapping)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -18,12 +18,15 @@ find_package(catkin REQUIRED COMPONENTS
         interactive_markers
         ros_babel_fish
         hector_radiation_mapping_msgs
+        ceres_catkin
         )
 
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Eigen3 REQUIRED)
+find_package(Ceres REQUIRED)
 
-catkin_package()
+catkin_package(CATKIN_DEPENDS
+        ceres_catkin)
 
 include_directories(
         ${catkin_INCLUDE_DIRS}
@@ -31,9 +34,12 @@ include_directories(
         include/hector_radiation_mapping
         include/
         ${EIGEN3_INCLUDE_DIRS}
+        ${CERES_INCLUDE_DIRS}
 )
 
 add_definitions(${EIGEN3_DEFINITIONS})
+
+set(CMAKE_SKIP_BUILD_RPATH TRUE)
 
 add_executable(radiation_mapping_node
         src/custom_geotiff/geotiff_writer.cpp
@@ -68,6 +74,7 @@ target_link_libraries(radiation_mapping_node
         ${catkin_LIBRARIES}
         Qt5::Widgets
         Qt5::Gui
+        ${CERES_LIBRARIES}
         )
 
 set_property(TARGET radiation_mapping_node PROPERTY CXX_STANDARD 17)

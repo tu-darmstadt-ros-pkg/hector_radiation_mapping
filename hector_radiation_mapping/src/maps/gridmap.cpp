@@ -31,6 +31,15 @@ void GridMap::addLayer(const std::string &layer_name) {
     map_.add(layer_name, 0.0);
 }
 
+Matrix GridMap::getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map, bool use_circle, double radius,
+                            const Vector2d &center) {
+    if (slam_map != nullptr) {
+        updateGridDimensionWithSlamMap(slam_map);
+    }
+    return use_circle ? getCircleSamplePositions(center, radius)
+                      : getMapSamplePositions();
+}
+
 Eigen::MatrixX2d GridMap::getMapSamplePositions() {
     Eigen::MatrixX2d grid_map_positions;
     grid_map_positions.conservativeResize(map_.getSize().x() * map_.getSize().y(), Eigen::NoChange);
@@ -113,7 +122,8 @@ void GridMap::updateSubMapLayer(const std::string &layer_name, const Vector &val
 }
 
 void
-GridMap::updateLayer(const std::string &layer_name, const Vector &values, const Eigen::Vector2d &center, double radius) {
+GridMap::updateLayer(const std::string &layer_name, const Vector &values, const Eigen::Vector2d &center,
+                     double radius) {
     if (!existsLayer(layer_name)) {
         STREAM_DEBUG("GridMap: updateLayer() Layer name \"" << layer_name << "\" for update does not exist.");
         return;

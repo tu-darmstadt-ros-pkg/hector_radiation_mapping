@@ -33,8 +33,8 @@ public:
     };
 
     /**
-     * Returns the instance of the GPython class.
-     * @return The instance of the GPython class.
+     * Returns the class instance.
+     * @return class instance.
      */
     static GPython &instance(){
         static GPython instance;
@@ -64,15 +64,6 @@ public:
     static std::vector<SampleGP> samplesToSamplesGP(std::vector<Sample> &samples);
 
     /**
-     * Adds all samples within a radius to the model.
-     * @param position The position.
-     * @param radius The radius.
-     * @param for2d If the samples should be added to the 2D model.
-     * @param for3d If the samples should be added to the 3D model.
-     */
-    void addSamplesWithinRadius(const Vector3d &position, double radius, bool for2d, bool for3d);
-
-    /**
      * Evaluates the model at the given positions.
      * @param positions The positions. The columns contain x, y and z coordinates. Only 2D and 3D is allowed.
      * @return The result of the evaluation. Empty if the evaluation failed or the dimension of the positions is not 2 or 3.
@@ -96,12 +87,7 @@ private:
     GPython(const GPython &) = delete;
     GPython &operator=(const GPython &) = delete;
 
-    /**
-     * Updates the model in a loop. It is called in a separate thread.
-     * It sends all samples in the samples_add_queue_ to the GPython model.
-     * It also updates the parameters of the GPython model.
-     */
-    void updateLoop() override;
+    void update() override;
 
     /**
      * Sends a vector of samples to the GPython model via the sample_service_client_.

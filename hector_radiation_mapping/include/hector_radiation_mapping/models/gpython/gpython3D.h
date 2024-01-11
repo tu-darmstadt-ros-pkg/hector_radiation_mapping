@@ -14,8 +14,8 @@
 class GPython3D {
 public:
     /**
-     * Returns the instance of the GPython3D class.
-     * @return The instance of the GPython3D class.
+     * Returns the class instance.
+     * @return class instance.
      */
     static GPython3D &instance();
 

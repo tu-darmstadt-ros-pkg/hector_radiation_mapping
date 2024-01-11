@@ -12,8 +12,8 @@
 class GPython2D {
 public:
     /**
-     * Returns the instance of the GPython2D class.
-     * @return The instance of the GPython2D class.
+     * Returns the class instance.
+     * @return class instance.
      */
     static GPython2D &instance();
 
@@ -99,16 +99,6 @@ private:
      */
     void updateMap(const Vector &mean, const Vector &std_dev, bool use_circle = false,
                    const Vector2d &center = Vector2d(0, 0));
-
-    /**
-     * Get the positions of the grid map to evaluate.
-     * @param slam_map
-     * @param use_circle
-     * @param center
-     * @return The positions of the grid map to evaluate.
-     */
-    Matrix getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map, bool use_circle = false,
-                              const Vector2d &center = Vector2d(0, 0));
 
     /**
      * Update the prediction of the sources.

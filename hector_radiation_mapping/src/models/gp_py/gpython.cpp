@@ -105,34 +105,29 @@ std::vector<GPython::SampleGP> GPython::samplesToSamplesGP(std::vector<Sample> &
     return samples_gp;
 }
 
-void GPython::updateLoop() {
-    Clock clock;
-    std::vector<SampleGP> samples_gp_queue;
-    while (active_ && ros::ok()) {
-        {
-            std::unique_lock<std::mutex> lock{sample_queue_mtx_};
-            update_condition_.wait(lock,
-                                   [this]() { return (!samples_add_queue_.empty()) || !active_ || param_update_; });
-            if (!active_) break;
-            param_update_ = false;
-            GPython2D::instance().triggerEvaluation();
-            GPython3D::instance().triggerEvaluation();
+void GPython::update() {
+    static Clock clock;
+    static std::vector<SampleGP> samples_gp_queue;
+    {
+        std::unique_lock<std::mutex> lock{sample_queue_mtx_};
+        update_condition_.wait(lock,
+                               [this]() { return (!samples_add_queue_.empty()) || !active_ || param_update_; });
+        if (!active_) return;
+        param_update_ = false;
+        GPython2D::instance().triggerEvaluation();
+        GPython3D::instance().triggerEvaluation();
 
-            // create copy of samples
-            samples_gp_queue = samplesToSamplesGP(samples_add_queue_);
-            samples_add_queue_.clear();
-        }
-        {
-            std::lock_guard<std::recursive_mutex> lock{model_mtx_};
-            clock.tick();
-            addSamplesToModel(samples_gp_queue);
-            update_times_.push_back((double) clock.tock());
-        }
-        update_sizes_.push_back((double) sample_ids_2d_.size());
+        // create copy of samples
+        samples_gp_queue = samplesToSamplesGP(samples_add_queue_);
+        samples_add_queue_.clear();
     }
-    //std::string export_path = Util::getExportPath("runtime");
-    //Util::exportVectorToTxtFile(update_times_, export_path, "update_times_", Util::TxtExportType::NEW, true);
-    //Util::exportVectorToTxtFile(update_sizes_, export_path, "update_sizes_", Util::TxtExportType::NEW, true);
+    {
+        std::lock_guard<std::recursive_mutex> lock{model_mtx_};
+        clock.tick();
+        addSamplesToModel(samples_gp_queue);
+        update_times_.push_back((double) clock.tock());
+    }
+    update_sizes_.push_back((double) sample_ids_2d_.size());
 }
 
 GPython::GPResult GPython::evaluate(Matrix &positions) {

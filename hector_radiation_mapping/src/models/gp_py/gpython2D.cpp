@@ -76,7 +76,7 @@ void GPython2D::updateLoop() {
             {
                 std::lock_guard<std::recursive_mutex> lock1{GPython::instance().getModelMutex()};
                 std::lock_guard<std::mutex> lock{grid_map_->getGridMapMutex()};
-                Matrix sample_positions = getSamplePositions(slamMap, use_circle, center);
+                Matrix sample_positions = grid_map_->getSamplePositions(slamMap, use_circle, Parameters::instance().gp_circle_radius, center);
                 GPython::GPResult gp_result = GPython::instance().evaluate(sample_positions);
                 updateMap(gp_result.mean, gp_result.std_dev, use_circle, center);
                 evaluation_times.push_back((double) clock.tock());
@@ -95,16 +95,6 @@ void GPython2D::updateLoop() {
     //Util::exportVectorToTxtFile(evaluation_sizes, export_path, "evaluation_sizes", Util::TxtExportType::NEW, true);
 }
 
-Matrix GPython2D::getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map, bool use_circle,
-                                     const Vector2d &center) {
-    double radius = Parameters::instance().gp_circle_radius;
-    if (slam_map != nullptr) {
-        grid_map_->updateGridDimensionWithSlamMap(slam_map);
-    }
-    return use_circle ? grid_map_->getCircleSamplePositions(center, radius)
-                      : grid_map_->getMapSamplePositions();
-}
-
 void GPython2D::updateMap(const Vector &mean, const Vector &std_dev, bool use_circle, const Vector2d &center) {
     double radius = Parameters::instance().gp_circle_radius;
     if (use_circle) {
@@ -121,7 +111,7 @@ std::pair<grid_map::GridMap, std::shared_ptr<nav_msgs::OccupancyGrid>> GPython2D
     std::lock_guard<std::mutex> lock{grid_map_->getGridMapMutex()};
     std::lock_guard<std::recursive_mutex> lock1{GPython::instance().getModelMutex()};
     std::shared_ptr<nav_msgs::OccupancyGrid> slam_map = slam_map_;
-    Matrix sample_positions = getSamplePositions(slam_map);
+    Matrix sample_positions = grid_map_->getSamplePositions(slam_map);
     GPython::GPResult gp_result = GPython::instance().evaluate(sample_positions);
     updateMap(gp_result.mean, gp_result.std_dev);
     return {grid_map_->getGridMap(), slam_map};

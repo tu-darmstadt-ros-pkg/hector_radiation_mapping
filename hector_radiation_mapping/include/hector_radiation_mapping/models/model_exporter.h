@@ -15,6 +15,10 @@ class PointCloud3D;
  */
 class ModelExporter {
 public:
+    /**
+     * Returns the class instance.
+     * @return class instance.
+     */
     static ModelExporter &instance();
 
     /**

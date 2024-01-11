@@ -102,18 +102,24 @@ public:
     virtual void reset() = 0;
 
 protected:
-    Model(ModelType model_type){
-        model_type_ = model_type;
-        ROS_INFO_STREAM(modelTypeToName(model_type_) << " created");
-    }
+    explicit Model(Model::ModelType model_type, int min_update_time = 0);
 
-    virtual void updateLoop() = 0;
+    virtual void updateLoop();
+
+    virtual void update() = 0;
+
+    /**
+     * Set the minimum update time.
+     * @param time
+     */
+    void setMinUpdateTime(int time);
 
     std::vector<Sample> samples_add_queue_;
     std::vector<Sample> samples_delete_queue_;
     std::mutex sample_queue_mtx_;
 
-    volatile bool active_ = false;
+    volatile std::atomic_bool active_;
+    volatile std::atomic_int min_update_time_;
     std::thread update_thread_;
     std::condition_variable update_condition_;
     std::mutex activation_mtx_;

@@ -5,6 +5,10 @@
 
 class ModelManager {
 public:
+    /**
+     * Returns the class instance.
+     * @return class instance.
+     */
     static ModelManager& instance();
 
     /**
