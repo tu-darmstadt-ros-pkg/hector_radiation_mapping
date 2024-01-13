@@ -108,12 +108,16 @@ protected:
 
     virtual void update() = 0;
 
+    virtual void updateSamples();
+
     /**
      * Set the minimum update time.
      * @param time
      */
     void setMinUpdateTime(int time);
 
+    std::vector<Sample> samples_;
+    std::vector<Sample> samples_new_;
     std::vector<Sample> samples_add_queue_;
     std::vector<Sample> samples_delete_queue_;
     std::mutex sample_queue_mtx_;

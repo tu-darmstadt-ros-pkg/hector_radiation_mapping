@@ -20,7 +20,7 @@ ModelManager::ModelManager() {
     Model &fp = FieldPropagation::instance();
     Model &bi = BayesianInference::instance();
 
-    models_ = {&gp, &ls, &fp, &bi};
+    models_ = {&ls};
     for (Model *model: models_) {
         model->activate();
         std::string model_name = model->getModelName();

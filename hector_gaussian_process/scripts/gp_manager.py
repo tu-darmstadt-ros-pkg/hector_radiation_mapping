@@ -28,7 +28,7 @@ class GPManager:
             x_star = torch.tensor([sample.position for sample in samples])
             x_star = x_star[:, :self.dimension]
             t = torch.tensor([sample.doseRate for sample in samples])
-            print(x_star.shape, t.shape)
+            #print(x_star.shape, t.shape)
             self.gp_model_update.add_data(x_star, t)
 
         # add samples to gp model and train
@@ -36,7 +36,7 @@ class GPManager:
             self.gp_model_update.train(params, len(samples)>0)
             self.new_model_available = True
         except():
-            print("GP model " + str(self.dimension) + "D training failed")
+            #print("GP model " + str(self.dimension) + "D training failed")
             pass
 
     def evaluate(self, positions: torch.Tensor):
@@ -46,7 +46,7 @@ class GPManager:
         :return: mean and variance tensors
         """
         if not self.gp_model_update.isTrained:
-            print("GP model " + str(self.dimension) + "D not trained")
+            #print("GP model " + str(self.dimension) + "D not trained")
             return torch.empty(0, 1), torch.empty(0, 1)
 
         #self.update_to_newest_model()
@@ -63,7 +63,7 @@ class GPManager:
             mean[start:end, :], variance[start:end, :] = self.gp_model_update.evaluate(batch)
             start = end
 
-        print(mean.shape, variance.shape)
+        #print(mean.shape, variance.shape)
         return mean, variance
 
     def update_to_newest_model(self):

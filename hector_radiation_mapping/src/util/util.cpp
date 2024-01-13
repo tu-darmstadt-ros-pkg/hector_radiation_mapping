@@ -96,7 +96,7 @@ double Util::getRamUsageMB() {
     return 0.001024 * usage.ru_maxrss;
 }
 
-void Util::exportVectorToTxtFile(const std::vector<double>& data, const std::string& path, const std::string& filename, TxtExportType type, bool print) {
+void Util::exportVectorToTxtFile(const std::vector<std::string>& data, const std::string& path, const std::string& filename, TxtExportType type, bool print) {
     std::ofstream file;
     std::string filePath;
     switch (type) {

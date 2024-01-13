@@ -2,7 +2,6 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <cstdlib>
 
-#include "pch.h"
 #include "models/gpython/gpython.h"
 #include "models/gpython/gpython2D.h"
 #include "models/gpython/gpython3D.h"
@@ -45,7 +44,6 @@ GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS) {
     DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_likelihood_noise", param3_ptr,
                                                               boost::bind(&GPython::paramCallback, this), "param3", 0.0,
                                                               20.0, group_name);
-    DDDynamicReconfigure::instance().publish();
     STREAM_DEBUG("GPython params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
 
     // Start the GPython node
@@ -56,7 +54,6 @@ GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS) {
     }
 
     // Initialize variables
-    active_ = false;
     param_update_ = false;
     model_size_ = 0;
 }

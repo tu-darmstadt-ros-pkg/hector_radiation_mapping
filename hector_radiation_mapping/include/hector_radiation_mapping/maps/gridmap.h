@@ -86,6 +86,8 @@ public:
      */
     grid_map::GridMap getGridMap() { return map_; };
 
+    grid_map::GridMap& getGridMapRef() { return map_; };
+
     /**
      * Get the positions of the grid map to evaluate.
      * @param slam_map

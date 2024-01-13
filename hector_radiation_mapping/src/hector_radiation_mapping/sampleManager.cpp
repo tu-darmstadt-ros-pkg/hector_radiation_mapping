@@ -3,7 +3,6 @@
 #include "hector_radiation_mapping/sample.h"
 #include "util/parameters.h"
 #include "models/model_manager.h"
-#include "models/gpython/gpython.h"
 
 SampleManager::SampleManager() {
     // Fix topic name if necessary
@@ -246,7 +245,7 @@ Sample SampleManager::getSampleById(int id) {
             return sample;
         }
     }
-    return Sample(); // return empty sample if no sample with id was found
+    return {}; // return empty sample if no sample with id was found
 }
 
 void SampleManager::reset() {

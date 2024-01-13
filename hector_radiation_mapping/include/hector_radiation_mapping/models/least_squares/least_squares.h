@@ -19,7 +19,7 @@ public:
      * Returns the class instance.
      * @return class instance.
      */
-    static LeastSquares &instance(){
+    static LeastSquares &instance() {
         static LeastSquares instance;
         return instance;
     }
@@ -34,7 +34,9 @@ public:
 
 private:
     LeastSquares();
+
     LeastSquares(const LeastSquares &) = delete;
+
     LeastSquares &operator=(const LeastSquares &) = delete;
 
     void update() override;
@@ -47,8 +49,14 @@ private:
      */
     void slamMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &gridMsgPtr);
 
-    std::string layer_name_std_dev_;
-    std::string layer_name_mean_;
+    static void
+    calculateOptimalIntensity(const Vector2d &position, const std::vector<Sample> &samples, float &intensity,
+                              float &numerator, float &denominator);
+
+    std::string layer_name_intensity_;
+    std::string layer_name_error_;
+    std::string layer_name_i_numerator_;
+    std::string layer_name_i_denominator_;
     volatile std::atomic_bool use_circle_;
 
     std::shared_ptr<GridMap> grid_map_;

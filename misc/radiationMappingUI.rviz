@@ -34,7 +34,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloudFilter
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -143,7 +143,7 @@ Visualization Manager:
       Autocompute Intensity Bounds: true
       Class: grid_map_rviz_plugin/GridMap
       Color: 200; 200; 200
-      Color Layer: prediction
+      Color Layer: error
       Color Transformer: GridMapLayer
       ColorMap: turbo
       Enabled: true
@@ -159,7 +159,7 @@ Visualization Manager:
       Min Intensity: 0
       Name: GridMap
       Show Grid Lines: false
-      Topic: /hector_radiation_mapping/grid_map_0
+      Topic: /grid_map_ls
       Unreliable: false
       Use ColorMap: true
       Value: true
@@ -185,23 +185,31 @@ Visualization Manager:
       Color Transformer: Intensity
       Decay Time: 0
       Enable filtering:
+        Filter by Channel Value:
+          Channel: ""
+          Channel Max Value: 255
+          Channel Min Value: -255
+          Value: false
         Frame: world
         Radial Filter:
           Radius: 3
           Value: false
+        Use other Axes:
+          Axes Frame: world
+          Value: false
         Value: true
         X Filter:
-          Max Value: 2
-          Min Value: -2
           Value: false
+          X Max Value: 2
+          X Min Value: -2
         Y Filter:
-          Max Value: 2
-          Min Value: -2
           Value: false
+          Y Max Value: 2
+          Y Min Value: -2
         Z Filter:
-          Max Value: 1
-          Min Value: 0
           Value: true
+          Z Max Value: 2
+          Z Min Value: -2
       Enabled: true
       Invert Rainbow: true
       Max Color: 255; 255; 255
@@ -246,7 +254,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 18.515869140625
+      Distance: 45.8446159362793
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -262,9 +270,9 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.11479682475328445
+      Pitch: 0.8797962069511414
       Target Frame: <Fixed Frame>
-      Yaw: 5.792205810546875
+      Yaw: 6.1772141456604
     Saved: ~
 Window Geometry:
   Displays:

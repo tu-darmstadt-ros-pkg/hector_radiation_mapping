@@ -46,7 +46,7 @@ class GPModel:
         :param y_: tensor of y values
         :return: None
         """
-        print("Adding data", x_star_.shape, y_.shape)
+        #print("Adding data", x_star_.shape, y_.shape)
         if self.data_x is None:
             self.data_x = x_star_
             self.data_y = y_
@@ -56,7 +56,7 @@ class GPModel:
         if self.cuda_available:
             self.data_x = self.data_x.cuda()
             self.data_y = self.data_y.cuda()
-        print(self.data_x.shape, self.data_y.shape)
+        #print(self.data_x.shape, self.data_y.shape)
 
     def train(self, params, newSamples, num_iterations=2, print_iterations=True):
         """
@@ -66,14 +66,14 @@ class GPModel:
         :return: None
         """
         self.parameters = params
-        print("Trained GP model", self.parameters)
+        #print("Trained GP model", self.parameters)
         #print("Training GP model", self.data_x.shape, self.data_y.shape)
         self.model = ExactGPModel(self.data_x, self.data_y, gpytorch.likelihoods.GaussianLikelihood())
         self.model.covar_module.base_kernel.lengthscale = self.parameters[0]
         self.model.covar_module.outputscale = self.parameters[1]
         self.model.likelihood.noise = self.parameters[2]
-        print(self.model.parameters())
-        print(self.model.named_parameters())
+        #print(self.model.parameters())
+        #print(self.model.named_parameters())
         if not newSamples:
             return
 
@@ -91,7 +91,7 @@ class GPModel:
                 loss = -mll(output, self.data_y)
                 loss.backward()
 
-                if print_iterations:
+                if print_iterations and False:
                     print('Iter %d/%d - Loss: %.3f   lengthscale: %.3f   noise: %.3f' % (
                         iteration + 1, num_iterations, loss.item(),
                         self.model.covar_module.base_kernel.lengthscale.item(),
@@ -102,7 +102,7 @@ class GPModel:
         self.parameters[0] = self.model.covar_module.base_kernel.lengthscale
         self.parameters[1] = self.model.covar_module.outputscale
         self.parameters[2] = self.model.likelihood.noise
-        print("Trained GP model", self.parameters)
+        #print("Trained GP model", self.parameters)
         self.isTrained = True
 
     def evaluate(self, eval_points):
@@ -112,7 +112,7 @@ class GPModel:
         :return: mean and variance of prediction distribution
         """
         eval_torch = eval_points
-        print("Evaluating GP model", eval_torch.shape, self.data_x.shape, self.data_y.shape)
+        #print("Evaluating GP model", eval_torch.shape, self.data_x.shape, self.data_y.shape)
         self.model.eval()
         self.model.likelihood.eval()
 

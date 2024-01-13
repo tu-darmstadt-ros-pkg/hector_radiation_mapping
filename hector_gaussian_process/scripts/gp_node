@@ -28,12 +28,12 @@ class GPNode:
         # self.evaluationTimes = []
         # self.modelSize = []
 
-        print("CUDA available: ", torch.cuda.is_available())
+        #print("CUDA available: ", torch.cuda.is_available())
 
         rospy.init_node('gp_node')
         rospy.Service('/hector_radiation_mapping/gp_samples', AddSamplesService, self.add_samples_callback)
         rospy.Service('/hector_radiation_mapping/gp_evaluation', GPEvaluationService, self.gp_evaluation_callback)
-        print("GPython Node initialized")
+        #print("GPython Node initialized")
         rospy.spin()
 
         # save_list_to_file(self.evaluationTimes, file_path, 'evaluationTimes.txt')
@@ -46,7 +46,7 @@ class GPNode:
         :param req: request message
         :return: response message
         """
-        print("Sample callback")
+        #print("Sample callback")
         # startTime = time.time()
 
         # add samples to lists
@@ -65,7 +65,7 @@ class GPNode:
         params = []
         for param in req_params:
             params.append(param)
-            print(param)
+            #print(param)
 
         self.gp_model2d.add_samples(samples2d, params)
         self.gp_model3d.add_samples(samples3d, params)
@@ -81,16 +81,16 @@ class GPNode:
         :return: response message
         """
         # startTime = time.time()
-        print("GP evaluation callback")
+        #print("GP evaluation callback")
         dim = request.positions.layout.dim
         num_rows = dim[0].size
         num_columns = dim[1].size
 
         if num_columns == 0 or num_rows == 0:
-            print("No positions to evaluate")
+            #print("No positions to evaluate")
             return GPEvaluationServiceResponse()
         if num_columns != 2 and num_columns != 3:
-            print("No Model for number of columns in positions exists")
+            #print("No Model for number of columns in positions exists")
             return GPEvaluationServiceResponse()
 
         eval_positions = torch.tensor(request.positions.data).view(num_rows, num_columns)
@@ -99,7 +99,7 @@ class GPNode:
             mean, variance = self.gp_model2d.evaluate(eval_positions)
         if num_columns == 3:
             mean, variance = self.gp_model3d.evaluate(eval_positions)
-        print(mean.shape, variance.shape)
+        #print(mean.shape, variance.shape)
 
         mean_msg = Float64MultiArray()
         mean_msg.data = mean.flatten().tolist()

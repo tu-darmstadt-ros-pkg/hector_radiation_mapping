@@ -36,10 +36,6 @@ void Model::deactivate() {
 }
 
 void Model::shutDown() {
-    {
-        std::lock_guard<std::mutex> lock{sample_queue_mtx_};
-        samples_add_queue_.clear();
-    }
     deactivate();
     ROS_INFO_STREAM(modelTypeToName(model_type_) << " shut down");
 }
@@ -63,11 +59,6 @@ void Model::addSamples(std::vector<Sample> &samples) {
 void Model::deleteSample(Sample &sample) {
     {
         std::lock_guard<std::mutex> lock{sample_queue_mtx_};
-        // remove sample from samples_add_queue_ if it is there
-        samples_add_queue_.erase(std::remove_if(samples_add_queue_.begin(), samples_add_queue_.end(),
-                                                [&sample](const Sample &s) { return s.id_ == sample.id_; }),
-                                 samples_add_queue_.end());
-
         samples_delete_queue_.push_back(sample);
     }
     update_condition_.notify_one();
@@ -76,15 +67,44 @@ void Model::deleteSample(Sample &sample) {
 void Model::deleteSamples(std::vector<Sample> &samples) {
     {
         std::lock_guard<std::mutex> lock{sample_queue_mtx_};
-        // remove samples from samples_add_queue_ if they are there
-        for (const Sample &sample: samples) {
-            samples_add_queue_.erase(std::remove_if(samples_add_queue_.begin(), samples_add_queue_.end(),
-                                                    [&sample](const Sample &s) { return s.id_ == sample.id_; }),
-                                     samples_add_queue_.end());
-        }
         samples_delete_queue_.insert(samples_delete_queue_.end(), samples.begin(), samples.end());
     }
     update_condition_.notify_one();
+}
+
+void Model::updateSamples() {
+    std::lock_guard<std::mutex> lock{sample_queue_mtx_};
+    samples_new_.clear();
+    // ersase all samples from the add queue and samples_ if they are in the delete queue
+    samples_add_queue_.erase(std::remove_if(samples_add_queue_.begin(), samples_add_queue_.end(),
+                                            [this](const Sample &sample_add) {
+                                                return std::any_of(samples_delete_queue_.begin(),
+                                                                   samples_delete_queue_.end(),
+                                                                   [&sample_add](const Sample &sample_delete) {
+                                                                       return sample_delete.id_ == sample_add.id_;
+                                                                   });
+                                            }),
+                             samples_add_queue_.end());
+    samples_.erase(std::remove_if(samples_.begin(), samples_.end(), [this](const Sample &sample) {
+                       return std::any_of(samples_delete_queue_.begin(), samples_delete_queue_.end(),
+                                          [&sample](const Sample &sample_delete) { return sample_delete.id_ == sample.id_; });
+                   }),
+                   samples_.end());
+    samples_delete_queue_.clear();
+
+    // insert all samples from the add queue if not already present
+    for (auto &sample_add: samples_add_queue_) {
+        auto it = std::find_if(samples_.begin(), samples_.end(),
+                               [&sample_add](const Sample &sample) {
+                                   return sample_add.id_ == sample.id_;
+                               });
+
+        if (it == samples_.end()) {
+            samples_.push_back(sample_add);
+            samples_new_.push_back(sample_add);
+        }
+    }
+    samples_add_queue_.clear();
 }
 
 void Model::updateLoop() {
@@ -102,3 +122,4 @@ void Model::setMinUpdateTime(int time) {
     STREAM(modelTypeToName(model_type_) + " set min map update time = " << time);
     min_update_time_ = time;
 }
+

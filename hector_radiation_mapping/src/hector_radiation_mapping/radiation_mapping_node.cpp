@@ -29,7 +29,6 @@ void RadiationMapper::sigintHandler(int sig) {
     MarkerManager::instance().deleteAllMarkers();
     MarkerManager::instance().deleteAllInteractiveMarkers();
     ModelManager::instance().shutDown();
-
     DDDynamicReconfigure::instance().reset();
     ros::shutdown();
 }
@@ -37,12 +36,18 @@ void RadiationMapper::sigintHandler(int sig) {
 bool RadiationMapper::resetServiceCallback(hector_radiation_mapping_msgs::ResetService::Request &req,
                                            hector_radiation_mapping_msgs::ResetService::Response &res) {
     ModelManager::instance().resetModels();
+    SampleManager::instance().reset();
+    MarkerManager::instance().deleteAllMarkers();
+    MarkerManager::instance().deleteAllInteractiveMarkers();
     return true;
 }
 
 void RadiationMapper::sysCmdCallback(const std_msgs::String_<std::allocator<void>>::ConstPtr &msg) {
     if (msg->data == "reset") {
         ModelManager::instance().resetModels();
+        SampleManager::instance().reset();
+        MarkerManager::instance().deleteAllMarkers();
+        MarkerManager::instance().deleteAllInteractiveMarkers();
     }
 }
 

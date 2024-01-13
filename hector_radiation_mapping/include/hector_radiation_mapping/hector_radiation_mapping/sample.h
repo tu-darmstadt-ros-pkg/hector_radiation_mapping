@@ -21,7 +21,7 @@ struct Sample{
      * Get the 2D position of the sample
      * @return 2D position of the sample
      */
-    Eigen::Vector2d get2DPos(){return {position_.x(), position_.y()};};
+    Eigen::Vector2d get2DPos() const {return {position_.x(), position_.y()};};
 
     /**
      * Get the 3D position of the sample with z = 0

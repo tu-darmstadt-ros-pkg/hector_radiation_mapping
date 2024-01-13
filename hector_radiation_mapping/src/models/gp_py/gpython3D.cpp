@@ -20,11 +20,9 @@ GPython3D::GPython3D() {
     DDDynamicReconfigure::instance().registerVariable<bool>(prefix + "_update", update_,
                                                             boost::bind(&GPython3D::setUpdate, this, _1), "on/off",
                                                             false, true, group_name_);
-    DDDynamicReconfigure::instance().publish();
     point_cloud_ = std::make_shared<PointCloud3D>("pointCloud3D");
     active_ = false;
     do_evaluation_ = false;
-    activate();
 }
 
 GPython3D &GPython3D::instance() {
@@ -109,22 +107,22 @@ void GPython3D::setMinUpdateTime(int time) {
 
 void
 GPython3D::environmentCloudCallback(const sensor_msgs::PointCloud2_<std::allocator<void>>::ConstPtr &point_cloud_msg_ptr) {
-    std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> environmentCloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-    pcl::fromROSMsg(*point_cloud_msg_ptr, *environmentCloud);
+    std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> environment_cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+    pcl::fromROSMsg(*point_cloud_msg_ptr, *environment_cloud);
 
     // Obtain tf transform from map frame to environment cloud frame
-    geometry_msgs::TransformStamped environmentCloudTransform;
+    geometry_msgs::TransformStamped environment_cloud_transform;
     try {
-        environmentCloudTransform = SampleManager::instance().getTfBuffer().lookupTransform(
-                "world", environmentCloud->header.frame_id, ros::Time(0));
+        environment_cloud_transform = SampleManager::instance().getTfBuffer().lookupTransform(
+                "world", environment_cloud->header.frame_id, ros::Time(0));
     } catch (tf2::TransformException &ex) {
         ROS_WARN("%s", ex.what());
         return;
     }
 
     std::lock_guard<std::mutex> lock{environment_cloud_mtx_};
-    environment_cloud_ = environmentCloud;
-    environment_cloud_transform_ = environmentCloudTransform;
+    environment_cloud_ = environment_cloud;
+    environment_cloud_transform_ = environment_cloud_transform;
 }
 
 void GPython3D::addSourceCandidate(std::shared_ptr<SourceInteractive> &source_candidate) {
@@ -146,43 +144,43 @@ void GPython3D::addSourceCandidate(std::shared_ptr<SourceInteractive> &source_ca
 pcl::PointCloud<PointCloud3D::PointXYZPC> GPython3D::getExportPointCloud() {
     std::lock_guard<std::recursive_mutex> lock1{GPython::instance().getModelMutex()};
     sources_.clear();
-    pcl::PointCloud<PointCloud3D::PointXYZPC> exportPointCloud;
-    int stepSize = 1;
+    pcl::PointCloud<PointCloud3D::PointXYZPC> export_point_cloud;
+    int step_size = 1;
 
     // get positions of all sourceCandidates
     STREAM_DEBUG("GPython3D: get positions of all sourceCandidates");
-    std::vector<Vector3d> sourceCandidatePositions;
+    std::vector<Vector3d> source_candidate_positions;
     {
         std::lock_guard<std::mutex> lock{add_source_mtx_};
-        for (auto &sourceCandidate: source_candidates_) {
-            if (sourceCandidate->isConfirmed()) {
-                sourceCandidatePositions.push_back(sourceCandidate->getPos());
+        for (auto &source_candidate: source_candidates_) {
+            if (source_candidate->isConfirmed()) {
+                source_candidate_positions.push_back(source_candidate->getPos());
             }
         }
     }
 
-    STREAM_DEBUG("GPython3D: sourceCandidatePositions.size() = " << sourceCandidatePositions.size());
+    STREAM_DEBUG("GPython3D: source_candidate_positions.size() = " << source_candidate_positions.size());
     std::lock_guard<std::mutex> lock{point_cloud_->getPointCloudMutex()};
-    for (Vector3d &sourcePositon: sourceCandidatePositions) {
+    for (Vector3d &sourcePositon: source_candidate_positions) {
         // Generate PointCloud3D from SourceCandidate
-        Matrix samplePositions = getSamplePositions(sourcePositon);
-        GPython::GPResult gpResult = GPython::instance().evaluate(samplePositions);
-        point_cloud_->updateMapValues(gpResult.mean, gpResult.std_dev);
+        Matrix sample_positions = getSamplePositions(sourcePositon);
+        GPython::GPResult gp_result = GPython::instance().evaluate(sample_positions);
+        point_cloud_->updateMapValues(gp_result.mean, gp_result.std_dev);
 
         // Make source prediction from PointCloud3D
-        std::shared_ptr<Source> source = getSourcePrediction(samplePositions, gpResult.mean);
+        std::shared_ptr<Source> source = getSourcePrediction(sample_positions, gp_result.mean);
         source->setConfirmed(true);
         sources_.push_back(source);
 
-        // Add Points from PointCloud3D to exportPointCloud
-        exportPointCloud.reserve(exportPointCloud.size() + point_cloud_->getPointCloud().size());
+        // Add Points from PointCloud3D to export_point_cloud
+        export_point_cloud.reserve(export_point_cloud.size() + point_cloud_->getPointCloud().size());
         for (PointCloud3D::PointXYZPC &point: point_cloud_->getPointCloud()) {
-            exportPointCloud.push_back(point);
+            export_point_cloud.push_back(point);
         }
 
-        // Update stepSize
-        if (point_cloud_->getStepSize() > stepSize) {
-            stepSize = ceil(point_cloud_->getStepSize());
+        // Update step_size
+        if (point_cloud_->getStepSize() > step_size) {
+            step_size = ceil(point_cloud_->getStepSize());
         }
     }
 
@@ -190,27 +188,27 @@ pcl::PointCloud<PointCloud3D::PointXYZPC> GPython3D::getExportPointCloud() {
     STREAM_DEBUG("GPython3D: Get downsampled EnvironmentCloud");
     {
         std::lock_guard<std::mutex> lock2{environment_cloud_mtx_};
-        point_cloud_->generatePointCloudFromEnvironmentCloud(environment_cloud_, environment_cloud_transform_, stepSize);
+        point_cloud_->generatePointCloudFromEnvironmentCloud(environment_cloud_, environment_cloud_transform_, step_size);
     }
 
-    // Add points from downsampled EnvironmentCloud to exportPointCloud if they are not in LocalModels
-    STREAM_DEBUG("GPython3D: Add points from downsampled EnvironmentCloud to exportPointCloud if they are not in LocalModels");
-    double maxDistance2 = point_cloud_->getPointCloudRadius() * point_cloud_->getPointCloudRadius();
+    // Add points from downsampled EnvironmentCloud to export_point_cloud if they are not in LocalModels
+    STREAM_DEBUG("GPython3D: Add points from downsampled EnvironmentCloud to export_point_cloud if they are not in LocalModels");
+    double max_distance2 = point_cloud_->getPointCloudRadius() * point_cloud_->getPointCloudRadius();
     for (PointCloud3D::PointXYZPC &point: point_cloud_->getPointCloud()) {
-        bool addPoint = true;
-        for (Vector3d &sourcePositon: sourceCandidatePositions) {
+        bool add_point = true;
+        for (Vector3d &source_positon: source_candidate_positions) {
             Vector3d p(point.x, point.y, point.z);
-            if ((p - sourcePositon).squaredNorm() < maxDistance2) {
-                addPoint = false;
+            if ((p - source_positon).squaredNorm() < max_distance2) {
+                add_point = false;
                 break;
             }
         }
-        if (addPoint) {
-            exportPointCloud.push_back(point);
+        if (add_point) {
+            export_point_cloud.push_back(point);
         }
     }
-    STREAM_DEBUG("GPython3D: exportPointCloud.size() = " << exportPointCloud.size() << " stepSize = " << stepSize);
-    return exportPointCloud;
+    STREAM_DEBUG("GPython3D: export_point_cloud.size() = " << export_point_cloud.size() << " step_size = " << step_size);
+    return export_point_cloud;
 }
 
 void GPython3D::setUpdate(bool update) {

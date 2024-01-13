@@ -50,7 +50,7 @@ gp_circle_radius: 5.0 # meter
 # The minimum distance that a sample needs to the last sample to be included in the model
 gp_min_distance_between_samples_2d: 0.2 # meter
 # The minimum time between two updates of the 2D model
-gp_min_update_time_2d: 100 # milliseconds
+gp_min_update_time_2d: 2000 # milliseconds
 
 # *** GridMap ***
 # The name of the gridmap topic
@@ -99,4 +99,4 @@ bi_grid_map_resolution: 0.1 # meter
 fp_circle_radius: 5.0 # meter
 fp_min_update_time: 1000 # milliseconds
 fp_grid_map_topic: "/grid_map_fp"
-fp_grid_map_resolution: 0.1 # meter
+fp_grid_map_resolution: 0.2 # meter

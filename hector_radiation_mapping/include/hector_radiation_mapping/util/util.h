@@ -19,7 +19,7 @@ public:
      * @param type the export type (REPLACE, APPEND, NEW)
      * @param print if true, the function will print some information
      */
-    static void exportVectorToTxtFile(const std::vector<double>& data, const std::string& path, const std::string& filename, TxtExportType type = TxtExportType::REPLACE, bool print = false);
+    static void exportVectorToTxtFile(const std::vector<std::string>& data, const std::string& path, const std::string& filename, TxtExportType type = TxtExportType::REPLACE, bool print = false);
 
     /**
      * Returns true if the file exists.

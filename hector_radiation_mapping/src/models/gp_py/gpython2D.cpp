@@ -33,7 +33,6 @@ GPython2D::GPython2D() {
                                                                &GPython2D::slamMapCallback, this));
 
     active_ = false;
-    activate();
 }
 
 GPython2D &GPython2D::instance() {
