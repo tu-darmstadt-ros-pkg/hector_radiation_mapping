@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_GPYTHON2D_H
 #define RADIATION_MAPPING_GPYTHON2D_H
 
+#include "pch.h"
+
 #include "gpython.h"
 #include "maps/gridmap.h"
 #include "hector_radiation_mapping/source_interactive.h"

@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_MARKER_H
 #define RADIATION_MAPPING_MARKER_H
 
+#include "pch.h"
+
 /**
  * @brief The Marker class is a wrapper for the visualization_msgs::Marker class. It provides methods to set the color,
  * orientation, position and scale of the marker. The marker is published if the publish parameter is true.

@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_GPYTHON3D_H
 #define RADIATION_MAPPING_GPYTHON3D_H
 
+#include "pch.h"
+
 #include "gpython.h"
 #include "marker/marker.h"
 #include "maps/pointcloud3d.h"

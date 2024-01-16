@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_UTIL_H
 #define RADIATION_MAPPING_UTIL_H
 
+#include "pch.h"
+
 class Util{
 public:
     enum class TxtExportType {

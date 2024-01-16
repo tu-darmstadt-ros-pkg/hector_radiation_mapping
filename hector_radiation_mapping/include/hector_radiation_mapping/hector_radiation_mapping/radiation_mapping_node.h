@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_RADIATION_MAPPING_NODE_H
 #define RADIATION_MAPPING_RADIATION_MAPPING_NODE_H
 
+#include "pch.h"
+
 #include "hector_radiation_mapping_msgs/ResetService.h"
 #include "hector_radiation_mapping_msgs/ResetServiceRequest.h"
 #include "hector_radiation_mapping_msgs/ResetServiceResponse.h"

@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_MODEL_EXPORTER_H
 #define RADIATION_MAPPING_MODEL_EXPORTER_H
 
+#include "pch.h"
+
 #include "hector_radiation_mapping_msgs/ExportService.h"
 #include "hector_radiation_mapping_msgs/ExportServiceRequest.h"
 #include "hector_radiation_mapping_msgs/ExportServiceResponse.h"

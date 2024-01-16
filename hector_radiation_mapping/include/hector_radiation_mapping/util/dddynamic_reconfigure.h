@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_DDDYNAMIC_RECONFIGURE_H
 #define RADIATION_MAPPING_DDDYNAMIC_RECONFIGURE_H
 
+#include "pch.h"
+
 #include <boost/variant.hpp>
 #include <ddynamic_reconfigure/ddynamic_reconfigure.h>
 #include "parameters.h"

@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_POINTCLOUD3D_H
 #define RADIATION_MAPPING_POINTCLOUD3D_H
 
+#include "pch.h"
+
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PointStamped.h>
 #include <tf2_ros/transform_listener.h>

@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_SAMPLE_H
 #define RADIATION_MAPPING_SAMPLE_H
 
+#include "pch.h"
+
 /**
  * @brief The Sample class
  * This class represents a sample of radiation. It contains the position, the cps and the dose rate of the sample.

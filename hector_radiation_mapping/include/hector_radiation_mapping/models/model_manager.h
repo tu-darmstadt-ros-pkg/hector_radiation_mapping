@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_MODEL_MANAGER_H
 #define RADIATION_MAPPING_MODEL_MANAGER_H
 
+#include "pch.h"
+
 #include "models/model.h"
 
 class ModelManager {

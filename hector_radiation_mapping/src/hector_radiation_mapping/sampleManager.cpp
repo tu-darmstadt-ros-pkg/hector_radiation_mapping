@@ -160,6 +160,11 @@ void SampleManager::addSample(Sample &sample) {
     for (const auto &model: ModelManager::instance().getModels()) {
         model->addSample(sample);
     }
+
+    boost::geometry::index::rtree<Sample, boost::geometry::index::quadratic<4>> rtree;
+    for (const Sample &sample: samples_) {
+        rtree.insert(sample);
+    }
 }
 
 void SampleManager::updateTrajectory(const double &value, const Eigen::Vector3d &position) {

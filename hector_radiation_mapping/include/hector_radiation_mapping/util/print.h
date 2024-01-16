@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_PRINT_H
 #define RADIATION_MAPPING_PRINT_H
 
+#include "pch.h"
+
 const Eigen::IOFormat CleanFmt = Eigen::IOFormat(4, 0, ", ", "\n", "[", "]");
 
 class Print{

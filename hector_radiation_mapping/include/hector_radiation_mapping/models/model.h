@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_MODEL_H
 #define RADIATION_MAPPING_MODEL_H
 
+#include "pch.h"
+
 #include "hector_radiation_mapping/sample.h"
 
 class Model {

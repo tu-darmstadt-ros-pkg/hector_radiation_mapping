@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_SAMPLE_MANAGER_H
 #define RADIATION_MAPPING_SAMPLE_MANAGER_H
 
+#include "pch.h"
+
 #include <Eigen/Core>
 #include <tf2_ros/transform_listener.h>
 #include <ros_babel_fish/babel_fish_message.h>
@@ -8,7 +10,50 @@
 
 #include "sample.h"
 #include "marker/marker.h"
+#include <boost/geometry.hpp>
 
+// Define the traits for your Sample class
+namespace boost {
+    namespace geometry {
+        namespace traits {
+            template <>
+            struct tag<Sample> {
+                typedef point_tag type;
+            };
+
+            template <>
+            struct coordinate_type<Sample> {
+                typedef double type;
+            };
+
+            template <>
+            struct coordinate_system<Sample> {
+                typedef cs::cartesian type;
+            };
+
+            template <>
+            struct dimension<Sample> : boost::mpl::int_<3> {};
+
+            template <>
+            struct access<Sample, 0> {
+                static double get(Sample const& p) { return p.position_(0); }
+                static void set(Sample& p, double const& value) { p.position_(0) = value; }
+            };
+
+            template <>
+            struct access<Sample, 1> {
+                static double get(Sample const& p) { return p.position_(1); }
+                static void set(Sample& p, double const& value) { p.position_(1) = value; }
+            };
+
+            template <>
+            struct access<Sample, 2> {
+                static double get(Sample const& p) { return p.position_(2); }
+                static void set(Sample& p, double const& value) { p.position_(2) = value; }
+            };
+        }  // namespace traits
+    }  // namespace geometry
+}  // namespace boost
 
 class SampleManager {
 public:
@@ -115,6 +160,7 @@ private:
 
     double background_radiation_cps_;
     double background_radiation_dose_rate_;
+
 
     std::vector<Sample> samples_;
     std::vector<Sample> sample_queue_;

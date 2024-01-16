@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_SOURCE_H
 #define RADIATION_MAPPING_SOURCE_H
 
+#include "pch.h"
+
 #include "marker/marker.h"
 
 const double cpsToMikroSievertPerHour_ = (1.0 / 3.0) * ((79.76 / 18372.0) + (8.36 / 1974.0) + (191.01 / 43815.0));

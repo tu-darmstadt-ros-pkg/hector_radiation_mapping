@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_MARKER_MANAGER_H
 #define RADIATION_MAPPING_MARKER_MANAGER_H
 
+#include "pch.h"
+
 #include <interactive_markers/interactive_marker_server.h>
 
 class MarkerManager {

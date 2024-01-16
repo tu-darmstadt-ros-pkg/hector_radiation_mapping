@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_FIELD_PROPAGATION_H
 #define RADIATION_MAPPING_FIELD_PROPAGATION_H
 
+#include "pch.h"
+
 #include "hector_radiation_mapping/models/model.h"
 #include "maps/gridmap.h"
 

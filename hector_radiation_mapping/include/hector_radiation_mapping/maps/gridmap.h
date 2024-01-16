@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_MAP2D_H
 #define RADIATION_MAPPING_MAP2D_H
 
+#include "pch.h"
+
 /**
  * @brief The GridMap class
  * Provides methods to add layers to the grid map, to update the layers and to publish the grid map.

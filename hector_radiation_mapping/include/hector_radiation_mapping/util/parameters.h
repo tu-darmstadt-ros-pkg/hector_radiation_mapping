@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_PARAMETERS_H
 #define RADIATION_MAPPING_PARAMETERS_H
 
+#include "pch.h"
+
 class Parameters {
 public:
     static Parameters &instance() {
