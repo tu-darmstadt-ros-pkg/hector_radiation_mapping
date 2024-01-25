@@ -153,7 +153,7 @@ void SampleManager::addSample(Sample &sample) {
     double pos_x = round(sample.position_[0] * 100) / 100;
     double pos_y = round(sample.position_[1] * 100) / 100;
     double pos_z = round(sample.position_[2] * 100) / 100;
-    STREAM("Added sample with dose rate " << sample.doseRate_ << " " << Parameters::instance().radiation_unit
+    ROS_INFO_STREAM("Added sample with dose rate " << sample.doseRate_ << " " << Parameters::instance().radiation_unit
                             << " at [" << pos_x << ", " << pos_y << ", " << pos_z << "].\n");
 
     // Add sample to radiation models
@@ -161,10 +161,12 @@ void SampleManager::addSample(Sample &sample) {
         model->addSample(sample);
     }
 
+    /*
     boost::geometry::index::rtree<Sample, boost::geometry::index::quadratic<4>> rtree;
     for (const Sample &sample: samples_) {
         rtree.insert(sample);
     }
+    */
 }
 
 void SampleManager::updateTrajectory(const double &value, const Eigen::Vector3d &position) {
@@ -188,6 +190,19 @@ std::vector<Sample> SampleManager::getSamplesWithinRadius(const Eigen::Vector3d 
     }
     return in_sphere;
 }
+
+
+std::vector<Sample> SampleManager::getSamplesWithinRadius(const Vector2d &position, double radius) {
+    std::vector<Sample> in_sphere;
+    double radius2 = radius * radius;
+    for (const Sample &sample: samples_) {
+        if ((position - sample.get2DPos()).squaredNorm() < radius2) {
+            in_sphere.push_back(sample);
+        }
+    }
+    return in_sphere;
+}
+
 
 Sample SampleManager::getNearestSample(const Eigen::Vector3d &position) {
     double min_dist = DBL_MAX;

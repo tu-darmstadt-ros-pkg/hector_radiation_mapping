@@ -20,7 +20,7 @@
 #include "hector_radiation_mapping_msgs/Sample.h"
 
 
-GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS) {
+GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS, Parameters::instance().gp_on_start_up) {
     // Define ROS service clients
     evaluation_service_client_ = Parameters::instance().node_handle_ptr_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>(
             "/hector_radiation_mapping/gp_evaluation");

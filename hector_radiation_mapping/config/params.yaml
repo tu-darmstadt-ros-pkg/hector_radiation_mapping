@@ -38,6 +38,8 @@ radiation_unit: "µSv/h"
 # *** GAUSSIAN PROCESS ***
 ##########################
 
+gp_on_start_up: false
+
 # *** Source prediciton***
 # Potential sources need to be at least meanFactor times stronger than the mean value of all measurements
 gp_mean_factor: 1
@@ -78,15 +80,18 @@ gp_point_cloud_3d_size_levels: [15000, 10000, 10000]
 # *** LEAST SQUARES ***
 ##########################
 
+ls_on_start_up: true
 ls_circle_radius: 5.0 # meter
-ls_min_update_time: 1000 # milliseconds
+ls_min_update_time: 100 # milliseconds
 ls_grid_map_topic: "/grid_map_ls"
 ls_grid_map_resolution: 0.1 # meter
+ls_max_queue: 20
 
 ##########################
 # *** BAYESIAN INFERENCE ***
 ##########################
 
+bi_on_start_up: false
 bi_circle_radius: 5.0 # meter
 bi_min_update_time: 1000 # milliseconds
 bi_grid_map_topic: "/grid_map_bi"
@@ -96,7 +101,8 @@ bi_grid_map_resolution: 0.1 # meter
 # *** FIELD PROPAGATION ***
 ##########################
 
+fp_on_start_up: false
 fp_circle_radius: 5.0 # meter
 fp_min_update_time: 1000 # milliseconds
 fp_grid_map_topic: "/grid_map_fp"
-fp_grid_map_resolution: 0.2 # meter
+fp_grid_map_resolution: 0.1 # meter

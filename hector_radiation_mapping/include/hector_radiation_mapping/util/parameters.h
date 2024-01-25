@@ -33,6 +33,7 @@ public:
 
     // Gaussian Process
     // Source prediction
+    bool gp_on_start_up;
     double gp_mean_factor;
     double gp_min_source_strength;
     // 2D model
@@ -51,18 +52,22 @@ public:
     std::vector<int> gp_point_cloud_3d_size_levels;
 
     // Least Squares
+    bool ls_on_start_up;
     double ls_circle_radius;
     int ls_min_update_time;
     std::string ls_grid_map_topic;
     double ls_grid_map_resolution;
+    int ls_max_queue;
 
     // Bayesian Inference
+    bool bi_on_start_up;
     double bi_circle_radius;
     int bi_min_update_time;
     std::string bi_grid_map_topic;
     double bi_grid_map_resolution;
 
     // Field Propagation
+    bool fp_on_start_up;
     double fp_circle_radius;
     int fp_min_update_time;
     std::string fp_grid_map_topic;
@@ -113,6 +118,7 @@ private:
 
         // Gaussian Process
         // 2D model
+        loadParam("gp_on_start_up", gp_on_start_up);
         loadParam("gp_circle_radius", gp_circle_radius);
         loadParam("gp_min_distance_between_samples_2d", gp_min_distance_between_samples_2d);
         loadParam("gp_min_update_time_2d", gp_min_update_time_2d);
@@ -128,18 +134,22 @@ private:
         loadParam("gp_point_cloud_3d_size_levels", gp_point_cloud_3d_size_levels);
 
         // Least Squares
+        loadParam("ls_on_start_up", ls_on_start_up);
         loadParam("ls_circle_radius", ls_circle_radius);
         loadParam("ls_min_update_time", ls_min_update_time);
         loadParam("ls_grid_map_topic", ls_grid_map_topic);
         loadParam("ls_grid_map_resolution", ls_grid_map_resolution);
+        loadParam("ls_max_queue", ls_max_queue);
 
         // Bayesian Inference
+        loadParam("bi_on_start_up", bi_on_start_up);
         loadParam("bi_circle_radius", bi_circle_radius);
         loadParam("bi_min_update_time", bi_min_update_time);
         loadParam("bi_grid_map_topic", bi_grid_map_topic);
         loadParam("bi_grid_map_resolution", bi_grid_map_resolution);
 
         // Field Propagation
+        loadParam("fp_on_start_up", fp_on_start_up);
         loadParam("fp_circle_radius", fp_circle_radius);
         loadParam("fp_min_update_time", fp_min_update_time);
         loadParam("fp_grid_map_topic", fp_grid_map_topic);

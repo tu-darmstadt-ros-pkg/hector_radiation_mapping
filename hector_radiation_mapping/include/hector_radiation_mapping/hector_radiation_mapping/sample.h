@@ -15,6 +15,7 @@ struct Sample{
         this->doseRate_ = doseRate;
         this->time_ = time;
         this->id_ = idCounter_++;
+        this->effective_radius_ = std::sqrt(doseRate_ / 0.01);
     }
 
     Sample(){};
@@ -36,6 +37,7 @@ struct Sample{
     double doseRate_;
     ros::Time time_;
     int id_;
+    double effective_radius_;
 
 private:
     inline static int idCounter_ = 0;

@@ -123,6 +123,14 @@ public:
     std::vector<Sample> getSamplesWithinRadius(const Eigen::Vector3d& position, double radius);
 
     /**
+     * Returns the samples that are within the given radius of the given position.
+     * @param position position to search from
+     * @param radius radius to search in
+     * @return vector of samples that are within the given radius of the given position
+     */
+    std::vector<Sample> getSamplesWithinRadius(const Eigen::Vector2d& position, double radius);
+
+    /**
      * Get the position of the latest sample.
      * @return The position of the latest sample.
      */

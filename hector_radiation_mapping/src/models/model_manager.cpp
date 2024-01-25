@@ -20,13 +20,16 @@ ModelManager::ModelManager() {
     Model &fp = FieldPropagation::instance();
     Model &bi = BayesianInference::instance();
 
-    models_ = {&ls};
+    models_ = {&ls, &fp, &gp, &bi};
     for (Model *model: models_) {
-        model->activate();
+        bool on_start_up = model->onStartup();
         std::string model_name = model->getModelName();
-        DDDynamicReconfigure::instance().registerVariable<bool>(model_name, true,
+        DDDynamicReconfigure::instance().registerVariable<bool>(model_name, on_start_up,
                                                                 boost::bind(&ModelManager::toggleModel, this, _1, model_name), "on/off", false,
                                                                 true, group_name_);
+        if (on_start_up) {
+            model->activate();
+        }
     }
     DDDynamicReconfigure::instance().publish();
 }

@@ -44,9 +44,12 @@ private:
      */
     void slamMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &gridMsgPtr);
 
-    std::string layer_name_std_dev_;
+    std::string layer_name_mean_confidence_;
     std::string layer_name_mean_;
-    volatile std::atomic_bool use_circle_;
+    std::string layer_name_prop_oder_;
+    std::string layer_name_prop_mean_;
+    std::string layer_name_prop_mean_confidence_;
+    volatile std::atomic_bool use_circle_{};
 
     std::shared_ptr<GridMap> grid_map_;
     std::shared_ptr<nav_msgs::OccupancyGrid> slam_map_;

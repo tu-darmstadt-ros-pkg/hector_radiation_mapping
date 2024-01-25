@@ -3,7 +3,7 @@
 #include "util/dddynamic_reconfigure.h"
 #include "hector_radiation_mapping/sampleManager.h"
 
-BayesianInference::BayesianInference() : Model(ModelType::BAYESIAN_INFERENCE, Parameters::instance().bi_min_update_time) {
+BayesianInference::BayesianInference() : Model(ModelType::BAYESIAN_INFERENCE, Parameters::instance().bi_on_start_up, Parameters::instance().bi_min_update_time) {
     layer_name_mean_ = "mean";
     grid_map_ = std::make_shared<GridMap>(Parameters::instance().bi_grid_map_topic,
                                           Parameters::instance().bi_grid_map_resolution);

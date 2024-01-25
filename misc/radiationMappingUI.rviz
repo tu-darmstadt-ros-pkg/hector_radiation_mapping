@@ -4,14 +4,9 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
         - /Status1
-        - /Map1
-        - /Marker1
-        - /PointCloud21
         - /GridMap1
-        - /InteractiveMarkers1
-        - /PointCloudFilter1
+        - /GridMap2
         - /PointCloudFilter1/Enable filtering1
         - /PointCloudFilter1/Enable filtering1/Radial Filter1
         - /PointCloudFilter1/Enable filtering1/Z Filter1
@@ -34,7 +29,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloudFilter
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -139,6 +134,30 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: false
+    - Alpha: 0.5
+      Autocompute Intensity Bounds: true
+      Class: grid_map_rviz_plugin/GridMap
+      Color: 200; 200; 200
+      Color Layer: error
+      Color Transformer: GridMapLayer
+      ColorMap: turbo
+      Enabled: true
+      Grid Cell Decimation: 1
+      Grid Line Thickness: 0.10000000149011612
+      Height Layer: elevation
+      Height Transformer: Flat
+      History Length: 1
+      Invert ColorMap: false
+      Max Color: 255; 255; 255
+      Max Intensity: 10
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: GridMap
+      Show Grid Lines: false
+      Topic: /grid_map_ls
+      Unreliable: false
+      Use ColorMap: true
+      Value: true
     - Alpha: 0.6000000238418579
       Autocompute Intensity Bounds: true
       Class: grid_map_rviz_plugin/GridMap
@@ -159,7 +178,7 @@ Visualization Manager:
       Min Intensity: 0
       Name: GridMap
       Show Grid Lines: false
-      Topic: /grid_map_ls
+      Topic: /grid_map_ls2
       Unreliable: false
       Use ColorMap: true
       Value: true
@@ -226,6 +245,15 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /radiation_source_marker/update
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -254,7 +282,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 45.8446159362793
+      Distance: 12.780037879943848
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -262,17 +290,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 1.8459725379943848
-        Y: 3.9920520782470703
-        Z: 1.736727237701416
+        X: 6.562087535858154
+        Y: 5.442893028259277
+        Z: 2.269036293029785
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8797962069511414
+      Pitch: 0.879797101020813
       Target Frame: <Fixed Frame>
-      Yaw: 6.1772141456604
+      Yaw: 5.1971940994262695
     Saved: ~
 Window Geometry:
   Displays:

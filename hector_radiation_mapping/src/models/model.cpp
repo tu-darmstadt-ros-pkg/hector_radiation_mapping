@@ -2,9 +2,10 @@
 #include "util/dddynamic_reconfigure.h"
 #include "models/model.h"
 
-Model::Model(Model::ModelType model_type, int min_update_time) :
+Model::Model(Model::ModelType model_type, bool on_start_up, int min_update_time) :
         model_type_(model_type),
         min_update_time_(min_update_time),
+        on_start_up_(on_start_up),
         active_(false) {
     ROS_INFO_STREAM(modelTypeToName(model_type_) << " created");
     DDDynamicReconfigure::instance().registerVariable<int>(getShortModelName() + "_minUpdateTime",

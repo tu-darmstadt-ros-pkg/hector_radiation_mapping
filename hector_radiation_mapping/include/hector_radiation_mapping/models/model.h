@@ -103,8 +103,12 @@ public:
 
     virtual void reset() = 0;
 
+    bool onStartup() {
+        return on_start_up_;
+    }
+
 protected:
-    explicit Model(Model::ModelType model_type, int min_update_time = 0);
+    explicit Model(Model::ModelType model_type, bool on_start_up, int min_update_time = 0);
 
     virtual void updateLoop();
 
@@ -125,6 +129,7 @@ protected:
     std::mutex sample_queue_mtx_;
 
     volatile std::atomic_bool active_;
+    volatile std::atomic_bool on_start_up_;
     volatile std::atomic_int min_update_time_;
     std::thread update_thread_;
     std::condition_variable update_condition_;
