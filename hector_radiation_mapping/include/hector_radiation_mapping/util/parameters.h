@@ -20,6 +20,10 @@ public:
     std::string export_path;
     std::string world_frame;
     bool enable_spatial_sample_filtering;
+    double background_radiation_dose_rate;
+    double background_radiation_cps;
+    bool background_radiation_dose_rate_set;
+    bool background_radiation_cps_set;
 
     // ROS topics
     bool use_dose_rate;
@@ -102,6 +106,8 @@ private:
         loadParam("enable_spatial_sample_filtering", enable_spatial_sample_filtering);
         loadParam("export_path", export_path);
         loadParam("world_frame", world_frame);
+        background_radiation_dose_rate_set = loadParam("background_radiation_dose_rate", background_radiation_dose_rate);
+        background_radiation_cps_set = loadParam("background_radiation_cps", background_radiation_cps);
 
         // ROS topics
         loadParam("subscribe_topic", subscribe_topic);

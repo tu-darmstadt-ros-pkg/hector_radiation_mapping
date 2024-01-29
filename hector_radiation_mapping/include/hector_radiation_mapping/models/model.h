@@ -57,23 +57,23 @@ public:
     std::recursive_mutex &getModelMutex() { return model_mtx_; };
 
     /**
-     * Returns if the GPython class is active.
-     * @return True if the GPython class is active.
+     * Returns if the GaussianProcess class is active.
+     * @return True if the GaussianProcess class is active.
      */
     bool isActive() const;
 
     /**
-     * Deactivates the GPython class.
+     * Deactivates the GaussianProcess class.
      */
     virtual void deactivate();
 
     /**
-     * Activates the GPython class.
+     * Activates the GaussianProcess class.
      */
     virtual void activate();
 
     /**
-     * Shuts down the GPython class.
+     * Shuts down the GaussianProcess class.
      */
     virtual void shutDown();
 

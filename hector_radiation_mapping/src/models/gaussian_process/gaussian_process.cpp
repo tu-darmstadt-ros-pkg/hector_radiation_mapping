@@ -2,9 +2,9 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <cstdlib>
 
-#include "models/gpython/gpython.h"
-#include "models/gpython/gpython2D.h"
-#include "models/gpython/gpython3D.h"
+#include "models/gpython/gaussian_process.h"
+#include "models/gpython/gaussian_process_2d.h"
+#include "models/gpython/gaussian_process_3d.h"
 #include "util/parameters.h"
 #include "util/dddynamic_reconfigure.h"
 #include "util/util.h"
@@ -20,7 +20,7 @@
 #include "hector_radiation_mapping_msgs/Sample.h"
 
 
-GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS, Parameters::instance().gp_on_start_up) {
+GaussianProcess::GaussianProcess() : Model(ModelType::GAUSSIAN_PROCESS, Parameters::instance().gp_on_start_up) {
     // Define ROS service clients
     evaluation_service_client_ = Parameters::instance().node_handle_ptr_->serviceClient<hector_radiation_mapping_msgs::GPEvaluationService>(
             "/hector_radiation_mapping/gp_evaluation");
@@ -36,17 +36,17 @@ GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS, Parameters::instance().g
     *param3_ptr = 10.0;
     std::string group_name = getShortModelName();
     DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_kernel_lengthscale", param1_ptr,
-                                                              boost::bind(&GPython::paramCallback, this), "param1", 0.0,
+                                                              boost::bind(&GaussianProcess::paramCallback, this), "param1", 0.0,
                                                               4.0, group_name);
     DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_outputscale", param2_ptr,
-                                                              boost::bind(&GPython::paramCallback, this), "param2", 0.0,
+                                                              boost::bind(&GaussianProcess::paramCallback, this), "param2", 0.0,
                                                               20.0, group_name);
     DDDynamicReconfigure::instance().registerVariable<double>(group_name + "_likelihood_noise", param3_ptr,
-                                                              boost::bind(&GPython::paramCallback, this), "param3", 0.0,
+                                                              boost::bind(&GaussianProcess::paramCallback, this), "param3", 0.0,
                                                               20.0, group_name);
-    STREAM_DEBUG("GPython params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
+    STREAM_DEBUG("GaussianProcess params: " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
 
-    // Start the GPython node
+    // Start the GaussianProcess node
     const char *command = "rosrun hector_gaussian_process gp_node &";
     int result = system(command);
     if (result != 0) {
@@ -58,28 +58,28 @@ GPython::GPython() : Model(ModelType::GAUSSIAN_PROCESS, Parameters::instance().g
     model_size_ = 0;
 }
 
-void GPython::shutDown() {
+void GaussianProcess::shutDown() {
     deactivate();
-    GPython2D::instance().shutDown();
-    GPython3D::instance().shutDown();
+    GaussianProcess2D::instance().shutDown();
+    GaussianProcess3D::instance().shutDown();
     ROS_INFO_STREAM(modelTypeToName(model_type_) << " shut down");
 }
 
-void GPython::activate() {
+void GaussianProcess::activate() {
     std::lock_guard<std::mutex> lock{activation_mtx_};
-    GPython2D::instance().activate();
-    GPython3D::instance().activate();
+    GaussianProcess2D::instance().activate();
+    GaussianProcess3D::instance().activate();
 
     if (active_) return;
     this->active_ = true;
-    update_thread_ = std::thread(&GPython::updateLoop, this);
+    update_thread_ = std::thread(&GaussianProcess::updateLoop, this);
     ROS_INFO_STREAM(modelTypeToName(model_type_) << " activated");
 }
 
-void GPython::deactivate() {
+void GaussianProcess::deactivate() {
     std::lock_guard<std::mutex> lock{activation_mtx_};
-    GPython2D::instance().deactivate();
-    GPython3D::instance().deactivate();
+    GaussianProcess2D::instance().deactivate();
+    GaussianProcess3D::instance().deactivate();
 
     if (!active_) return;
     this->active_ = false;
@@ -88,13 +88,13 @@ void GPython::deactivate() {
     ROS_INFO_STREAM(modelTypeToName(model_type_) << " deactivated");
 }
 
-void GPython::reset() {
+void GaussianProcess::reset() {
     // TODO: implement
     ROS_INFO_STREAM(modelTypeToName(model_type_) << " reset");
 }
 
-std::vector<GPython::SampleGP> GPython::samplesToSamplesGP(std::vector<Sample> &samples) {
-    std::vector<GPython::SampleGP> samples_gp;
+std::vector<GaussianProcess::SampleGP> GaussianProcess::samplesToSamplesGP(std::vector<Sample> &samples) {
+    std::vector<GaussianProcess::SampleGP> samples_gp;
     samples_gp.reserve(samples.size());
     for (const Sample &sample: samples) {
         samples_gp.emplace_back(sample, true, true);
@@ -102,7 +102,7 @@ std::vector<GPython::SampleGP> GPython::samplesToSamplesGP(std::vector<Sample> &
     return samples_gp;
 }
 
-void GPython::update() {
+void GaussianProcess::update() {
     static Clock clock;
     static std::vector<SampleGP> samples_gp_queue;
     {
@@ -111,8 +111,8 @@ void GPython::update() {
                                [this]() { return (!samples_add_queue_.empty()) || !active_ || param_update_; });
         if (!active_) return;
         param_update_ = false;
-        GPython2D::instance().triggerEvaluation();
-        GPython3D::instance().triggerEvaluation();
+        GaussianProcess2D::instance().triggerEvaluation();
+        GaussianProcess3D::instance().triggerEvaluation();
 
         // create copy of samples
         samples_gp_queue = samplesToSamplesGP(samples_add_queue_);
@@ -127,10 +127,10 @@ void GPython::update() {
     update_sizes_.push_back((double) sample_ids_2d_.size());
 }
 
-GPython::GPResult GPython::evaluate(Matrix &positions) {
+GaussianProcess::GPResult GaussianProcess::evaluate(Matrix &positions) {
     // check if positions are 2D or 3D
     if (positions.cols() != 2 && positions.cols() != 3) {
-        STREAM_ERROR("GPython: evaluate() positions must be 2D or 3D");
+        STREAM_ERROR("GaussianProcess: evaluate() positions must be 2D or 3D");
         return {{},
                 {}};
     }
@@ -162,7 +162,7 @@ GPython::GPResult GPython::evaluate(Matrix &positions) {
     return {mean_vec, variance_vec};
 }
 
-void GPython::addSamplesToModel(const std::vector<SampleGP> &samples) {
+void GaussianProcess::addSamplesToModel(const std::vector<SampleGP> &samples) {
     hector_radiation_mapping_msgs::Samples samples_msg;
     for (const SampleGP &sample: samples) {
         // check if sample is already in list
@@ -210,16 +210,16 @@ void GPython::addSamplesToModel(const std::vector<SampleGP> &samples) {
     //}
 }
 
-bool GPython::isSampleIn2DModel(const Sample &sample) {
+bool GaussianProcess::isSampleIn2DModel(const Sample &sample) {
     return std::find(sample_ids_2d_.begin(), sample_ids_2d_.end(), sample.id_) != sample_ids_2d_.end();
 }
 
-bool GPython::isSampleIn3DModel(const Sample &sample) {
+bool GaussianProcess::isSampleIn3DModel(const Sample &sample) {
     return std::find(sample_ids_3d_.begin(), sample_ids_3d_.end(), sample.id_) != sample_ids_3d_.end();
 }
 
-void GPython::paramCallback() {
-    STREAM_DEBUG("GPython params changed " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
+void GaussianProcess::paramCallback() {
+    STREAM_DEBUG("GaussianProcess params changed " << *param1_ptr << " " << *param2_ptr << " " << *param3_ptr);
     param_update_ = true;
     update_condition_.notify_one();
 }

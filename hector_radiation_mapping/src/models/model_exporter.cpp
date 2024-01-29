@@ -3,9 +3,9 @@
 
 #include "models/model_exporter.h"
 #include "models/model_manager.h"
-#include "models/gpython/gpython.h"
-#include "models/gpython/gpython3D.h"
-#include "models/gpython/gpython2D.h"
+#include "models/gpython/gaussian_process.h"
+#include "models/gpython/gaussian_process_3d.h"
+#include "models/gpython/gaussian_process_2d.h"
 #include "maps/pointcloud3d.h"
 #include "util/color.h"
 #include "util/parameters.h"
@@ -110,7 +110,7 @@ void ModelExporter::export2DMap(std::string path) {
 
 void ModelExporter::export3DMap(std::string path) {
     STREAM_DEBUG("ModelExport export3DMap()");
-    pcl::PointCloud<PointCloud3D::PointXYZPC> exportPointCloud = GPython3D::instance().getExportPointCloud();
+    pcl::PointCloud<PointCloud3D::PointXYZPC> exportPointCloud = GaussianProcess3D::instance().getExportPointCloud();
     if(path.empty()) {
         path = Util::getExportPath("pointclouds");
     }
@@ -122,17 +122,17 @@ void ModelExporter::export3DMap(std::string path) {
 
 std::vector<std::pair<grid_map::GridMap, std::shared_ptr<nav_msgs::OccupancyGrid>>> ModelExporter::getMaps() {
     STREAM_DEBUG("ModelExport getGridMaps()");
-    return {GPython2D::instance().getExportGridMap()};
+    return {GaussianProcess2D::instance().getExportGridMap()};
 }
 
 std::vector<std::shared_ptr<Source>> ModelExporter::getSources() {
     STREAM_DEBUG("ModelExport getSources()");
     std::vector<std::shared_ptr<Source>> sources;
-    if (GPython3D::instance().hasEnvironmentCloud()) {
-        std::vector<std::shared_ptr<Source>> sources_copy(GPython3D::instance().getSources());
+    if (GaussianProcess3D::instance().hasEnvironmentCloud()) {
+        std::vector<std::shared_ptr<Source>> sources_copy(GaussianProcess3D::instance().getSources());
         sources.insert(std::end(sources), std::begin(sources_copy), std::end(sources_copy));
     } else {
-        std::vector<std::shared_ptr<SourceInteractive>> sources_copy(GPython2D::instance().getSources());
+        std::vector<std::shared_ptr<SourceInteractive>> sources_copy(GaussianProcess2D::instance().getSources());
         sources.insert(std::end(sources), std::begin(sources_copy), std::end(sources_copy));
     }
     return sources;
@@ -257,7 +257,7 @@ double ModelExporter::computeSourceError2D(int sourceId, const Eigen::Vector3d &
             evalPositions.row(evalPositions.rows() - 1) << pos.x(), pos.y(), pos.z();
         }
     }
-    Vector predictions = GPython::instance().evaluate(evalPositions).mean;
+    Vector predictions = GaussianProcess::instance().evaluate(evalPositions).mean;
     double mean = predictions.mean();
 
     // calculate variance

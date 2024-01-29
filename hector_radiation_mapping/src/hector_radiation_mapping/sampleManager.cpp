@@ -38,6 +38,7 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
     ros_babel_fish::TranslatedMessage::Ptr translated = babel_fish_->translateMessage(msg);
     auto &compound = translated->translated_message->as<ros_babel_fish::CompoundMessage>();
     double dose_rate = compound[key_rate].value<float>();
+    ROS_INFO_STREAM("Received dose rate " << dose_rate << " " << Parameters::instance().radiation_unit << ".\n");
     double cps = -1;
     std::string frame_id = compound["header"][key_frame_id].value<std::string>();
 
@@ -54,7 +55,7 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
 
         updateTrajectory(Parameters::instance().use_dose_rate ? dose_rate : cps, pos);
 
-        static bool calculated_background_radiation = false;
+        static bool calculated_background_radiation = Parameters::instance().background_radiation_dose_rate_set;
         if (!calculated_background_radiation) {
             static std::vector<double> cps_vec;
             static std::vector<double> dose_rate_vec;
@@ -78,6 +79,7 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
                 calculated_background_radiation = true;
             }
         } else {
+            ROS_INFO_STREAM("Received dose rate2 " << dose_rate << " " << Parameters::instance().radiation_unit << ".\n");
             processSampleData(pos, cps, dose_rate, ros::Time::now());
         }
 
@@ -97,6 +99,7 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate
     double adj_cps = fmax(cps - background_radiation_cps_, 0.0);
     double adj_dose_rate = fmax(dose_rate - background_radiation_dose_rate_, 0.0);
     Sample sample(pos, adj_cps, adj_dose_rate, time);
+    ROS_INFO_STREAM("Received sample with dose rate " << sample.doseRate_ << " at [" << pos.x() << ", " << pos.y() << ", " << pos.z() << "].\n");
 
     if(!Parameters::instance().enable_spatial_sample_filtering){
         double min_dist2 = 0.2 * 0.2;

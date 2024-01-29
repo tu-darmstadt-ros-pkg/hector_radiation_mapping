@@ -221,6 +221,14 @@ void LeastSquares::evaluate3() {
     std::vector<SampleLS> samples_remove;
     std::vector<SampleLS> samples_add;
 
+    Vector2d center =SampleManager::instance().getLastSamplePos().topRows(2);
+    std::vector<Sample> samples_n = SampleManager::instance().getSamplesWithinRadius(center, 5.0);
+    for (Sample &sample: samples_n) {
+        samples_active.emplace_back(sample, current_queue_id_);
+        current_queue_id_++;
+    }
+
+    /*
     for (SampleLS &sample: samples_ls_) {
         if (sample.queue_id_ + max_queue_size > current_queue_id_) {
             samples_active.emplace_back(sample);
@@ -235,6 +243,7 @@ void LeastSquares::evaluate3() {
             }
         }
     }
+    */
 
     for (grid_map::GridMapIterator it(grid_map_ref); !it.isPastEnd(); ++it) {
         const grid_map::Index &index = *it;

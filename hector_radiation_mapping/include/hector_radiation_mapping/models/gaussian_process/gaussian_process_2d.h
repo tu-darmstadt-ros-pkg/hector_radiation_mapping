@@ -1,42 +1,42 @@
-#ifndef RADIATION_MAPPING_GPYTHON2D_H
-#define RADIATION_MAPPING_GPYTHON2D_H
+#ifndef RADIATION_MAPPING_GAUSSIAN_PROCESS_2D_H
+#define RADIATION_MAPPING_GAUSSIAN_PROCESS_2D_H
 
 #include "pch.h"
 
-#include "gpython.h"
+#include "gaussian_process.h"
 #include "maps/gridmap.h"
 #include "hector_radiation_mapping/source_interactive.h"
 
 /**
- * @brief The GPython2D class is a singleton and manages the 2D GridMap, the evaluation process of its positions in the
- * GPython model and the localisation of the sources. Runs in a separate thread.
+ * @brief The GaussianProcess2D class is a singleton and manages the 2D GridMap, the evaluation process of its positions in the
+ * GaussianProcess model and the localisation of the sources. Runs in a separate thread.
  */
-class GPython2D {
+class GaussianProcess2D {
 public:
     /**
      * Returns the class instance.
      * @return class instance.
      */
-    static GPython2D &instance();
+    static GaussianProcess2D &instance();
 
     /**
-     * Returns if the GPython2D class is active.
-     * @return True if the GPython2D class is active.
+     * Returns if the GaussianProcess2D class is active.
+     * @return True if the GaussianProcess2D class is active.
      */
     bool isActive() { return active_; };
 
     /**
-     * Deactivates the GPython2D class.
+     * Deactivates the GaussianProcess2D class.
      */
     void deactivate();
 
     /**
-     * Activates the GPython2D class.
+     * Activates the GaussianProcess2D class.
      */
     void activate();
 
     /**
-     * Shuts down the GPython2D class.
+     * Shuts down the GaussianProcess2D class.
      */
     void shutDown();
 
@@ -53,8 +53,8 @@ public:
     std::vector<std::shared_ptr<SourceInteractive>> getSources() { return sources_; };
 
     /**
-     * Check if the GPython2D class has a slam map.
-     * @return True if the GPython2D class has a slam map.
+     * Check if the GaussianProcess2D class has a slam map.
+     * @return True if the GaussianProcess2D class has a slam map.
      */
     bool hasSlamMap() { return slam_map_ != nullptr; };
 
@@ -82,12 +82,12 @@ public:
     void triggerEvaluation();
 
 private:
-    GPython2D();
-    GPython2D(const GPython2D &) = delete;
-    GPython2D &operator=(const GPython2D &) = delete;
+    GaussianProcess2D();
+    GaussianProcess2D(const GaussianProcess2D &) = delete;
+    GaussianProcess2D &operator=(const GaussianProcess2D &) = delete;
 
     /**
-     * The update loop of the GPython2D class. It waits for the activation signal and then evaluates the model and
+     * The update loop of the GaussianProcess2D class. It waits for the activation signal and then evaluates the model and
      * updates the grid map.
      */
     void updateLoop();
@@ -159,4 +159,4 @@ private:
     std::mutex activation_mtx_;
 };
 
-#endif //RADIATION_MAPPING_GPYTHON2D_H
+#endif //RADIATION_MAPPING_GAUSSIAN_PROCESS_2D_H

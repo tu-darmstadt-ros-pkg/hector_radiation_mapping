@@ -32,7 +32,8 @@ message_key_rate: "rate"
 message_key_frame_id: "frame_id"
 # The unit of the radiation values used for display
 radiation_unit: "µSv/h"
-
+background_radiation_dose_rate: 0.0 # µSv/h
+#background_radiation_cps: 0.0 # per second
 
 ##########################
 # *** GAUSSIAN PROCESS ***

@@ -1,44 +1,44 @@
-#ifndef RADIATION_MAPPING_GPYTHON3D_H
-#define RADIATION_MAPPING_GPYTHON3D_H
+#ifndef RADIATION_MAPPING_GAUSSIAN_PROCESS_3D_H
+#define RADIATION_MAPPING_GAUSSIAN_PROCESS_3D_H
 
 #include "pch.h"
 
-#include "gpython.h"
+#include "gaussian_process.h"
 #include "marker/marker.h"
 #include "maps/pointcloud3d.h"
 #include "hector_radiation_mapping/source.h"
 #include "hector_radiation_mapping/source_interactive.h"
 
 /**
- * @brief The GPython3D class is a singleton and manages the 3D PointCloud, the evaluation process of its positions in the
- * GPython model and the localisation of the sources. Runs in a separate thread.
+ * @brief The GaussianProcess3D class is a singleton and manages the 3D PointCloud, the evaluation process of its positions in the
+ * GaussianProcess model and the localisation of the sources. Runs in a separate thread.
  */
-class GPython3D {
+class GaussianProcess3D {
 public:
     /**
      * Returns the class instance.
      * @return class instance.
      */
-    static GPython3D &instance();
+    static GaussianProcess3D &instance();
 
     /**
-     * Returns if the GPython3D class is active.
-     * @return True if the GPython3D class is active.
+     * Returns if the GaussianProcess3D class is active.
+     * @return True if the GaussianProcess3D class is active.
      */
     bool isActive() { return active_; };
 
     /**
-     * Deactivates the GPython3D class.
+     * Deactivates the GaussianProcess3D class.
      */
     void deactivate();
 
     /**
-     * Activates the GPython3D class.
+     * Activates the GaussianProcess3D class.
      */
     void activate();
 
     /**
-     * Shuts down the GPython3D class.
+     * Shuts down the GaussianProcess3D class.
      */
     void shutDown();
 
@@ -55,8 +55,8 @@ public:
     geometry_msgs::TransformStamped getEnvironmentCloudTransform() { return environment_cloud_transform_; };
 
     /**
-     * Check if the GPython3D class has a point cloud.
-     * @return True if the GPython3D class has a point cloud.
+     * Check if the GaussianProcess3D class has a point cloud.
+     * @return True if the GaussianProcess3D class has a point cloud.
      */
     bool hasEnvironmentCloud() { return environment_cloud_ != nullptr; };
 
@@ -85,12 +85,12 @@ public:
     void triggerEvaluation();
 
 private:
-    GPython3D();
-    GPython3D(const GPython3D &) = delete;
-    GPython3D &operator=(const GPython3D &) = delete;
+    GaussianProcess3D();
+    GaussianProcess3D(const GaussianProcess3D &) = delete;
+    GaussianProcess3D &operator=(const GaussianProcess3D &) = delete;
 
     /**
-     * The update loop of the GPython3D class. It waits for the activation signal and then evaluates the model and
+     * The update loop of the GaussianProcess3D class. It waits for the activation signal and then evaluates the model and
      * updates the grid map.
      */
     void updateLoop();
@@ -124,7 +124,7 @@ private:
     void setMinUpdateTime(int time);
 
     /**
-     * Set if the GPython3D class should update.
+     * Set if the GaussianProcess3D class should update.
      * @param update
      */
     void setUpdate(bool update);
@@ -158,4 +158,4 @@ private:
     std::mutex environment_cloud_mtx_;
 };
 
-#endif //RADIATION_MAPPING_GPYTHON3D_H
+#endif //RADIATION_MAPPING_GAUSSIAN_PROCESS_3D_H

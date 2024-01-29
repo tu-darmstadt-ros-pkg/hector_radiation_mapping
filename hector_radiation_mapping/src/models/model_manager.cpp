@@ -1,9 +1,9 @@
 #include "marker/marker_manager.h"
 #include "util/dddynamic_reconfigure.h"
 #include "models/model_manager.h"
-#include "models/gpython/gpython.h"
-#include "models/gpython/gpython2D.h"
-#include "models/gpython/gpython3D.h"
+#include "models/gpython/gaussian_process.h"
+#include "models/gpython/gaussian_process_2d.h"
+#include "models/gpython/gaussian_process_3d.h"
 #include "models/least_squares/least_squares.h"
 #include "models/field_propagation/field_propagation.h"
 #include "models/baysian_inference/bayesian_inference.h"
@@ -13,9 +13,9 @@
 ModelManager::ModelManager() {
     std::string group_name_ = "MODEL_MANAGER";
     ModelExporter::instance();
-    Model &gp = GPython::instance();
-    GPython2D::instance();
-    GPython3D::instance();
+    Model &gp = GaussianProcess::instance();
+    GaussianProcess2D::instance();
+    GaussianProcess3D::instance();
     Model &ls = LeastSquares::instance();
     Model &fp = FieldPropagation::instance();
     Model &bi = BayesianInference::instance();

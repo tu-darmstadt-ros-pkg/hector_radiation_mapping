@@ -1,17 +1,17 @@
-#ifndef RADIATION_MAPPING_GP_PY_MANAGER_H
-#define RADIATION_MAPPING_GP_PY_MANAGER_H
+#ifndef RADIATION_MAPPING_GAUSSIAN_PROCESS_H
+#define RADIATION_MAPPING_GAUSSIAN_PROCESS_H
 
 #include "pch.h"
 #include "hector_radiation_mapping/sample.h"
 #include "models/model.h"
 
 /**
- * @brief The GPython class
- * This class is a singleton and manages the connection to the GPython model over in Python. It provides methods to add
+ * @brief The GaussianProcess class
+ * This class is a singleton and manages the connection to the GaussianProcess model over in Python. It provides methods to add
  * samples to the model and to evaluate the model at given positions and check if a sample is already in the model.
  * Runs in a separate thread.
  */
-class GPython : public Model {
+class GaussianProcess : public Model {
 public:
     /**
      * Struct for storing the result of a GP evaluation.
@@ -36,8 +36,8 @@ public:
      * Returns the class instance.
      * @return class instance.
      */
-    static GPython &instance(){
-        static GPython instance;
+    static GaussianProcess &instance(){
+        static GaussianProcess instance;
         return instance;
     }
 
@@ -47,17 +47,17 @@ public:
     void reset() override;
 
     /**
-     * Deactivates the GPython class.
+     * Deactivates the GaussianProcess class.
      */
     void deactivate() override;
 
     /**
-     * Activates the GPython class.
+     * Activates the GaussianProcess class.
      */
     void activate() override;
 
     /**
-     * Shuts down the GPython class.
+     * Shuts down the GaussianProcess class.
      */
     void shutDown() override;
 
@@ -83,14 +83,14 @@ public:
     std::vector<int> getSampleIds3d() { return sample_ids_3d_; };
 
 private:
-    GPython();
-    GPython(const GPython &) = delete;
-    GPython &operator=(const GPython &) = delete;
+    GaussianProcess();
+    GaussianProcess(const GaussianProcess &) = delete;
+    GaussianProcess &operator=(const GaussianProcess &) = delete;
 
     void update() override;
 
     /**
-     * Sends a vector of samples to the GPython model via the sample_service_client_.
+     * Sends a vector of samples to the GaussianProcess model via the sample_service_client_.
      * @param samples The vector of samples to send.
      */
     void addSamplesToModel(const std::vector<SampleGP> &samples);
@@ -135,4 +135,4 @@ private:
     std::vector<double> update_sizes_;
 };
 
-#endif //RADIATION_MAPPING_GP_PY_MANAGER_H
+#endif //RADIATION_MAPPING_GAUSSIAN_PROCESS_H

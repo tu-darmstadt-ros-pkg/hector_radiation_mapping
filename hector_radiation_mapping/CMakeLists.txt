@@ -52,9 +52,9 @@ add_executable(radiation_mapping_node
         src/marker/marker_trajectory.cpp
         src/hector_radiation_mapping/radiation_mapping_node.cpp
         src/hector_radiation_mapping/sampleManager.cpp
-        src/models/gp_py/gpython.cpp
-        src/models/gp_py/gpython2D.cpp
-        src/models/gp_py/gpython3D.cpp
+        src/models/gaussian_process/gaussian_process.cpp
+        src/models/gaussian_process/gaussian_process_2d.cpp
+        src/models/gaussian_process/gaussian_process_3d.cpp
         src/models/model_manager.cpp
         src/models/model_exporter.cpp
         src/models/model.cpp
