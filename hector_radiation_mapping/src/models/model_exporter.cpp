@@ -3,9 +3,9 @@
 
 #include "models/model_exporter.h"
 #include "models/model_manager.h"
-#include "models/gpython/gaussian_process.h"
-#include "models/gpython/gaussian_process_3d.h"
-#include "models/gpython/gaussian_process_2d.h"
+#include "models/gaussian_process/gaussian_process.h"
+#include "models/gaussian_process/gaussian_process_3d.h"
+#include "models/gaussian_process/gaussian_process_2d.h"
 #include "maps/pointcloud3d.h"
 #include "util/color.h"
 #include "util/parameters.h"

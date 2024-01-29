@@ -2,9 +2,9 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <cstdlib>
 
-#include "models/gpython/gaussian_process.h"
-#include "models/gpython/gaussian_process_2d.h"
-#include "models/gpython/gaussian_process_3d.h"
+#include "models/gaussian_process/gaussian_process.h"
+#include "models/gaussian_process/gaussian_process_2d.h"
+#include "models/gaussian_process/gaussian_process_3d.h"
 #include "util/parameters.h"
 #include "util/dddynamic_reconfigure.h"
 #include "util/util.h"

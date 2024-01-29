@@ -2,7 +2,7 @@
 #include "util/dddynamic_reconfigure.h"
 #include "hector_radiation_mapping/sampleManager.h"
 #include "models/model_manager.h"
-#include "models/gpython/gaussian_process_3d.h"
+#include "models/gaussian_process/gaussian_process_3d.h"
 
 GaussianProcess3D::GaussianProcess3D() {
     group_name_ = GaussianProcess::instance().getShortModelName();

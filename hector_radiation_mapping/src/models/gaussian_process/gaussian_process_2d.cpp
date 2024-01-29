@@ -1,5 +1,5 @@
-#include "models/gpython/gaussian_process_2d.h"
-#include "models/gpython/gaussian_process_3d.h"
+#include "models/gaussian_process//gaussian_process_2d.h"
+#include "models/gaussian_process/gaussian_process_3d.h"
 #include "models/model_exporter.h"
 #include "hector_radiation_mapping/sampleManager.h"
 #include "util/parameters.h"
