@@ -1,0 +1,11 @@
+<launch>
+	<rosparam command="load" ns="hector_radiation_mapping" file="$(find hector_radiation_mapping)/config/params.yaml" />
+
+	<node name="hector_radiation_mapping" pkg="hector_radiation_mapping" type="radiation_mapping_node" output="screen">
+	
+        <param name="mode" value="0" type="int" /> <!-- MODE: 0 = normal, 1 = test-->
+        <param name="message_key_rate" value="rate" type="string" />
+        <param name="subscribe_topic" value="/radiation_sensor_emulator/radiation" type="string" />
+	<param name="enable_online_3d_evaluation" value="true" type="bool" />
+	</node>
+</launch>

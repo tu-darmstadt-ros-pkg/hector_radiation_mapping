@@ -103,9 +103,11 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate
 
     if(!Parameters::instance().enable_spatial_sample_filtering){
         double min_dist2 = 0.2 * 0.2;
+        /*
         if (samples_.empty() || (sample.position_ - getLastSamplePos()).squaredNorm() > min_dist2 || sample.doseRate_ > 20.0) {
             addSample(sample);
-        }
+        }*/
+        addSample(sample);
         return;
     }
 

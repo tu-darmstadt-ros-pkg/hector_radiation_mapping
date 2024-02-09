@@ -49,6 +49,7 @@ void FieldPropagation::evaluate(Matrix &positions) {
     grid_map::Matrix &layer_mean_confidence = (grid_map_->getGridMapRef())[layer_name_mean_confidence_];
 
     Eigen::Matrix<Vector2d, Eigen::Dynamic, Eigen::Dynamic> gradients(layer_mean.rows(), layer_mean.cols());
+    Eigen::Matrix<Vector2d, Eigen::Dynamic, Eigen::Dynamic> entropy(layer_mean.rows(), layer_mean.cols());
     std::vector<Eigen::Vector2i> current_layer;
 
     // 4.1 Field Estimation
@@ -185,7 +186,6 @@ void FieldPropagation::evaluate(Matrix &positions) {
 
                 float contribution = 0.0;
                 float weight = 0.0;
-                int num_weights = 0;
                 float sum_weights = 0.0;
                 Eigen::Vector2d gradient(0, 0);
                 for (const Eigen::Vector2i &neighbour: neighbours) {
@@ -193,7 +193,6 @@ void FieldPropagation::evaluate(Matrix &positions) {
                     int n_col = neighbour.y();
 
                     if(layer_prop_order(n_row, n_col) < (float)order){
-                        num_weights++;
                         weight = layer_prop_mean_confidence(n_row, n_col);
                         contribution += weight * (layer_prop_mean(n_row, n_col) +
                                 (row - n_row) * prop_gradients(n_row, n_col).x() * resolution +
@@ -203,10 +202,8 @@ void FieldPropagation::evaluate(Matrix &positions) {
                     }
                 }
                 layer_prop_mean_confidence(row, col) = sum_weights / (float)neighbours.size();
-
-                sum_weights = (float)neighbours.size() - (float)num_weights + sum_weights;
                 layer_prop_mean(row, col) = std::max(0.0f, contribution / sum_weights);
-                prop_gradients(row, col) = gradient / sum_weights;
+                prop_gradients(row, col) = 0.8 * gradient / sum_weights;
             }
         }
         order++;
