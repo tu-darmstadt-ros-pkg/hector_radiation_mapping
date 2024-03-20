@@ -39,7 +39,7 @@ background_radiation_cps: 0.0 # per second
 # *** GAUSSIAN PROCESS ***
 ##########################
 
-gp_on_start_up: false
+gp_on_start_up: true
 
 # *** Source prediciton***
 # Potential sources need to be at least meanFactor times stronger than the mean value of all measurements
@@ -96,7 +96,7 @@ bi_on_start_up: false
 bi_circle_radius: 5.0 # meter
 bi_min_update_time: 1000 # milliseconds
 bi_grid_map_topic: "/grid_map_bi"
-bi_grid_map_resolution: 0.1 # meter
+bi_grid_map_resolution: 0.2 # meter
 
 ##########################
 # *** FIELD PROPAGATION ***
@@ -107,3 +107,21 @@ fp_circle_radius: 5.0 # meter
 fp_min_update_time: 1000 # milliseconds
 fp_grid_map_topic: "/grid_map_fp"
 fp_grid_map_resolution: 0.1 # meter
+
+##########################
+# *** TRIANGULATION ***
+##########################
+
+tr_on_start_up: true
+tr_circle_radius: 5.0 # meter
+tr_min_update_time: 100 # milliseconds
+tr_grid_map_topic: "/grid_map_tr"
+tr_grid_map_resolution: 0.1 # meter
+
+##########################
+# *** EXPLORATION ***
+##########################
+
+exploration_grid_map_topic: "/grid_map_exploration"
+exploration_grid_map_resolution: 0.5 # meter
+exploration_automated: true

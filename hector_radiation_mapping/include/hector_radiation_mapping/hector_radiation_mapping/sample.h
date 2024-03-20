@@ -12,10 +12,10 @@ struct Sample{
     Sample(Eigen::Vector3d position, double cps, double doseRate, ros::Time time){
         this->position_ = position;
         this->cps_ = cps;
-        this->doseRate_ = doseRate;
+        this->dose_rate_ = doseRate;
         this->time_ = time;
-        this->id_ = idCounter_++;
-        this->effective_radius_ = std::sqrt(doseRate_ / 0.01);
+        this->id_ = id_counter_++;
+        this->effective_radius_ = std::sqrt(dose_rate_ / 0.01);
     }
 
     Sample(){};
@@ -34,13 +34,13 @@ struct Sample{
 
     Eigen::Vector3d position_;
     double cps_;
-    double doseRate_;
+    double dose_rate_;
     ros::Time time_;
     int id_;
     double effective_radius_;
 
 private:
-    inline static int idCounter_ = 0;
+    inline static int id_counter_ = 0;
 };
 
 #endif //RADIATION_MAPPING_SAMPLE_H

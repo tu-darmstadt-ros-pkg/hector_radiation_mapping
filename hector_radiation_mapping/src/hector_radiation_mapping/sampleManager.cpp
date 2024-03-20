@@ -3,6 +3,10 @@
 #include "hector_radiation_mapping/sample.h"
 #include "util/parameters.h"
 #include "models/model_manager.h"
+#include "exploration/exploration.h"
+
+namespace bg = boost::geometry;
+namespace bgi = boost::geometry::index;
 
 SampleManager::SampleManager() {
     // Fix topic name if necessary
@@ -99,12 +103,12 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate
     double adj_cps = fmax(cps - background_radiation_cps_, 0.0);
     double adj_dose_rate = fmax(dose_rate - background_radiation_dose_rate_, 0.0);
     Sample sample(pos, adj_cps, adj_dose_rate, time);
-    ROS_INFO_STREAM("Received sample with dose rate " << sample.doseRate_ << " at [" << pos.x() << ", " << pos.y() << ", " << pos.z() << "].\n");
+    ROS_INFO_STREAM("Received sample with dose rate " << sample.dose_rate_ << " at [" << pos.x() << ", " << pos.y() << ", " << pos.z() << "].\n");
 
-    if(!Parameters::instance().enable_spatial_sample_filtering){
+    if(Parameters::instance().enable_spatial_sample_filtering){
         double min_dist2 = 0.2 * 0.2;
         /*
-        if (samples_.empty() || (sample.position_ - getLastSamplePos()).squaredNorm() > min_dist2 || sample.doseRate_ > 20.0) {
+        if (samples_.empty() || (sample.position_ - getLastSamplePos()).squaredNorm() > min_dist2 || sample.dose_rate_ > 20.0) {
             addSample(sample);
         }*/
         addSample(sample);
@@ -152,26 +156,22 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate
 }
 
 void SampleManager::addSample(Sample &sample) {
+    Exploration::instance().addSampleLocation(sample.get2DPos());
+
     samples_.push_back(sample);
+    rtree_.insert(sample);
 
     // Position with 2 decimals
     double pos_x = round(sample.position_[0] * 100) / 100;
     double pos_y = round(sample.position_[1] * 100) / 100;
     double pos_z = round(sample.position_[2] * 100) / 100;
-    ROS_INFO_STREAM("Added sample with dose rate " << sample.doseRate_ << " " << Parameters::instance().radiation_unit
-                            << " at [" << pos_x << ", " << pos_y << ", " << pos_z << "].\n");
+    ROS_INFO_STREAM("Added sample with dose rate " << sample.dose_rate_ << " " << Parameters::instance().radiation_unit
+                                                   << " at [" << pos_x << ", " << pos_y << ", " << pos_z << "].\n");
 
     // Add sample to radiation models
     for (const auto &model: ModelManager::instance().getModels()) {
         model->addSample(sample);
     }
-
-    /*
-    boost::geometry::index::rtree<Sample, boost::geometry::index::quadratic<4>> rtree;
-    for (const Sample &sample: samples_) {
-        rtree.insert(sample);
-    }
-    */
 }
 
 void SampleManager::updateTrajectory(const double &value, const Eigen::Vector3d &position) {
@@ -185,32 +185,24 @@ Eigen::Vector3d SampleManager::getLastSamplePos() {
     return samples_.back().position_;
 }
 
-std::vector<Sample> SampleManager::getSamplesWithinRadius(const Eigen::Vector3d &position, double radius) {
-    std::vector<Sample> in_sphere;
-    double radius2 = radius * radius;
-    for (const Sample &sample: samples_) {
-        if ((position - sample.position_).squaredNorm() < radius2) {
-            in_sphere.push_back(sample);
-        }
-    }
-    return in_sphere;
+std::vector<Sample> SampleManager::getSamplesWithinRadius(const Eigen::Vector3d &position, double radius2) {
+    std::vector<Sample> result_rtree;
+    rtree_.query(bgi::satisfies([&position, radius2](const Sample &s) {
+        return (position - s.position_).squaredNorm() < radius2;
+    }), std::back_inserter(result_rtree));
+    return result_rtree;
 }
 
-
-std::vector<Sample> SampleManager::getSamplesWithinRadius(const Vector2d &position, double radius) {
-    std::vector<Sample> in_sphere;
-    double radius2 = radius * radius;
-    for (const Sample &sample: samples_) {
-        if ((position - sample.get2DPos()).squaredNorm() < radius2) {
-            in_sphere.push_back(sample);
-        }
-    }
-    return in_sphere;
+std::vector<Sample> SampleManager::getSamplesWithinRadius(const Vector2d &position, double radius2) {
+    std::vector<Sample> result_rtree;
+    rtree_.query(bgi::satisfies([&position, radius2](const Sample &s) {
+        return (position - s.get2DPos()).squaredNorm() < radius2;
+    }), std::back_inserter(result_rtree));
+    return result_rtree;
 }
-
 
 Sample SampleManager::getNearestSample(const Eigen::Vector3d &position) {
-    double min_dist = DBL_MAX;
+    auto min_dist = DBL_MAX;
     Sample nearest_sample;
     for (const Sample &sample: samples_) {
         double dist = (position - sample.position_).squaredNorm();
@@ -232,7 +224,7 @@ Sample SampleManager::getMeanSample(const std::vector<Sample> &samples, bool wei
     for (const Sample &sample: samples) {
         mean_pos = mean_pos + weight * sample.position_;
         mean_cps = mean_cps + weight * sample.cps_;
-        mean_dose_rate = mean_dose_rate + weight * sample.doseRate_;
+        mean_dose_rate = mean_dose_rate + weight * sample.dose_rate_;
         total_weight += weight;
         //weight += 0.5;
     }
@@ -279,4 +271,57 @@ void SampleManager::reset() {
     background_radiation_cps_ = 0.0;
     background_radiation_dose_rate_ = 0.0;
     trajectory_marker_->reset();
+}
+
+std::vector<Sample> SampleManager::getLatestSamples(int num_samples) {
+    if (samples_.size() < num_samples) {
+        return samples_;
+    }
+    return std::vector<Sample>(samples_.end() - num_samples, samples_.end());
+}
+
+Vector2d SampleManager::getRadiationGradient(const Vector2d &position, double radius) {
+    std::vector<Sample> samples = SampleManager::instance().getSamplesWithinRadius(position, radius * radius);
+    if (samples.size() <= 2) {
+        return {0, 0};
+    }
+
+    // Construct X_ijk and S_ijk
+    Eigen::MatrixX3d X_ijk;// N rows x 3 cols
+    X_ijk.resize(samples.size(), Eigen::NoChange);
+    Vector S_ijk(samples.size()); // N rows x 1 col
+    Vector2d avg_pos(0, 0);
+    for (int i = 0; i < samples.size(); ++i) {
+        // extend sample pos 2d with 1 for 3D
+        avg_pos += samples[i].position_.topRows(2);
+        X_ijk.row(i) = Vector3d(samples[i].position_.x(), samples[i].position_.y(), 1).transpose();
+        S_ijk(i) = samples[i].dose_rate_;
+    }
+    avg_pos /= samples.size();
+    // subtract avg_pos from each row of X_ijk
+    for (int i = 0; i < samples.size(); ++i) {
+        X_ijk.row(i) -= Vector3d(avg_pos.x(), avg_pos.y(), 0).transpose();
+    }
+
+    // Check if determinant of X_ijk_transpose * X_ijk is zero (3x3)
+    Eigen::Matrix3d XtX = X_ijk.transpose() * X_ijk;
+    if (XtX.determinant() != 0) {
+        Vector3d res = XtX.inverse() * X_ijk.transpose() * S_ijk;
+        Vector2d grad = res.topRows(2);
+        // normalize gradient
+        grad.normalize();
+        return grad;
+    }
+    return {0, 0};
+}
+
+double SampleManager::getMinDistanceToAllSamples(const Vector2d& position) {
+    double min_dist = DBL_MAX;
+    for (const Sample &sample: samples_) {
+        double dist = (position - sample.get2DPos()).norm();
+        if (dist < min_dist) {
+            min_dist = dist;
+        }
+    }
+    return min_dist;
 }

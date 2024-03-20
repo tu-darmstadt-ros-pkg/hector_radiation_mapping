@@ -38,6 +38,8 @@ private:
 
     void paramCallback();
 
+    double cumulativePoisson(double lambda, int k);
+
     /**
      * Callback for the slam map.
      * @param gridMsgPtr

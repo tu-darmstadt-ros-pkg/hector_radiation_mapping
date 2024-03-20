@@ -12,7 +12,14 @@ public:
         GAUSSIAN_PROCESS,
         LEAST_SQUARES,
         FIELD_PROPAGATION,
-        BAYESIAN_INFERENCE
+        BAYESIAN_INFERENCE,
+        TRIANGULATION,
+        TRI_RSD,
+        MLE,
+        SPRT,
+        PF,
+        SRD,
+        ROSD_RSD
         // Add more model types here
     };
 
@@ -23,6 +30,13 @@ public:
                 case LEAST_SQUARES: return "LS";
                 case FIELD_PROPAGATION: return "FP";
                 case BAYESIAN_INFERENCE: return "BI";
+                case TRIANGULATION: return "TR";
+                case TRI_RSD: return "TRI";
+                case MLE: return "MLE";
+                case SPRT: return "SPRT";
+                case PF: return "PF";
+                case SRD: return "SRD";
+                case ROSD_RSD: return "ROS";
                 // Add more model types here
                 default: return "UNKNOWN";
             }
@@ -32,6 +46,13 @@ public:
                 case LEAST_SQUARES: return "Least_Squares";
                 case FIELD_PROPAGATION: return "Field_Propagation";
                 case BAYESIAN_INFERENCE: return "Bayesian_Inference";
+                case TRIANGULATION: return "Triangulation";
+                case TRI_RSD: return "Tri_RSD";
+                case MLE: return "Maximum_Likelihood_Estimation";
+                case SPRT: return "Sequential_Probability_Ratio_Test";
+                case PF: return "Particle_Filter";
+                case SRD: return "Source_Attractor_Radiation_Detection";
+                case ROSD_RSD: return "Ratio_of_Squared_Distances_Radiation_Source_Detection";
                 // Add more model types here
                 default: return "UNKNOWN";
             }

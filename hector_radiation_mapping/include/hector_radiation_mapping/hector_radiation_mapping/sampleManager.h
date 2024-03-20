@@ -136,6 +136,8 @@ public:
      */
     Eigen::Vector3d getLastSamplePos();
 
+    std::vector<Sample> getLatestSamples(int num_samples);
+
     /**
      * Get the mean sample of the given samples.
      * @param samples
@@ -159,7 +161,11 @@ public:
      */
     std::vector<Sample> getSamplesNotInIdVector(const std::vector<Sample> &samples, const std::vector<int> &ids);
 
+    Vector2d getRadiationGradient(const Vector2d &position, double radius);
+
     Sample getSampleById(int id);
+
+    double getMinDistanceToAllSamples(const Vector2d& position);
 
 private:
     SampleManager();
@@ -168,7 +174,7 @@ private:
 
     double background_radiation_cps_;
     double background_radiation_dose_rate_;
-
+    boost::geometry::index::rtree<Sample, boost::geometry::index::quadratic<4>> rtree_;
 
     std::vector<Sample> samples_;
     std::vector<Sample> sample_queue_;

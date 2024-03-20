@@ -76,7 +76,7 @@ void FieldPropagation::evaluate(Matrix &positions) {
                 // extend sample pos 2d with 1 for 3D
                 avg_pos += samples[i].position_.topRows(2);
                 X_ijk.row(i) = Vector3d(samples[i].position_.x(), samples[i].position_.y(), 1).transpose();
-                S_ijk(i) = samples[i].doseRate_;
+                S_ijk(i) = samples[i].dose_rate_;
             }
             avg_pos /= samples.size();
             // subtract avg_pos from each row of X_ijk

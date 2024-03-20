@@ -184,7 +184,7 @@ void GaussianProcess::addSamplesToModel(const std::vector<SampleGP> &samples) {
         // create sample message
         hector_radiation_mapping_msgs::Sample sample_msg;
         sample_msg.cps = s.cps_;
-        sample_msg.doseRate = s.doseRate_;
+        sample_msg.doseRate = s.dose_rate_;
         sample_msg.id = s.id_;
         sample_msg.header.stamp = ros::Time::now();
         sample_msg.position.resize(3);

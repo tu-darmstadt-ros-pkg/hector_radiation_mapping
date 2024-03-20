@@ -11,6 +11,8 @@ class GridMap {
 public:
     GridMap(const std::string &name, double resolution, Vector3d origin = Vector3d(0, 0, 0));
 
+    void reset();
+
     /**
      * Publishes the gridMap.
      */
@@ -20,7 +22,7 @@ public:
      * Adds a layer to the grid map with the given name.
      * @param layer_name
      */
-    void addLayer(const std::string &layer_name);
+    void addLayer(const std::string &layer_name, float default_value = std::numeric_limits<float>::quiet_NaN());
 
     /**
      * Updates the layer with the given name with the given values.

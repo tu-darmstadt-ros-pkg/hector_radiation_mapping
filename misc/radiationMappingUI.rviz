@@ -11,7 +11,7 @@ Panels:
         - /PointCloudFilter1/Enable filtering1/Radial Filter1
         - /PointCloudFilter1/Enable filtering1/Z Filter1
       Splitter Ratio: 0.5
-    Tree Height: 919
+    Tree Height: 1014
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -29,7 +29,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloudFilter
+    SyncSource: ""
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -82,6 +82,203 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        arm_link_0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_link_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_link_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_link_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_link_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_link_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rgbd_cam_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_rgbd_cam_mount_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        arm_sensor_box_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_tele_cam_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        arm_tele_cam_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        arm_thermal_cam_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        arm_thermal_cam_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        back_rgbd_cam_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        back_rgbd_cam_mount_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera360_center_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        camera360_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera360_left_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera360_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera360_right_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        chassis_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        flipper_back_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        flipper_back_left_motor_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        flipper_back_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        flipper_back_right_motor_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        flipper_front_left_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        flipper_front_left_motor_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        flipper_front_right_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        flipper_front_right_motor_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        front_rgbd_cam_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_rgbd_cam_mount_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        gripper_servo_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        gripper_tcp_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_finger_end_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        left_finger_middle_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        manipulator_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        navigation_module_lidar_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        navigation_module_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        radeye_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_finger_end_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_finger_middle_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -141,7 +338,7 @@ Visualization Manager:
       Color Layer: error
       Color Transformer: GridMapLayer
       ColorMap: turbo
-      Enabled: true
+      Enabled: false
       Grid Cell Decimation: 1
       Grid Line Thickness: 0.10000000149011612
       Height Layer: elevation
@@ -157,13 +354,13 @@ Visualization Manager:
       Topic: /grid_map_ls
       Unreliable: false
       Use ColorMap: true
-      Value: true
+      Value: false
     - Alpha: 0.6000000238418579
       Autocompute Intensity Bounds: true
       Class: grid_map_rviz_plugin/GridMap
       Color: 200; 200; 200
-      Color Layer: error
-      Color Transformer: GridMapLayer
+      Color Layer: locations
+      Color Transformer: ""
       ColorMap: turbo
       Enabled: true
       Grid Cell Decimation: 1
@@ -178,7 +375,7 @@ Visualization Manager:
       Min Intensity: 0
       Name: GridMap
       Show Grid Lines: false
-      Topic: /grid_map_ls2
+      Topic: /grid_map_exploration
       Unreliable: false
       Use ColorMap: true
       Value: true
@@ -282,7 +479,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 12.780037879943848
+      Distance: 23.622385025024414
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -290,25 +487,25 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 6.562087535858154
-        Y: 5.442893028259277
-        Z: 2.269036293029785
+        X: 1.1758925914764404
+        Y: 0.384694367647171
+        Z: 5.730072975158691
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.879797101020813
+      Pitch: 1.4797964096069336
       Target Frame: <Fixed Frame>
-      Yaw: 5.1971940994262695
+      Yaw: 4.685976028442383
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1308
+  Height: 1403
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002f30000045efc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000045e000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000047efc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000047e000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000a000000005efc0100000002fb0000000800540069006d0065010000000000000a00000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000007070000045e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002f3000004bdfc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000004bd000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f0000047efc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000047e000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006a80000005efc0100000002fb0000000800540069006d00650100000000000006a8000003bc00fffffffb0000000800540069006d00650100000000000004500000000000000000000003af000004bd00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -317,6 +514,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 2560
-  X: 2560
-  Y: 27
+  Width: 1704
+  X: 856
+  Y: 0

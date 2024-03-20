@@ -162,3 +162,30 @@ std::string Util::getUniqueFileName(const std::string& path, const std::string& 
 Vector Util::varianceToStdDeviation(Vector &variance) {
     return variance.array().sqrt();
 }
+
+double Util::circularMean(const std::vector<double>& angles) {
+    double sum_sin = 0.0;
+    double sum_cos = 0.0;
+
+    for (const auto& angle : angles) {
+        sum_sin += std::sin(angle);
+        sum_cos += std::cos(angle);
+    }
+
+    return std::atan2(sum_sin, sum_cos);
+}
+
+double Util::circularVariance(const std::vector<double>& angles, double circularMean) {
+    double sum_diff = 0.0;
+
+    for (const auto& angle : angles) {
+        double diff = std::atan2(std::sin(angle - circularMean), std::cos(angle - circularMean));
+        sum_diff += diff * diff;
+    }
+
+    return sum_diff / angles.size();
+}
+
+double Util::directionToAngle(const Vector2d &direction) {
+    return std::atan2(direction.y(), direction.x());
+}

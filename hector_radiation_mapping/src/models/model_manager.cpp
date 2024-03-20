@@ -7,6 +7,8 @@
 #include "models/least_squares/least_squares.h"
 #include "models/field_propagation/field_propagation.h"
 #include "models/baysian_inference/bayesian_inference.h"
+#include "models/triangulation/triangulation.h"
+#include "models/triangulation/tri_rsd.h"
 #include "models/model_exporter.h"
 #include "models/model.h"
 
@@ -19,8 +21,10 @@ ModelManager::ModelManager() {
     Model &ls = LeastSquares::instance();
     Model &fp = FieldPropagation::instance();
     Model &bi = BayesianInference::instance();
+    Model &tr = Triangulation::instance();
+    Model &tr_rsd = TriRSD::instance();
 
-    models_ = {&ls, &fp, &gp, &bi};
+    models_ = {&ls, &fp, &gp, &bi , &tr, &tr_rsd};
     for (Model *model: models_) {
         bool on_start_up = model->onStartup();
         std::string model_name = model->getModelName();

@@ -19,14 +19,17 @@ find_package(catkin REQUIRED COMPONENTS
         ros_babel_fish
         hector_radiation_mapping_msgs
         ceres_catkin
+        move_base_lite_msgs
         )
 
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Eigen3 REQUIRED)
-find_package(Ceres REQUIRED)
+#find_package(Ceres REQUIRED)
+find_package(GSL REQUIRED)
 
 catkin_package(CATKIN_DEPENDS
-        ceres_catkin)
+        ceres_catkin
+)
 
 include_directories(
         ${catkin_INCLUDE_DIRS}
@@ -66,6 +69,13 @@ add_executable(radiation_mapping_node
         src/models/least_squares/least_squares.cpp
         src/models/field_propagation/field_propagation.cpp
         src/models/baysian_inference/baysian_inference.cpp
+        src/marker/marker_arrow.cpp
+        src/models/triangulation/triangulation.cpp
+        src/models/triangulation/tri_rsd.cpp
+        include/hector_radiation_mapping/util/test.h
+        src/exploration/exploration.cpp
+        src/exploration/exploration_map.cpp
+        src/exploration/exploration_service.cpp
 )
 
 target_precompile_headers(radiation_mapping_node PRIVATE include/pch.h)
@@ -75,6 +85,9 @@ target_link_libraries(radiation_mapping_node
         Qt5::Widgets
         Qt5::Gui
         ${CERES_LIBRARIES}
+        glog
+        GSL::gsl
+        GSL::gslcblas
         )
 
 set_property(TARGET radiation_mapping_node PROPERTY CXX_STANDARD 17)

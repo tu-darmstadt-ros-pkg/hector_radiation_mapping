@@ -13,8 +13,6 @@
 #include "hector_radiation_mapping/source.h"
 #include "hector_radiation_mapping/sampleManager.h"
 
-
-
 ModelExporter::ModelExporter() {
     exporting_ = false;
     geotiff_writer_ = std::make_shared<geotiff::GeotiffWriter>();

@@ -25,13 +25,13 @@ void GridMap::initGridMap(Eigen::Vector3d &origin, double resolution) {
     tmp_map_.setFrameId(Parameters::instance().world_frame);
 }
 
-void GridMap::addLayer(const std::string &layer_name) {
+void GridMap::addLayer(const std::string &layer_name, float default_value) {
     if (existsLayer(layer_name)) {
         STREAM_DEBUG("GridMap: addLayer() Layer name \"" << layer_name << "\" already exists.");
         return;
     }
-    map_.add(layer_name, 0.0);
-    tmp_map_.add(layer_name, 0.0);
+    map_.add(layer_name, default_value);
+    tmp_map_.add(layer_name, default_value);
 }
 
 Matrix GridMap::getSamplePositions(const std::shared_ptr<nav_msgs::OccupancyGrid> &slam_map, bool use_circle, double radius,
@@ -209,6 +209,7 @@ void GridMap::updateGridDimensionWithSlamMap(const std::shared_ptr<nav_msgs::Occ
     tmp_map_.setGeometry(map_size, resolution_, map_position);
     map_.move(map_position);
     map_.extendToInclude(tmp_map_);
+    //map_.addDataFrom(tmp_map_, true, false, true);
 
     int map_width = map_.getSize()(0);
     int map_height = map_.getSize()(1);
@@ -218,22 +219,24 @@ void GridMap::updateGridDimensionWithSlamMap(const std::shared_ptr<nav_msgs::Occ
     top_ = map_height - top * ratio;
     bottom_ = map_height - bottom * ratio;
 
+    /*
     // get lengths from left_ right_ and top_ bottom_ and set map size
-    ROS_INFO_STREAM("GRIDMAP TEST: ");
     grid_map::Index sub_map_start_index(0, 0);
     grid_map::Size sub_map_buffer_size(left_ - right_, top_ - bottom_);
 
     grid_map::GridMap tmp_map;
 
     tmp_map_.setGeometry(map_size * 0.5, resolution_, map_position);
-    ROS_INFO_STREAM("GRIDMAP TEST: ");
     tmp_map_.addDataFrom(tmp_map_, false, true, true);
-    ROS_INFO_STREAM("GRIDMAP TEST: ");
     tmp_map_.setFrameId(Parameters::instance().world_frame);
-    map_ = tmp_map_;
-    ROS_INFO_STREAM("GRIDMAP TEST: ");
+    map_ = tmp_map_;*/
     //const grid_map::Length mapLength(1,1);
     //bool success;
     //map_ = map_.getSubmap(map_position, mapLength, sub_map_start_index, success);
     //ROS_INFO_STREAM("GRIDMAP TEST: " <<success << " " << map_.getLength().x() << " " << map_.getLength().y() << " " << sub_map_start_index.x() << " " << sub_map_start_index.y() << " " << sub_map_buffer_size.x() << " " << sub_map_buffer_size.y());
+}
+
+void GridMap::reset() {
+    map_.clearAll();
+    tmp_map_.clearAll();
 }

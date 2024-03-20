@@ -115,6 +115,9 @@ public:
      */
     static Vector varianceToStdDeviation(Vector &variance);
 
+    static double directionToAngle(const Eigen::Vector2d& direction);
+    static double circularMean(const std::vector<double>& angles);
+    static double circularVariance(const std::vector<double>& angles, double circularMean);
 private:
     Util() = default;
 };

@@ -81,17 +81,33 @@ public:
      */
     virtual void deleteMarker();
 
+    Vector3d getPos() const;
+
 protected:
     Marker();
 
     int id_;
     inline static int idCounter_ = 0;
     visualization_msgs::Marker marker_;
+    Vector3d pos_;
 };
 
 class SphereMarker : public Marker {
 public:
     explicit SphereMarker(const Eigen::Vector3d &origin = {0, 0, 0}, const Eigen::Vector4d &color = {0.0, 1.0, 0.0, 1.0});
+};
+
+class ArrowMarker : public Marker {
+public:
+    explicit ArrowMarker(const Eigen::Vector3d &origin = {0, 0, 0}, const Eigen::Vector3d &direction = {1, 0, 0},
+                         const Eigen::Vector4d &color = {1.0, 1.0, 1.0, 1.0});
+
+    /**
+     * Set the direction of the arrow. The direction is published if publish is true.
+     * @param direction vector with x, y and z value of direction
+     * @param publish publish the marker if true
+     */
+    void setDirection(const Eigen::Vector3d &direction, bool publish = true);
 };
 
 class TextMarker : public Marker {

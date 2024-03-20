@@ -6,6 +6,10 @@
         <param name="mode" value="0" type="int" /> <!-- MODE: 0 = normal, 1 = test-->
         <param name="message_key_rate" value="rate" type="string" />
         <param name="subscribe_topic" value="/radiation_sensor_emulator/radiation" type="string" />
-	<param name="enable_online_3d_evaluation" value="true" type="bool" />
+        <param name="enable_online_3d_evaluation" value="false" type="bool" />
+	</node>
+
+	<rosparam command="load" ns="radiation_sensor_emulator" file="$(find radiation_sensor_emulator)/config/params.yaml" />
+	<node name="radiation_sensor_emulator" pkg="radiation_sensor_emulator" type="radiation_sensor_emulator_node" output="screen">
 	</node>
 </launch>

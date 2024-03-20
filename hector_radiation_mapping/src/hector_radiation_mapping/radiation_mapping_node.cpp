@@ -5,6 +5,7 @@
 #include "util/parameters.h"
 #include "util/dddynamic_reconfigure.h"
 #include "marker/marker_manager.h"
+#include "exploration/exploration.h"
 
 RadiationMapper::RadiationMapper() {
     sys_cmd_sub_ = ros::Subscriber(
@@ -16,7 +17,9 @@ RadiationMapper::RadiationMapper() {
     DDDynamicReconfigure::instance();
     MarkerManager::instance();
     SampleManager::instance();
+    Exploration::instance();
     ModelManager::instance();
+
 
     STREAM("hector_radiation_mapping node initialized!");
     ros::MultiThreadedSpinner spinner(Parameters::instance().ros_spinner_threads);

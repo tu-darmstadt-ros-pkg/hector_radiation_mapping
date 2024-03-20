@@ -22,9 +22,11 @@
 #include <visualization_msgs/Marker.h>
 #include <grid_map_ros/grid_map_ros.hpp>
 #include <grid_map_msgs/GridMap.h>
+#include "move_base_lite_msgs/MoveBaseAction.h"
+#include "move_base_lite_msgs/ExploreAction.h"
+#include <actionlib/client/simple_action_client.h>
 
-
-
+#include "util/test.h"
 #include "util/clock.h"
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;

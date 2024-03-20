@@ -77,6 +77,17 @@ public:
     std::string fp_grid_map_topic;
     double fp_grid_map_resolution;
 
+    // Triangulation
+    bool tr_on_start_up;
+    double tr_circle_radius;
+    int tr_min_update_time;
+    std::string tr_grid_map_topic;
+    double tr_grid_map_resolution;
+
+    // Exploration
+    std::string exploration_grid_map_topic;
+    double exploration_grid_map_resolution;
+    bool exploration_automated;
 private:
 
     // templated method for loading a parameter from the parameter server
@@ -160,6 +171,18 @@ private:
         loadParam("fp_min_update_time", fp_min_update_time);
         loadParam("fp_grid_map_topic", fp_grid_map_topic);
         loadParam("fp_grid_map_resolution", fp_grid_map_resolution);
+
+        // Triangulation
+        loadParam("tr_on_start_up", tr_on_start_up);
+        loadParam("tr_circle_radius", tr_circle_radius);
+        loadParam("tr_min_update_time", tr_min_update_time);
+        loadParam("tr_grid_map_topic", tr_grid_map_topic);
+        loadParam("tr_grid_map_resolution", tr_grid_map_resolution);
+
+        // Exploration
+        loadParam("exploration_grid_map_topic", exploration_grid_map_topic);
+        loadParam("exploration_grid_map_resolution", exploration_grid_map_resolution);
+        loadParam("exploration_automated", exploration_automated);
 
         // Set use_dose_rate to true, if message_key_rate is set
         use_dose_rate = !message_key_rate.empty();

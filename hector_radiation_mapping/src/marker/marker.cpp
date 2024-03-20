@@ -74,3 +74,7 @@ void Marker::setScale(const Eigen::Vector3d &scale, bool publish) {
     marker_.scale.z = scale.z();
     if (publish) { MarkerManager::instance().publishMarker(marker_); }
 }
+
+Vector3d Marker::getPos() const {
+    return {marker_.pose.position.x, marker_.pose.position.y, marker_.pose.position.z};
+}
