@@ -5,7 +5,7 @@
 #include "util/parameters.h"
 #include "util/dddynamic_reconfigure.h"
 #include "marker/marker_manager.h"
-#include "exploration/exploration.h"
+#include "exploration/exploration_manager.h"
 
 RadiationMapper::RadiationMapper() {
     sys_cmd_sub_ = ros::Subscriber(
@@ -17,9 +17,8 @@ RadiationMapper::RadiationMapper() {
     DDDynamicReconfigure::instance();
     MarkerManager::instance();
     SampleManager::instance();
-    Exploration::instance();
     ModelManager::instance();
-
+    ExplorationManager::instance();
 
     STREAM("hector_radiation_mapping node initialized!");
     ros::MultiThreadedSpinner spinner(Parameters::instance().ros_spinner_threads);
@@ -32,26 +31,29 @@ void RadiationMapper::sigintHandler(int sig) {
     MarkerManager::instance().deleteAllMarkers();
     MarkerManager::instance().deleteAllInteractiveMarkers();
     ModelManager::instance().shutDown();
+    ExplorationManager::instance().shutdown();
     DDDynamicReconfigure::instance().reset();
     ros::shutdown();
 }
 
 bool RadiationMapper::resetServiceCallback(hector_radiation_mapping_msgs::ResetService::Request &req,
                                            hector_radiation_mapping_msgs::ResetService::Response &res) {
-    ModelManager::instance().resetModels();
-    SampleManager::instance().reset();
-    MarkerManager::instance().deleteAllMarkers();
-    MarkerManager::instance().deleteAllInteractiveMarkers();
+    reset();
     return true;
 }
 
 void RadiationMapper::sysCmdCallback(const std_msgs::String_<std::allocator<void>>::ConstPtr &msg) {
     if (msg->data == "reset") {
-        ModelManager::instance().resetModels();
-        SampleManager::instance().reset();
-        MarkerManager::instance().deleteAllMarkers();
-        MarkerManager::instance().deleteAllInteractiveMarkers();
+        reset();
     }
+}
+
+void RadiationMapper::reset() {
+    ModelManager::instance().resetModels();
+    SampleManager::instance().reset();
+    MarkerManager::instance().deleteAllMarkers();
+    MarkerManager::instance().deleteAllInteractiveMarkers();
+    ExplorationManager::instance().reset();
 }
 
 int main(int argc, char **argv) {

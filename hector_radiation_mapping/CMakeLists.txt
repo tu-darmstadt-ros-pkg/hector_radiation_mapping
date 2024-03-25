@@ -73,7 +73,7 @@ add_executable(radiation_mapping_node
         src/models/triangulation/triangulation.cpp
         src/models/triangulation/tri_rsd.cpp
         include/hector_radiation_mapping/util/test.h
-        src/exploration/exploration.cpp
+        src/exploration/exploration_manager.cpp
         src/exploration/exploration_map.cpp
         src/exploration/exploration_service.cpp
 )

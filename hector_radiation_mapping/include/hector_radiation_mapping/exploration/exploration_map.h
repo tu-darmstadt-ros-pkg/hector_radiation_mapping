@@ -6,17 +6,26 @@
 
 class ExplorationMap {
 public:
-    struct Location{
-        double min_distance_;
+    struct SensorLocation{
+        Vector2d position_;
+        u_int id_;
+        double min_distance_ = DBL_MAX;
+        bool explored_ = false;
+        bool reachable_ = true;
+    };
+
+    struct BaseLocation{
         Vector2d position_;
         u_int id_;
     };
 
     enum TRAVERSEABILITY {
-        OCCUPIED = 1,
-        FREE = 0,
-        UNKNOWN = -1,
-        UNREACHABLE = 2
+        OCCUPIED = 0,
+        FREE = 1,
+        EXPLORED = 2,
+        NONE = -1,
+        UNKNOWN = -2,
+        UNREACHABLE = -3
     };
 
     /**
@@ -29,9 +38,20 @@ public:
     }
 
     void reset();
+    void shutdown();
 
-    void addSampleLocation(const Vector2d &pos);
-    Vector2d getClosestLocation(const Vector2d &pos);
+    void addSampleLocation(const Vector2d &sensor_position, const Vector2d &base_position);
+
+    bool getClosestSensorLocation(const Vector2d &pos, Vector2d &closest_location);
+    bool getClosestBaseLocation(const Vector2d &pos, Vector2d &closest_location);
+
+    bool hasLocations() {
+        return !sensor_locations_.empty();
+    }
+
+    void setLocationExplored(Vector2d &pos, bool explored);
+    void setLocationReachable(Vector2d &pos, bool reachable);
+    void updateExplorationMap();
 
 private:
     ExplorationMap();
@@ -44,28 +64,24 @@ private:
      */
     void slamMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &grid_msg_ptr);
 
-    void updateLoop();
-    void addLocation(const Vector2d& pos, grid_map::Matrix &locations, grid_map::Index &index);
-    void removeLocation(grid_map::Matrix &locations, grid_map::Index &index);
-    void removeLocation(u_int id, grid_map::Matrix &locations);
-    void updateExplorationMap(std::vector<Vector2d> &new_sample_locations);
+    void addLocation(const Vector2d& pos, grid_map::Matrix &sensor_locations, grid_map::Matrix &base_locations, grid_map::Index &index, bool base);
+    void removeLocation(grid_map::Matrix &sensor_locations, grid_map::Matrix &base_locations, grid_map::Index &index);
 
-    std::string layer_name_locations_;
+    std::string layer_name_sensor_locations_;
+    std::string layer_name_base_locations_;
     std::string layer_name_traverseability_;
     std::shared_ptr<GridMap> grid_map_;
     std::shared_ptr<nav_msgs::OccupancyGrid> slam_map_;
     std::shared_ptr<ros::Subscriber> slam_map_subscriber_;
 
-    std::map<u_int, Location> locations_map_;
+    std::map<u_int, SensorLocation> sensor_locations_;
+    std::map<u_int, BaseLocation> base_locations_;
+    std::mutex locations_mutex_;
     u_int id_counter_ = 0;
 
-    std::thread update_thread_;
-    std::mutex update_mutex_;
     std::mutex sample_mutex_;
-    std::condition_variable update_condition_;
-
-    std::vector<Vector2d> new_sample_locations_;
+    std::vector<Vector2d> new_sensor_locations_;
+    std::vector<Vector2d> new_base_locations_;
 };
-
 
 #endif //HECTOR_RADIATION_MAPPING_EXPLORATION_MAP_H

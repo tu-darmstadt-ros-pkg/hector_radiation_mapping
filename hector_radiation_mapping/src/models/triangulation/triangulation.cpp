@@ -32,6 +32,8 @@ Triangulation::Triangulation() : Model(ModelType::TRIANGULATION, Parameters::ins
     DDDynamicReconfigure::instance().registerVariable<bool>(getShortModelName() + "_eval_error_map", false,
                                                             boost::bind(&Triangulation::useErrorMap, this, _1), "on/off",
                                                             false, true, getShortModelName());
+
+    /*
     Clock clock;
     clock.tick();
     double A1;
@@ -44,6 +46,7 @@ Triangulation::Triangulation() : Model(ModelType::TRIANGULATION, Parameters::ins
     ROS_INFO_STREAM(one  << " A1: " << A1 << " A2: " << A2 << " time ms: " << clock.tock());
     bool two = Test::calculateA12(A1, A2,  x1, y1, x2, y2, 1.9, 1.9, 1.0, -1.9, 0.9, 1.0, 0.7, 1.2, 1.0);
     ROS_INFO_STREAM(two << " A1: " << A1 << " A2: " << A2 << " time ms: " << clock.tock());
+    */
 }
 
 void Triangulation::reset() {
@@ -74,7 +77,7 @@ void Triangulation::update() {
 }
 
 void Triangulation::updateSourcePrediction() {
-    Eigen::Vector3d t = samples_.back().position_;
+    Eigen::Vector3d t = samples_.back().sensor_position_;
     Eigen::Vector3d minPos = nelderMeadMinimization(t);
     ROS_INFO_STREAM("neldermead completed");
     Source source(minPos, calculateSourceValue(minPos), calculateSourceValue(minPos));
@@ -187,7 +190,7 @@ double Triangulation::error(const Sample &sample1, const Sample &sample2, const 
     double val1 = Parameters::instance().use_dose_rate ? sample1.dose_rate_ : sample1.cps_;
     double val2 = Parameters::instance().use_dose_rate ? sample2.dose_rate_ : sample2.cps_;
     return pow(
-            val1 * (sample1.position_ - posSource).squaredNorm() - val2 * (sample2.position_ - posSource).squaredNorm(),
+            val1 * (sample1.sensor_position_ - posSource).squaredNorm() - val2 * (sample2.sensor_position_ - posSource).squaredNorm(),
             2);
 }
 
@@ -245,7 +248,7 @@ double Triangulation::calculateSourceValue(const Eigen::Vector3d &position) {
 
     listSDistVal.reserve(samples_.size());
     for (Sample &sample: samples_) {
-        listSDistVal.emplace_back((sample.position_ - position).squaredNorm(),
+        listSDistVal.emplace_back((sample.sensor_position_ - position).squaredNorm(),
                                   (Parameters::instance().use_dose_rate ? sample.dose_rate_ : sample.cps_));
     }
     auto sortByDistance = [](const std::tuple<double, double> &i1, const std::tuple<double, double> &i2) {

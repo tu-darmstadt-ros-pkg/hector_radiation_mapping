@@ -11,5 +11,6 @@
 
 	<rosparam command="load" ns="radiation_sensor_emulator" file="$(find radiation_sensor_emulator)/config/params.yaml" />
 	<node name="radiation_sensor_emulator" pkg="radiation_sensor_emulator" type="radiation_sensor_emulator_node" output="screen">
+
 	</node>
 </launch>

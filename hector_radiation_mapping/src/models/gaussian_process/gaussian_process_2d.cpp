@@ -150,7 +150,7 @@ void GaussianProcess2D::updateSourcePrediction(const Matrix &positions, const Ve
 
     std::vector<Sample> samples = SampleManager::instance().getSamples();
     for (const Sample &sample: samples) {
-        pos_3d = sample.position_;
+        pos_3d = sample.sensor_position_;
         if (!grid_map_->isInside(pos_3d.topRows(dim))) {
             continue;
         }

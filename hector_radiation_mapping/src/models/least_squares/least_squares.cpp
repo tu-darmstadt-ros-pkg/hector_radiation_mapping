@@ -4,7 +4,7 @@
 #include "util/dddynamic_reconfigure.h"
 #include "hector_radiation_mapping/sampleManager.h"
 #include <ceres/ceres.h>
-#include "exploration/exploration.h"
+#include "exploration/exploration_manager.h"
 #include "glog/logging.h"
 
 LeastSquares::LeastSquares() : Model(ModelType::LEAST_SQUARES, Parameters::instance().ls_on_start_up,
@@ -31,6 +31,9 @@ LeastSquares::LeastSquares() : Model(ModelType::LEAST_SQUARES, Parameters::insta
                                                            0, 2000, getShortModelName());
 
     google::InitGoogleLogging("least_squares");
+
+    result_ = nullptr;
+    new_result_ = nullptr;
     gradient_marker_ = ArrowMarker(Vector3d(0.0, 0.0, 0.0), Vector3d(1.0, 1.0, 0.0));
 }
 
@@ -64,17 +67,18 @@ void LeastSquares::update() {
     for (TextMarker text_marker: text_markers_) {
         text_marker.deleteMarker();
     }
+
+    new_result_ = std::make_shared<Result>();
     createMinMarkers(center, grid_map_ref, (grid_map_ref)[layer_name_error_latest_], {0.0, 0.0, 1.0, 1.0});
-    new_result_.latest_minima.emplace_back(text_markers_.back().getPos().topRows(2));
+    new_result_->latest_minima.emplace_back(text_markers_.back().getPos().topRows(2));
     createMinMarkers(center, grid_map_ref, (grid_map_ref)[layer_name_error_radius_], {0.0, 1.0, 0.0, 1.0});
-    new_result_.radius_minima.emplace_back(text_markers_.back().getPos().topRows(2));
+    new_result_->radius_minima.emplace_back(text_markers_.back().getPos().topRows(2));
     // get last text marker
 
-    //Exploration::instance().moveBase(text_markers_.back().getPos().topRows(2));
+    //ExplorationManager::instance().moveBase(text_markers_.back().getPos().topRows(2));
 
     //createMinMarkers(center, grid_map_ref, (grid_map_ref)[layer_name_error_], {1.0, 0.0, 0.0, 1.0});
     //evaluate();
-
 
     {
         std::lock_guard<std::mutex> result_lock{result_mutex_};
@@ -283,7 +287,7 @@ void LeastSquares::createMinMarkers(const Vector2d &center, const grid_map::Grid
     text_markers_.push_back(text_marker);
 }
 
-LeastSquares::Result LeastSquares::getResult() {
+std::shared_ptr<LeastSquares::Result> LeastSquares::getResult() {
     std::lock_guard<std::mutex> lock{result_mutex_};
     return result_;
 }

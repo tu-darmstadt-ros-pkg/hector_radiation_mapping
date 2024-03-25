@@ -188,9 +188,9 @@ void GaussianProcess::addSamplesToModel(const std::vector<SampleGP> &samples) {
         sample_msg.id = s.id_;
         sample_msg.header.stamp = ros::Time::now();
         sample_msg.position.resize(3);
-        sample_msg.position[0] = s.position_[0];
-        sample_msg.position[1] = s.position_[1];
-        sample_msg.position[2] = s.position_[2];
+        sample_msg.position[0] = s.sensor_position_[0];
+        sample_msg.position[1] = s.sensor_position_[1];
+        sample_msg.position[2] = s.sensor_position_[2];
         sample_msg.for2d = add2d;
         sample_msg.for3d = add3d;
         samples_msg.samples.push_back(sample_msg);

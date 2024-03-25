@@ -81,7 +81,7 @@ public:
      */
     void reset() override;
 
-    Result getResult();
+    std::shared_ptr<LeastSquares::Result> getResult();
 
 private:
     LeastSquares();
@@ -132,8 +132,8 @@ private:
     std::shared_ptr<ros::Subscriber> slam_map_subscriber_;
 
     std::mutex result_mutex_;
-    Result result_;
-    Result new_result_;
+    std::shared_ptr<Result> result_;
+    std::shared_ptr<Result> new_result_;
 };
 
 #endif //RADIATION_MAPPING_LEAST_SQUARES_H

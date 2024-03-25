@@ -78,8 +78,8 @@ void TriRSD::evaluate() {
                 double x2;
                 double y2;
                 if(Test::calculateA12(I1, I2, x1, y1, x2, y2, s1.dose_rate_, s2.dose_rate_, s3.dose_rate_,
-                                      s1.position_.x(), s2.position_.x(), s3.position_.x(),
-                                      s1.position_.y(), s2.position_.y(), s3.position_.y())){
+                                      s1.sensor_position_.x(), s2.sensor_position_.x(), s3.sensor_position_.x(),
+                                      s1.sensor_position_.y(), s2.sensor_position_.y(), s3.sensor_position_.y())){
                     //ROS_INFO_STREAM("TriRSD: A12" << I1 << " " << I2 << " " << x1 << " " << y1 << " " << x2 << " " << y2);
                     // check for nan
                     if(I1 != I1 || I2 != I2 || x1 != x1 || y1 != y1 || x2 != x2 || y2 != y2){

@@ -3,7 +3,7 @@
 #include "hector_radiation_mapping/sample.h"
 #include "util/parameters.h"
 #include "models/model_manager.h"
-#include "exploration/exploration.h"
+#include "exploration/exploration_map.h"
 
 namespace bg = boost::geometry;
 namespace bgi = boost::geometry::index;
@@ -45,7 +45,6 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
     ROS_INFO_STREAM("Received dose rate " << dose_rate << " " << Parameters::instance().radiation_unit << ".\n");
     double cps = -1;
     std::string frame_id = compound["header"][key_frame_id].value<std::string>();
-
     try {
         cps = compound[key_cps].value<float>();
     } catch (...) {
@@ -53,38 +52,45 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
     }
 
     try {
-        geometry_msgs::Transform trans = tf_buffer_.lookupTransform("world", frame_id, ros::Time(0),
+        geometry_msgs::Transform sensor_trans = tf_buffer_.lookupTransform("world", frame_id, ros::Time(0),
+                                                                           ros::Duration(1)).transform;
+        geometry_msgs::Transform base_trans = tf_buffer_.lookupTransform("world", Parameters::instance().robot_base_frame, ros::Time(0),
                                                                     ros::Duration(1)).transform;
-        Eigen::Vector3d pos(trans.translation.x, trans.translation.y, trans.translation.z);
 
-        updateTrajectory(Parameters::instance().use_dose_rate ? dose_rate : cps, pos);
+        Eigen::Vector3d sensor_pos(sensor_trans.translation.x, sensor_trans.translation.y, sensor_trans.translation.z);
+        Eigen::Vector3d base_pos(base_trans.translation.x, base_trans.translation.y, base_trans.translation.z);
+
+        updateTrajectory(Parameters::instance().use_dose_rate ? dose_rate : cps, sensor_pos);
 
         static bool calculated_background_radiation = Parameters::instance().background_radiation_dose_rate_set;
         if (!calculated_background_radiation) {
             static std::vector<double> cps_vec;
             static std::vector<double> dose_rate_vec;
-            static std::vector<Eigen::Vector3d> pos_vec;
+            static std::vector<Vector3d> sensor_pos_vec;
+            static std::vector<Vector3d> base_pos_vec;
             static std::vector<ros::Time> time_vec;
             cps_vec.push_back(cps);
             dose_rate_vec.push_back(dose_rate);
-            pos_vec.push_back(pos);
+            sensor_pos_vec.push_back(sensor_pos);
+            base_pos_vec.push_back(base_pos);
             time_vec.push_back(ros::Time::now());
             background_radiation_cps_ += cps / 10.0;
             background_radiation_dose_rate_ += dose_rate / 10.0;
 
             if (cps_vec.size() >= 10) {
                 for (int i = 0; i < cps_vec.size(); i++) {
-                    processSampleData(pos_vec[i], cps_vec[i], dose_rate_vec[i], time_vec[i]);
+                    processSampleData(sensor_pos_vec[i], base_pos_vec[i], cps_vec[i], dose_rate_vec[i], time_vec[i]);
                 }
                 cps_vec.clear();
                 dose_rate_vec.clear();
-                pos_vec.clear();
+                sensor_pos_vec.clear();
+                base_pos_vec.clear();
                 time_vec.clear();
                 calculated_background_radiation = true;
             }
         } else {
             ROS_INFO_STREAM("Received dose rate2 " << dose_rate << " " << Parameters::instance().radiation_unit << ".\n");
-            processSampleData(pos, cps, dose_rate, ros::Time::now());
+            processSampleData(sensor_pos, base_pos, cps, dose_rate, ros::Time::now());
         }
 
         //double time = sample.time_.toSec() - Parameters::instance().startTime_;
@@ -97,18 +103,17 @@ void SampleManager::doseCallbackFish(const ros_babel_fish::BabelFishMessage::Con
     }
 }
 
-
-void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate, ros::Time time) {
+void SampleManager::processSampleData(Vector3d sensor_position, Vector3d base_position, double cps, double dose_rate, ros::Time time) {
     /// Get background radiation from average of first few samples
     double adj_cps = fmax(cps - background_radiation_cps_, 0.0);
     double adj_dose_rate = fmax(dose_rate - background_radiation_dose_rate_, 0.0);
-    Sample sample(pos, adj_cps, adj_dose_rate, time);
-    ROS_INFO_STREAM("Received sample with dose rate " << sample.dose_rate_ << " at [" << pos.x() << ", " << pos.y() << ", " << pos.z() << "].\n");
+    Sample sample(sensor_position, base_position, adj_cps, adj_dose_rate, time);
+    ROS_INFO_STREAM("Received sample with dose rate " << sample.dose_rate_ << " at [" << sensor_position.x() << ", " << sensor_position.y() << ", " << sensor_position.z() << "].\n");
 
     if(Parameters::instance().enable_spatial_sample_filtering){
         double min_dist2 = 0.2 * 0.2;
         /*
-        if (samples_.empty() || (sample.position_ - getLastSamplePos()).squaredNorm() > min_dist2 || sample.dose_rate_ > 20.0) {
+        if (samples_.empty() || (sample.sensor_position_ - getLastSamplePos()).squaredNorm() > min_dist2 || sample.dose_rate_ > 20.0) {
             addSample(sample);
         }*/
         addSample(sample);
@@ -123,7 +128,7 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate
     }
     else {
         /// if position has changed considerably, add new sample and the mean of the old ones that are left in the Queue
-        if((sample.position_ - sample_queue_.back().position_).squaredNorm() > dist_cutoff2) {
+        if((sample.sensor_position_ - sample_queue_.back().sensor_position_).squaredNorm() > dist_cutoff2) {
             Sample mean_sample = getMeanSample(sample_queue_, false);
             for(int i = 0; i < ceil((double)sample_queue_.size() / 5.0); i++){
                 addSample(mean_sample);
@@ -138,7 +143,7 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate
             double max_dist, dist_sqr = 0.0;
             for(int i = 0; i < sample_queue_.size() - 1; ++i) {
                 for(int j = i + 1; j < sample_queue_.size(); j++){
-                    dist_sqr = (sample_queue_[i].position_ - sample_queue_[j].position_).squaredNorm();
+                    dist_sqr = (sample_queue_[i].sensor_position_ - sample_queue_[j].sensor_position_).squaredNorm();
                     if(dist_sqr > max_dist){
                         max_dist = dist_sqr;
                     }
@@ -156,15 +161,15 @@ void SampleManager::processSampleData(Vector3d pos, double cps, double dose_rate
 }
 
 void SampleManager::addSample(Sample &sample) {
-    Exploration::instance().addSampleLocation(sample.get2DPos());
+    ExplorationMap::instance().addSampleLocation(sample.get2DPos());
 
     samples_.push_back(sample);
     rtree_.insert(sample);
 
     // Position with 2 decimals
-    double pos_x = round(sample.position_[0] * 100) / 100;
-    double pos_y = round(sample.position_[1] * 100) / 100;
-    double pos_z = round(sample.position_[2] * 100) / 100;
+    double pos_x = round(sample.sensor_position_[0] * 100) / 100;
+    double pos_y = round(sample.sensor_position_[1] * 100) / 100;
+    double pos_z = round(sample.sensor_position_[2] * 100) / 100;
     ROS_INFO_STREAM("Added sample with dose rate " << sample.dose_rate_ << " " << Parameters::instance().radiation_unit
                                                    << " at [" << pos_x << ", " << pos_y << ", " << pos_z << "].\n");
 
@@ -182,13 +187,13 @@ Eigen::Vector3d SampleManager::getLastSamplePos() {
     if (samples_.empty()) {
         return {-DBL_MAX, -DBL_MAX, -DBL_MAX};
     }
-    return samples_.back().position_;
+    return samples_.back().sensor_position_;
 }
 
 std::vector<Sample> SampleManager::getSamplesWithinRadius(const Eigen::Vector3d &position, double radius2) {
     std::vector<Sample> result_rtree;
     rtree_.query(bgi::satisfies([&position, radius2](const Sample &s) {
-        return (position - s.position_).squaredNorm() < radius2;
+        return (position - s.sensor_position_).squaredNorm() < radius2;
     }), std::back_inserter(result_rtree));
     return result_rtree;
 }
@@ -205,7 +210,7 @@ Sample SampleManager::getNearestSample(const Eigen::Vector3d &position) {
     auto min_dist = DBL_MAX;
     Sample nearest_sample;
     for (const Sample &sample: samples_) {
-        double dist = (position - sample.position_).squaredNorm();
+        double dist = (position - sample.sensor_position_).squaredNorm();
         if (dist < min_dist) {
             min_dist = dist;
             nearest_sample = sample;
@@ -215,25 +220,28 @@ Sample SampleManager::getNearestSample(const Eigen::Vector3d &position) {
 }
 
 Sample SampleManager::getMeanSample(const std::vector<Sample> &samples, bool weighted) {
-    Eigen::Vector3d mean_pos(0.0, 0.0, 0.0);
+    Vector3d mean_sensor_pos(0.0, 0.0, 0.0);
+    Vector3d mean_base_pos(0.0, 0.0, 0.0);
     double mean_cps = 0.0;
     double mean_dose_rate = 0.0;
     double weight = 1.0;
     double total_weight = 0.0;
 
     for (const Sample &sample: samples) {
-        mean_pos = mean_pos + weight * sample.position_;
+        mean_sensor_pos = mean_sensor_pos + weight * sample.sensor_position_;
+        mean_base_pos = mean_base_pos + weight * sample.base_position_;
         mean_cps = mean_cps + weight * sample.cps_;
         mean_dose_rate = mean_dose_rate + weight * sample.dose_rate_;
         total_weight += weight;
         //weight += 0.5;
     }
 
-    mean_pos /= total_weight;
+    mean_sensor_pos /= total_weight;
+    mean_base_pos /= total_weight;
     mean_cps /= total_weight;
     mean_dose_rate /= total_weight;
 
-    Sample combined_sample(mean_pos, mean_cps, mean_dose_rate, ros::Time::now());
+    Sample combined_sample(mean_sensor_pos, mean_base_pos, mean_cps, mean_dose_rate, ros::Time::now());
     return combined_sample;
 }
 
@@ -293,8 +301,8 @@ Vector2d SampleManager::getRadiationGradient(const Vector2d &position, double ra
     Vector2d avg_pos(0, 0);
     for (int i = 0; i < samples.size(); ++i) {
         // extend sample pos 2d with 1 for 3D
-        avg_pos += samples[i].position_.topRows(2);
-        X_ijk.row(i) = Vector3d(samples[i].position_.x(), samples[i].position_.y(), 1).transpose();
+        avg_pos += samples[i].sensor_position_.topRows(2);
+        X_ijk.row(i) = Vector3d(samples[i].sensor_position_.x(), samples[i].sensor_position_.y(), 1).transpose();
         S_ijk(i) = samples[i].dose_rate_;
     }
     avg_pos /= samples.size();

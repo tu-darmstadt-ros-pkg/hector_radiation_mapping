@@ -16,6 +16,7 @@ enable_spatial_sample_filtering: false
 export_path: "/../exports/"
 # The name of the world frame
 world_frame: "world"
+robot_base_frame: "base_link"
 
 # *** ROS topics ***
 # The topic on which the radiation measurements are published
@@ -125,3 +126,6 @@ tr_grid_map_resolution: 0.1 # meter
 exploration_grid_map_topic: "/grid_map_exploration"
 exploration_grid_map_resolution: 0.5 # meter
 exploration_automated: true
+exploration_move_base_client: "/move_base"
+exploration_explore_client: "/explore"
+exploration_timeout: 5 # seconds

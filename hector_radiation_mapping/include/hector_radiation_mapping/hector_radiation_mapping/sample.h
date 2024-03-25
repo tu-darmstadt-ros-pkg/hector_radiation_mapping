@@ -1,6 +1,8 @@
 #ifndef RADIATION_MAPPING_SAMPLE_H
 #define RADIATION_MAPPING_SAMPLE_H
 
+#include <utility>
+
 #include "pch.h"
 
 /**
@@ -9,8 +11,9 @@
  * It also contains a timestamp. The id is used to identify the sample.
  */
 struct Sample{
-    Sample(Eigen::Vector3d position, double cps, double doseRate, ros::Time time){
-        this->position_ = position;
+    Sample(Vector3d sensor_position, Vector3d base_position, double cps, double doseRate, ros::Time time){
+        this->sensor_position_ = std::move(sensor_position);
+        this->base_position_ = std::move(base_position);
         this->cps_ = cps;
         this->dose_rate_ = doseRate;
         this->time_ = time;
@@ -24,15 +27,18 @@ struct Sample{
      * Get the 2D position of the sample
      * @return 2D position of the sample
      */
-    Eigen::Vector2d get2DPos() const {return {position_.x(), position_.y()};};
+    Vector2d get2DPos() const {return {sensor_position_.x(), sensor_position_.y()};};
+
+    Vector3d getBase2DPos() const {return {base_position_.x(), base_position_.y(), 0.0};};
 
     /**
      * Get the 3D position of the sample with z = 0
      * @return 3D position of the sample with z = 0
      */
-    Eigen::Vector3d get3DzZero(){return {position_.x(), position_.y(), 0.0};};
+    Vector3d get3DzZero(){return {sensor_position_.x(), sensor_position_.y(), 0.0};};
 
-    Eigen::Vector3d position_;
+    Vector3d sensor_position_;
+    Vector3d base_position_;
     double cps_;
     double dose_rate_;
     ros::Time time_;

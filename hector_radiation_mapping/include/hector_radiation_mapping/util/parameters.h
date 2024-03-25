@@ -19,6 +19,7 @@ public:
     bool enable_online_3d_evaluation;
     std::string export_path;
     std::string world_frame;
+    std::string robot_base_frame;
     bool enable_spatial_sample_filtering;
     double background_radiation_dose_rate;
     double background_radiation_cps;
@@ -84,10 +85,13 @@ public:
     std::string tr_grid_map_topic;
     double tr_grid_map_resolution;
 
-    // Exploration
+    // ExplorationManager
     std::string exploration_grid_map_topic;
     double exploration_grid_map_resolution;
     bool exploration_automated;
+    std::string exploration_move_base_client;
+    std::string exploration_explore_client;
+    double exploration_timeout;
 private:
 
     // templated method for loading a parameter from the parameter server
@@ -117,6 +121,7 @@ private:
         loadParam("enable_spatial_sample_filtering", enable_spatial_sample_filtering);
         loadParam("export_path", export_path);
         loadParam("world_frame", world_frame);
+        loadParam("robot_base_frame", robot_base_frame);
         background_radiation_dose_rate_set = loadParam("background_radiation_dose_rate", background_radiation_dose_rate);
         background_radiation_cps_set = loadParam("background_radiation_cps", background_radiation_cps);
 
@@ -179,10 +184,13 @@ private:
         loadParam("tr_grid_map_topic", tr_grid_map_topic);
         loadParam("tr_grid_map_resolution", tr_grid_map_resolution);
 
-        // Exploration
+        // ExplorationManager
         loadParam("exploration_grid_map_topic", exploration_grid_map_topic);
         loadParam("exploration_grid_map_resolution", exploration_grid_map_resolution);
         loadParam("exploration_automated", exploration_automated);
+        loadParam("exploration_move_base_client", exploration_move_base_client);
+        loadParam("exploration_explore_client", exploration_explore_client);
+        loadParam("exploration_timeout", exploration_timeout);
 
         // Set use_dose_rate to true, if message_key_rate is set
         use_dose_rate = !message_key_rate.empty();

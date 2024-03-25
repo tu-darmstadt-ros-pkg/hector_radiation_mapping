@@ -35,6 +35,7 @@ public:
      */
     static void sysCmdCallback(const std_msgs::String::ConstPtr &msg);
 
+    static void reset();
 private:
 
     ros::ServiceServer reset_service_;

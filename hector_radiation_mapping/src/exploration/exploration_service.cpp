@@ -1,22 +1,75 @@
 #include "exploration/exploration_service.h"
 #include "util/parameters.h"
-#include "exploration/exploration.h"
 
 ExplorationService::ExplorationService() :
-        move_base_client_("/move_base", true),
-        explore_client_("/explore", true) {
-    move_base_client_.waitForServer();
-    explore_client_.waitForServer();
+        move_base_client_(Parameters::instance().exploration_move_base_client, true),
+        explore_client_(Parameters::instance().exploration_explore_client, true) {
     latest_result_ = RESULT::NONE;
-    STREAM("Exploration clients initialized.");
+    connectToServices();
+}
+
+bool ExplorationService::connectToServices(){
+    ros::Duration timeout(5);
+    if (!move_base_client_.waitForServer(timeout)) {
+        ROS_ERROR("Cannot connect to move_base action server.");
+        return false;
+    }
+    if (!explore_client_.waitForServer(timeout)) {
+        ROS_ERROR("Cannot connect to explore action server.");
+        return false;
+    }
+    return true;
+}
+
+bool ExplorationService::isConnected() {
+    bool connected = true;
+    if (!move_base_client_.isServerConnected()) {
+        connected = false;
+        ROS_ERROR("Move base action server not connected.");
+    }
+    if (!explore_client_.isServerConnected()) {
+        connected = false;
+        ROS_ERROR("Explore action server not connected.");
+    }
+    return connected;
+}
+
+void ExplorationService::waitForConnection() {
+    if(!ExplorationService::instance().isConnected()){
+        if (move_base_client_.isServerConnected()) {
+            move_base_client_.cancelAllGoals();
+        }
+        if (explore_client_.isServerConnected()) {
+            explore_client_.cancelAllGoals();
+        }
+        while(ros::ok() && !ExplorationService::instance().connectToServices()){
+            ROS_ERROR("Could not connect to exploration services. Exploration not active.");
+        }
+    }
+}
+
+void ExplorationService::shutdown() {
+    move_base_client_.cancelAllGoals();
+    explore_client_.cancelAllGoals();
 }
 
 void ExplorationService::reset() {
     move_base_client_.cancelAllGoals();
     explore_client_.cancelAllGoals();
+    latest_result_ = RESULT::NONE;
+    connectToServices();
 }
 
-void ExplorationService::moveBase(Vector2d pos) {
+void ExplorationService::cancel() {
+    move_base_client_.cancelAllGoals();
+    explore_client_.cancelAllGoals();
+}
+
+ExplorationService::RESULT ExplorationService::getLatestResult() {
+    return latest_result_;
+}
+
+bool ExplorationService::moveBase(Vector2d pos, double timeout, double pos_tolerance) {
     move_base_lite_msgs::MoveBaseGoal goal;
     goal.target_pose.header.frame_id = Parameters::instance().world_frame; // world?
     goal.target_pose.header.stamp = ros::Time::now();
@@ -24,17 +77,20 @@ void ExplorationService::moveBase(Vector2d pos) {
     goal.target_pose.pose.position.y = pos.y();
 
     goal.follow_path_options.goal_pose_angle_tolerance = M_PI;
-    goal.follow_path_options.goal_pose_position_tolerance = 0.2;
+    goal.follow_path_options.goal_pose_position_tolerance = pos_tolerance;
     goal.follow_path_options.use_path_orientation = true;
     goal.follow_path_options.reverse_allowed = true;
 
+    waitForConnection();
+    latest_result_ = TIMEOUT;
     move_base_client_.sendGoal(goal, boost::bind(&ExplorationService::moveBaseDoneCb, this, _1, _2),
                                boost::bind(&ExplorationService::moveBaseActiveCb, this),
                                boost::bind(&ExplorationService::moveBaseFeedbackCb, this, _1));
     STREAM("Move base goal sent.");
+    return move_base_client_.waitForResult(ros::Duration(timeout));
 }
 
-void ExplorationService::moveBase(Vector2d pos, double orientation) {
+void ExplorationService::moveBase(Vector2d pos, double orientation, double timeout, double pos_tolerance, double orientation_tolerance) {
 
 }
 
@@ -42,6 +98,8 @@ void ExplorationService::explore() {
     move_base_lite_msgs::ExploreGoal goal;
     goal.reset_stuck_history = true;
     goal.desired_speed = 0.5;
+
+    waitForConnection();
     explore_client_.sendGoal(goal, boost::bind(&ExplorationService::exploreDoneCb, this, _1, _2),
                              boost::bind(&ExplorationService::exploreActiveCb, this),
                              boost::bind(&ExplorationService::exploreFeedbackCb, this, _1));
@@ -53,7 +111,6 @@ void ExplorationService::moveBaseDoneCb(const actionlib::SimpleClientGoalState &
     ROS_INFO("Finished in state [%s]", state.toString().c_str());
     move_base_lite_msgs::ErrorCodes error;
     latest_result_ = reinterpretResult(result->result);
-    Exploration::instance().explore();
 }
 
 void ExplorationService::moveBaseActiveCb() {
@@ -68,7 +125,6 @@ void ExplorationService::exploreDoneCb(const actionlib::SimpleClientGoalState &s
                                 const move_base_lite_msgs::ExploreResultConstPtr &result) {
     ROS_INFO("Finished in state [%s]", state.toString().c_str());
     latest_result_ = reinterpretResult(result->result);
-    Exploration::instance().explore();
 }
 
 void ExplorationService::exploreActiveCb() {
@@ -112,13 +168,4 @@ ExplorationService::RESULT ExplorationService::reinterpretResult(const move_base
         default:
             return RESULT::ABORTED;
     }
-}
-
-void ExplorationService::cancel() {
-    move_base_client_.cancelAllGoals();
-    explore_client_.cancelAllGoals();
-}
-
-ExplorationService::RESULT ExplorationService::getLatestResult() {
-    return latest_result_;
 }

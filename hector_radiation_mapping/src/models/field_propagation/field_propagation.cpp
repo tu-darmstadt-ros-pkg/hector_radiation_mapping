@@ -74,8 +74,8 @@ void FieldPropagation::evaluate(Matrix &positions) {
             Vector2d avg_pos(0, 0);
             for (int i = 0; i < samples.size(); ++i) {
                 // extend sample pos 2d with 1 for 3D
-                avg_pos += samples[i].position_.topRows(2);
-                X_ijk.row(i) = Vector3d(samples[i].position_.x(), samples[i].position_.y(), 1).transpose();
+                avg_pos += samples[i].sensor_position_.topRows(2);
+                X_ijk.row(i) = Vector3d(samples[i].sensor_position_.x(), samples[i].sensor_position_.y(), 1).transpose();
                 S_ijk(i) = samples[i].dose_rate_;
             }
             avg_pos /= samples.size();

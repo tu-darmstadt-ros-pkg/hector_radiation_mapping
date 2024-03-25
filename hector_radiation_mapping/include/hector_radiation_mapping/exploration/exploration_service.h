@@ -11,6 +11,7 @@ public:
     enum RESULT {
         SUCCESS = 1,
         ABORTED = 2,
+        TIMEOUT = 3,
         NONE = 0
     };
 
@@ -27,11 +28,15 @@ public:
      * Resets.
      */
     void reset();
+    void shutdown();
 
-    void moveBase(Vector2d pos);
-    void moveBase(Vector2d pos, double orientation);
+    bool moveBase(Vector2d pos, double timeout, double pos_tolerance);
+    void moveBase(Vector2d pos, double orientation, double timeout, double pos_tolerance, double orientation_tolerance);
     void explore();
     void cancel();
+    bool connectToServices();
+    bool isConnected();
+    void waitForConnection();
 
     RESULT getLatestResult();
 private:
@@ -52,7 +57,6 @@ private:
 
     MoveBaseClient move_base_client_;
     ExploreClient explore_client_;
-
     RESULT latest_result_;
 };
 

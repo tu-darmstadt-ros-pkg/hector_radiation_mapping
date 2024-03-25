@@ -36,20 +36,20 @@ namespace boost {
 
             template <>
             struct access<Sample, 0> {
-                static double get(Sample const& p) { return p.position_(0); }
-                static void set(Sample& p, double const& value) { p.position_(0) = value; }
+                static double get(Sample const& p) { return p.sensor_position_(0); }
+                static void set(Sample& p, double const& value) { p.sensor_position_(0) = value; }
             };
 
             template <>
             struct access<Sample, 1> {
-                static double get(Sample const& p) { return p.position_(1); }
-                static void set(Sample& p, double const& value) { p.position_(1) = value; }
+                static double get(Sample const& p) { return p.sensor_position_(1); }
+                static void set(Sample& p, double const& value) { p.sensor_position_(1) = value; }
             };
 
             template <>
             struct access<Sample, 2> {
-                static double get(Sample const& p) { return p.position_(2); }
-                static void set(Sample& p, double const& value) { p.position_(2) = value; }
+                static double get(Sample const& p) { return p.sensor_position_(2); }
+                static void set(Sample& p, double const& value) { p.sensor_position_(2) = value; }
             };
         }  // namespace traits
     }  // namespace geometry
@@ -81,7 +81,7 @@ public:
      * Processes the given sample. It adds the sample to the sample queue and updates the background radiation.
      * @param newSample The sample to process.
      */
-    void processSampleData(Vector3d pos, double cps, double dose_rate, ros::Time time);
+    void processSampleData(Vector3d sensor_position, Vector3d base_position, double cps, double dose_rate, ros::Time time);
 
     /**
      * Adds the given sample to the radiation models.
