@@ -29,7 +29,7 @@ struct Sample{
      */
     Vector2d get2DPos() const {return {sensor_position_.x(), sensor_position_.y()};};
 
-    Vector3d getBase2DPos() const {return {base_position_.x(), base_position_.y(), 0.0};};
+    Vector2d getBase2DPos() const {return {base_position_.x(), base_position_.y()};};
 
     /**
      * Get the 3D position of the sample with z = 0

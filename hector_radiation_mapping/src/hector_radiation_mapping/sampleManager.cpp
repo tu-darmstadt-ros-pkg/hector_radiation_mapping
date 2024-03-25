@@ -161,7 +161,7 @@ void SampleManager::processSampleData(Vector3d sensor_position, Vector3d base_po
 }
 
 void SampleManager::addSample(Sample &sample) {
-    ExplorationMap::instance().addSampleLocation(sample.get2DPos());
+    ExplorationMap::instance().addSampleLocation(sample.get2DPos(), sample.getBase2DPos());
 
     samples_.push_back(sample);
     rtree_.insert(sample);
