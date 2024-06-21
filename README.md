@@ -111,13 +111,15 @@ in another terminal window, before launching the Radiation Mapping node.
 
 ## Paper 
 
-Thank you for citing [Paper Link coming soon! (SSRR-2023)]() if you use any of this code. 
+Thank you for citing our [SSRR 2023 Paper](https://ieeexplore.ieee.org/abstract/document/10499940) if you use any of this code. 
 
 
 ```latex
-@INPROCEEDINGS{suess_radiation_mapping,
-  author={Suess, Jonas and Volz, Martin and Daun, Kevin and von Stryk, Oskar},
+@INPROCEEDINGS{10499940,
+  author={SüB, Jonas and Volz, Martin and Daun, Kevin and von Stryk, Oskar},
   booktitle={2023 IEEE International Symposium on Safety, Security, and Rescue Robotics (SSRR)}, 
   title={Online 2D-3D Radiation Mapping and Source Localization using Gaussian Processes with Mobile Ground Robots}, 
-  year={2023}}
+  year={2023},
+  pages={39-46},
+  doi={10.1109/SSRR59696.2023.10499940}}
 ```
